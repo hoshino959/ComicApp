@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "478802217841",
+    "project_id": "comicapp-294f7",
+    "storage_bucket": "comicapp-294f7.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:478802217841:android:356da6b8d305ae75c944d0",
+        "android_client_info": {
+          "package_name": "com.example.comic_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA-IC0pfGGOIp-PGlvhfTFkxZMqaTKrv-U"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
