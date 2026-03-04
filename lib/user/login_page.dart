@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:comic_app/screens/main_screen.dart';
 import 'package:comic_app/theme/app_dark_colors.dart';
 import 'package:comic_app/theme/app_light_colors.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
@@ -596,6 +597,11 @@ class LoginPageState extends State<LoginPage> {
                                                 ),
                                               ),
                                             );
+                                            setState(() {
+                                              isForgot = false;
+                                              isLogin = true;
+                                              emailController.clear();
+                                            });
                                           } on FirebaseAuthException catch (e) {
                                             ScaffoldMessenger.of(
                                               context,
@@ -705,6 +711,8 @@ class LoginPageState extends State<LoginPage> {
                                                 return;
                                               } else {
                                                 try {
+                                                  // UserCredential
+                                                  // userCredential =
                                                   await FirebaseAuth.instance
                                                       .createUserWithEmailAndPassword(
                                                         email: emailController
@@ -714,7 +722,24 @@ class LoginPageState extends State<LoginPage> {
                                                             .text
                                                             .trim(),
                                                       );
-
+                                                  // User? user =
+                                                  //     userCredential.user;
+                                                  // if (user != null) {
+                                                  //   await FirebaseFirestore
+                                                  //       .instance
+                                                  //       .collection('Users')
+                                                  //       .doc(user.uid)
+                                                  //       .set({
+                                                  //         'uid': user.uid,
+                                                  //         'email':
+                                                  //             emailController
+                                                  //                 .text
+                                                  //                 .trim(),
+                                                  //         'password':
+                                                  //             passController
+                                                  //                 .text,
+                                                  //       });
+                                                  // }
                                                   ScaffoldMessenger.of(
                                                     context,
                                                   ).showSnackBar(
@@ -731,14 +756,29 @@ class LoginPageState extends State<LoginPage> {
                                                 } on FirebaseAuthException catch (
                                                   e
                                                 ) {
+                                                  String message;
+                                                  switch (e.code) {
+                                                    case 'email-already-in-use':
+                                                      message =
+                                                          'Email đã được sử dụng';
+                                                      break;
+                                                    case 'invalid-email':
+                                                      message =
+                                                          'Email không hợp lệ';
+                                                      break;
+                                                    case 'weak-password':
+                                                      message =
+                                                          'Mật khẩu quá yếu';
+                                                      break;
+                                                    default:
+                                                      message =
+                                                          'Đã có lỗi xảy ra, vui lòng thử lại';
+                                                  }
                                                   ScaffoldMessenger.of(
                                                     context,
                                                   ).showSnackBar(
                                                     SnackBar(
-                                                      content: Text(
-                                                        e.message ??
-                                                            "Đăng ký thất bại",
-                                                      ),
+                                                      content: Text(message),
                                                     ),
                                                   );
                                                 }

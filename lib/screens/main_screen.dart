@@ -1,5 +1,6 @@
 import 'package:comic_app/theme/app_colors.dart';
 import 'package:comic_app/screens/home_screen.dart';
+import 'package:comic_app/user/user_screen.dart';
 import 'package:flutter/material.dart';
 
 class MainScreen extends StatefulWidget {
@@ -16,7 +17,7 @@ class _MainScreenState extends State<MainScreen> {
     const HomeScreen(),
     const Text('Màn hình Tìm kiếm'),
     const Text('Màn hình Thông báo'),
-    const Text('Màn hình Cá nhân'),
+    const UserScreen(),
   ];
 
   void _onItemTapped(int index) {
@@ -28,14 +29,10 @@ class _MainScreenState extends State<MainScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
-        child: _widgetOptions.elementAt(_selectedIndex),
-      ),
+      body: Center(child: _widgetOptions.elementAt(_selectedIndex)),
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
-        backgroundColor: Theme.of(
-          context,
-        ).scaffoldBackgroundColor,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         selectedItemColor: AppColors.primaryPink,
         unselectedItemColor: Colors.grey,
         selectedFontSize: 12,

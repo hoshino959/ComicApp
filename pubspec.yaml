@@ -39,6 +39,7 @@ dependencies:
   cloud_firestore: ^6.1.2
   carousel_slider: ^5.1.2
   smooth_page_indicator: ^2.0.1
+  okcolor: ^1.0.1
 
 dev_dependencies:
   flutter_test:

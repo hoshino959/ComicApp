@@ -1,4 +1,4 @@
-import 'package:comic_app/login_page.dart';
+import 'package:comic_app/user/login_page.dart';
 import 'package:comic_app/theme/app_colors.dart';
 import 'package:comic_app/screens/main_screen.dart';
 import 'package:comic_app/theme/app_dark_colors.dart';
