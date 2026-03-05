@@ -1,3 +1,5 @@
+import 'package:comic_app/api/api_service.dart';
+import 'package:comic_app/models/comic_model';
 import 'package:comic_app/theme/app_colors.dart';
 import 'package:comic_app/widgets/comic_card.dart';
 import 'package:flutter/material.dart';
@@ -12,16 +14,37 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  final List<String> imgList = [
-    'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTNzf3PVejSbptxE9nbN5Ck0Zow95zjzbQihQ&s',
-  ];
-
   int _currentIndex = 0;
+  bool _isLoading = true; // Thêm trạng thái loading
 
   final CarouselSliderController _carouselController =
       CarouselSliderController();
 
-  final List<int> _dummyList = [1, 2, 3, 4, 5];
+  List<ComicModel>? comics;
+
+  @override
+  void initState() {
+    fetchComics();
+    super.initState();
+  }
+
+  void fetchComics() async {
+    try {
+      final result =
+          await ApiService.fetchRecentlyUpdatedComics();
+      if (!mounted) return;
+      setState(() {
+        comics = result;
+        _isLoading = false;
+      });
+    } catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _isLoading = false;
+      });
+      debugPrint('Error fetching comics: $e');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -29,109 +52,112 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: AppBar(
         leading: Padding(
           padding: const EdgeInsets.fromLTRB(15, 8, 0, 8),
-          child: Image.network(
-            'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTnYT0cIjOVWd50zJP4yav9d0Uko3kS1f1-fQ&s',
-          ),
+          child: Image.asset('assets/images/logo.png'),
         ),
-        title: Text(
-          'YURINEKO',
-          style: TextStyle(letterSpacing: 3),
-        ),
+        title: Text('Comic Garden'),
       ),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          CarouselSlider(
-            options: CarouselOptions(
-              height: 150,
-              autoPlay: true,
-              enlargeCenterPage: true,
-              viewportFraction: 1,
+      body: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Image.network(
+              'https://scontent.fsgn5-5.fna.fbcdn.net/v/t39.30808-6/623426145_1407740497394126_4920768692675398143_n.jpg?_nc_cat=108&ccb=1-7&_nc_sid=b895b5&_nc_ohc=N2Jbt0WABU8Q7kNvwHwX_S9&_nc_oc=Admwok3cU2hnrTA2093NgoxUURapScRx0I3bgLje-kH87IFSdWMSNQeHfvF3DIVsjdw&_nc_zt=23&_nc_ht=scontent.fsgn5-5.fna&_nc_gid=TLKuWd02XB_1R9tUnCPDaQ&_nc_ss=8&oh=00_AfyPmpx3AWj9A3YcsEeTpUPWPA4UmKpOSsdCmXjq_vG9xA&oe=69AEBD21',
             ),
-            items: imgList
-                .map(
-                  (item) => Image.network(
-                    item,
-                    fit: BoxFit.cover,
-                    width: 1000,
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 20,
+                    horizontal: 20,
                   ),
-                )
-                .toList(),
-          ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Padding(
-                padding: const EdgeInsets.symmetric(
-                  vertical: 20,
-                  horizontal: 20,
-                ),
-                child: Text(
-                  '◈ Random Yuri ◈',
-                  style: TextStyle(
-                    color: AppColors.secondaryPink,
-                    fontSize: 25,
-                  ),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                ),
-                child: CarouselSlider(
-                  carouselController: _carouselController,
-                  options: CarouselOptions(
-                    height: 320,
-                    viewportFraction: 0.5,
-                    enableInfiniteScroll: false,
-                    padEnds: false,
-                    onPageChanged: (index, reason) {
-                      setState(() {
-                        _currentIndex = index;
-                      });
-                    },
-                  ),
-                  items: _dummyList.map((item) {
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 8.0,
-                      ),
-                      child: ComicCard(
-                        thumbnailUrl:
-                            'https://m.media-amazon.com/images/I/81fHjBbiTJL._AC_UF894,1000_QL80_.jpg',
-                        title: 'Opapagoto',
-                        timeAgo: '6 ngày trước',
-                        newestChapter:
-                            'Chương 2: Màn ra mắt',
-                      ),
-                    );
-                  }).toList(),
-                ),
-              ),
-              const SizedBox(height: 15),
-              Center(
-                child: AnimatedSmoothIndicator(
-                  activeIndex: _currentIndex,
-                  count: _dummyList.length,
-                  effect: ExpandingDotsEffect(
-                    activeDotColor: AppColors.secondaryPink,
-                    dotColor: Colors.grey.withValues(
-                      alpha: 0.3,
+                  child: Text(
+                    '◈ Truyện mới nhất ◈',
+                    style: TextStyle(
+                      color: AppColors.secondaryPink,
+                      fontSize: 25,
                     ),
-                    dotHeight: 6,
-                    dotWidth: 6,
-                    expansionFactor: 3,
                   ),
-                  onDotClicked: (index) {
-                    _carouselController.animateToPage(
-                      index,
-                    );
-                  },
                 ),
-              ),
-            ],
-          ),
-        ],
+                // Xử lý hiển thị UI dựa theo trạng thái dữ liệu
+                if (_isLoading)
+                  const SizedBox(
+                    height: 320,
+                    child: Center(
+                      child: CircularProgressIndicator(),
+                    ),
+                  )
+                else if (comics == null || comics!.isEmpty)
+                  const SizedBox(
+                    height: 320,
+                    child: Center(
+                      child: Text('Không có dữ liệu'),
+                    ),
+                  )
+                else ...[
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                    ),
+                    child: CarouselSlider(
+                      carouselController:
+                          _carouselController,
+                      options: CarouselOptions(
+                        height: 320,
+                        viewportFraction: 0.5,
+                        enableInfiniteScroll: false,
+                        padEnds: false,
+                        onPageChanged: (index, reason) {
+                          setState(() {
+                            _currentIndex = index;
+                          });
+                        },
+                      ),
+                      items: comics!.map((comic) {
+                        return Padding(
+                          padding:
+                              const EdgeInsets.symmetric(
+                                horizontal: 8.0,
+                              ),
+                          child: ComicCard(
+                            thumbnailUrl:
+                                comic.thumbnailUrl,
+                            title: comic.title,
+                            timeAgo: comic.timeAgo,
+                            newestChapter:
+                                comic.newestChapter,
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                  ),
+                  const SizedBox(height: 15),
+                  Center(
+                    child: AnimatedSmoothIndicator(
+                      activeIndex: _currentIndex,
+                      count: comics!.length,
+                      effect: ExpandingDotsEffect(
+                        activeDotColor:
+                            AppColors.secondaryPink,
+                        dotColor: Colors.grey.withValues(
+                          alpha: 0.3,
+                        ),
+                        dotHeight: 6,
+                        dotWidth: 6,
+                        expansionFactor: 3,
+                      ),
+                      onDotClicked: (index) {
+                        _carouselController.animateToPage(
+                          index,
+                        );
+                      },
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -18,7 +18,8 @@ class UserScreen extends StatefulWidget {
 class UserScreenState extends State<UserScreen> {
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isDark =
+        Theme.of(context).brightness == Brightness.dark;
 
     final gradient = isDark
         ? AppColorsDark.gradientBackground
@@ -48,32 +49,56 @@ class UserScreenState extends State<UserScreen> {
                   SizedBox(height: 20),
                   GestureDetector(
                     child: Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
+                      mainAxisAlignment:
+                          MainAxisAlignment.start,
                       children: [
                         Icon(
                           Icons.account_circle,
                           size: 40,
                           color: !isDark
-                              ? Color.fromRGBO(130, 0, 219, 1.0)
-                              : Color.fromRGBO(255, 121, 172, 1),
+                              ? Color.fromRGBO(
+                                  130,
+                                  0,
+                                  219,
+                                  1.0,
+                                )
+                              : Color.fromRGBO(
+                                  255,
+                                  121,
+                                  172,
+                                  1,
+                                ),
                         ),
                         SizedBox(width: 20),
                         Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                          crossAxisAlignment:
+                              CrossAxisAlignment.start,
                           children: [
                             Text(
                               'Hồ sơ',
                               style: TextStyle(
                                 fontSize: 18,
                                 color: !isDark
-                                    ? Color.fromRGBO(130, 0, 219, 1.0)
-                                    : Color.fromRGBO(255, 121, 172, 1),
+                                    ? Color.fromRGBO(
+                                        130,
+                                        0,
+                                        219,
+                                        1.0,
+                                      )
+                                    : Color.fromRGBO(
+                                        255,
+                                        121,
+                                        172,
+                                        1,
+                                      ),
                               ),
                             ),
                             Text(
                               'Chỉnh sửa hồ sơ của bạn',
                               style: TextStyle(
-                                color: isDark ? Colors.white : Colors.black,
+                                color: isDark
+                                    ? Colors.white
+                                    : Colors.black,
                               ),
                             ),
                           ],
@@ -84,32 +109,56 @@ class UserScreenState extends State<UserScreen> {
                   SizedBox(height: 40),
                   GestureDetector(
                     child: Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
+                      mainAxisAlignment:
+                          MainAxisAlignment.start,
                       children: [
                         Icon(
                           Icons.library_books,
                           size: 40,
                           color: !isDark
-                              ? Color.fromRGBO(130, 0, 219, 1.0)
-                              : Color.fromRGBO(255, 121, 172, 1),
+                              ? Color.fromRGBO(
+                                  130,
+                                  0,
+                                  219,
+                                  1.0,
+                                )
+                              : Color.fromRGBO(
+                                  255,
+                                  121,
+                                  172,
+                                  1,
+                                ),
                         ),
                         SizedBox(width: 20),
                         Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                          crossAxisAlignment:
+                              CrossAxisAlignment.start,
                           children: [
                             Text(
                               'Thư viện',
                               style: TextStyle(
                                 fontSize: 18,
                                 color: !isDark
-                                    ? Color.fromRGBO(130, 0, 219, 1.0)
-                                    : Color.fromRGBO(255, 121, 172, 1),
+                                    ? Color.fromRGBO(
+                                        130,
+                                        0,
+                                        219,
+                                        1.0,
+                                      )
+                                    : Color.fromRGBO(
+                                        255,
+                                        121,
+                                        172,
+                                        1,
+                                      ),
                               ),
                             ),
                             Text(
                               'Xem lại những bộ truyện của bạn',
                               style: TextStyle(
-                                color: isDark ? Colors.white : Colors.black,
+                                color: isDark
+                                    ? Colors.white
+                                    : Colors.black,
                               ),
                             ),
                           ],
@@ -120,32 +169,56 @@ class UserScreenState extends State<UserScreen> {
                   SizedBox(height: 40),
                   GestureDetector(
                     child: Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
+                      mainAxisAlignment:
+                          MainAxisAlignment.start,
                       children: [
                         Icon(
                           Icons.settings,
                           size: 40,
                           color: !isDark
-                              ? Color.fromRGBO(130, 0, 219, 1.0)
-                              : Color.fromRGBO(255, 121, 172, 1),
+                              ? Color.fromRGBO(
+                                  130,
+                                  0,
+                                  219,
+                                  1.0,
+                                )
+                              : Color.fromRGBO(
+                                  255,
+                                  121,
+                                  172,
+                                  1,
+                                ),
                         ),
                         SizedBox(width: 20),
                         Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                          crossAxisAlignment:
+                              CrossAxisAlignment.start,
                           children: [
                             Text(
                               'Cài đặt',
                               style: TextStyle(
                                 fontSize: 18,
                                 color: !isDark
-                                    ? Color.fromRGBO(130, 0, 219, 1.0)
-                                    : Color.fromRGBO(255, 121, 172, 1),
+                                    ? Color.fromRGBO(
+                                        130,
+                                        0,
+                                        219,
+                                        1.0,
+                                      )
+                                    : Color.fromRGBO(
+                                        255,
+                                        121,
+                                        172,
+                                        1,
+                                      ),
                               ),
                             ),
                             Text(
                               'Chỉnh nền sáng tối tại đây',
                               style: TextStyle(
-                                color: isDark ? Colors.white : Colors.black,
+                                color: isDark
+                                    ? Colors.white
+                                    : Colors.black,
                               ),
                             ),
                           ],
@@ -159,25 +232,32 @@ class UserScreenState extends State<UserScreen> {
                   GestureDetector(
                     onTap: () async {
                       await FirebaseAuth.instance.signOut();
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(builder: (_) => LoginPage()),
-                      );
                     },
                     child: Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
+                      mainAxisAlignment:
+                          MainAxisAlignment.start,
                       children: [
                         Icon(
                           Icons.logout,
                           size: 40,
-                          color: Color.fromRGBO(251, 44, 54, 1.0),
+                          color: Color.fromRGBO(
+                            251,
+                            44,
+                            54,
+                            1.0,
+                          ),
                         ),
                         SizedBox(width: 20),
                         Text(
                           'Đăng xuất',
                           style: TextStyle(
                             fontSize: 18,
-                            color: Color.fromRGBO(251, 44, 54, 1.0),
+                            color: Color.fromRGBO(
+                              251,
+                              44,
+                              54,
+                              1.0,
+                            ),
                           ),
                         ),
                       ],

@@ -1,8 +1,6 @@
+import 'package:comic_app/auth_gate.dart';
 import 'package:comic_app/user/login_page.dart';
 import 'package:comic_app/theme/app_colors.dart';
-import 'package:comic_app/screens/main_screen.dart';
-import 'package:comic_app/theme/app_dark_colors.dart';
-import 'package:comic_app/theme/app_light_colors.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
@@ -18,8 +16,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      // home: MainScreen(),
-      home: LoginPage(),
+      home: AuthGate(),
       debugShowCheckedModeBanner: false,
 
       theme: ThemeData(
