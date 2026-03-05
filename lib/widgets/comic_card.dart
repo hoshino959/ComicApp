@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:comic_app/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 
@@ -18,7 +19,7 @@ class ComicCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 180,
+      width: double.infinity,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
@@ -33,11 +34,33 @@ class ComicCard extends StatelessWidget {
               topLeft: Radius.circular(9),
               topRight: Radius.circular(9),
             ),
-            child: Image.network(
-              thumbnailUrl,
-              width: 180,
-              height: 210,
+            child: CachedNetworkImage(
+              imageUrl: thumbnailUrl,
+              width: double.infinity,
+              height: 220,
               fit: BoxFit.cover,
+              memCacheHeight: 300,
+              placeholder: (context, url) => Container(
+                height: 220,
+                color: Colors.grey.withValues(alpha: 0.1),
+                child: Center(
+                  child: CircularProgressIndicator(
+                    color: AppColors.secondaryPink,
+                  ),
+                ),
+              ),
+              errorWidget: (context, url, error) =>
+                  Container(
+                    height: 220,
+                    color: Colors.grey.withValues(
+                      alpha: 0.1,
+                    ),
+                    child: const Icon(
+                      Icons.broken_image,
+                      color: Colors.grey,
+                      size: 40,
+                    ),
+                  ),
             ),
           ),
 
@@ -51,6 +74,7 @@ class ComicCard extends StatelessWidget {
                     Icon(
                       Icons.history,
                       color: AppColors.textColor,
+                      size: 16,
                     ),
                     const SizedBox(width: 5),
                     Text(
@@ -63,7 +87,7 @@ class ComicCard extends StatelessWidget {
                 ),
                 Text(
                   title,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 18,
                   ),
@@ -73,9 +97,10 @@ class ComicCard extends StatelessWidget {
                 const SizedBox(height: 10),
                 Row(
                   children: [
-                    Icon(
+                    const Icon(
                       Icons.book,
                       color: Colors.orangeAccent,
+                      size: 16,
                     ),
                     const SizedBox(width: 5),
                     Expanded(

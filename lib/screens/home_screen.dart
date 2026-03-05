@@ -1,5 +1,5 @@
 import 'package:comic_app/api/api_service.dart';
-import 'package:comic_app/models/comic_model';
+import 'package:comic_app/models/comic_model.dart';
 import 'package:comic_app/theme/app_colors.dart';
 import 'package:comic_app/widgets/comic_card.dart';
 import 'package:flutter/material.dart';
@@ -15,35 +15,133 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   int _currentIndex = 0;
-  bool _isLoading = true; // Thêm trạng thái loading
+  bool _isLoadingRandom = true;
+  bool _isLoadingNewest = true;
 
   final CarouselSliderController _carouselController =
       CarouselSliderController();
 
-  List<ComicModel>? comics;
+  List<ComicModel>? randomComics;
+  List<ComicModel>? newestComics;
+
+  final ScrollController _scrollController =
+      ScrollController();
+  int _currentOffset = 0;
+  bool _isFetchingMore = false;
+  bool _hasMore = true;
+
+  bool _showBackToTopButton = false;
 
   @override
   void initState() {
-    fetchComics();
     super.initState();
+    fetchRandomComics();
+    fetchNewestComics();
+
+    _scrollController.addListener(() {
+      if (_scrollController.position.pixels >=
+          _scrollController.position.maxScrollExtent -
+              200) {
+        if (!_isFetchingMore &&
+            !_isLoadingNewest &&
+            _hasMore) {
+          fetchNewestComics(isLoadMore: true);
+        }
+      }
+
+      if (_scrollController.offset >= 400) {
+        if (!_showBackToTopButton) {
+          setState(() {
+            _showBackToTopButton = true;
+          });
+        }
+      } else {
+        if (_showBackToTopButton) {
+          setState(() {
+            _showBackToTopButton = false;
+          });
+        }
+      }
+    });
   }
 
-  void fetchComics() async {
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void fetchRandomComics() async {
     try {
       final result =
-          await ApiService.fetchRecentlyUpdatedComics();
+          await ApiService.fetchRandomComicsFromList();
       if (!mounted) return;
       setState(() {
-        comics = result;
-        _isLoading = false;
+        randomComics = result;
+        _isLoadingRandom = false;
       });
     } catch (e) {
       if (!mounted) return;
       setState(() {
-        _isLoading = false;
+        _isLoadingRandom = false;
       });
       debugPrint('Error fetching comics: $e');
     }
+  }
+
+  void fetchNewestComics({bool isLoadMore = false}) async {
+    if (isLoadMore) {
+      setState(() {
+        _isFetchingMore = true;
+      });
+    } else {
+      setState(() {
+        _isLoadingNewest = true;
+        _currentOffset = 0;
+      });
+    }
+
+    try {
+      final result =
+          await ApiService.fetchRecentlyUpdatedComics(
+            limit: 20,
+            offset: _currentOffset,
+          );
+
+      if (!mounted) return;
+
+      setState(() {
+        if (isLoadMore) {
+          newestComics!.addAll(result);
+        } else {
+          newestComics = result;
+        }
+
+        _currentOffset += 10;
+
+        if (result.length < 10) {
+          _hasMore = false;
+        }
+
+        _isLoadingNewest = false;
+        _isFetchingMore = false;
+      });
+    } catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _isLoadingNewest = false;
+        _isFetchingMore = false;
+      });
+      debugPrint('Error fetching comics: $e');
+    }
+  }
+
+  void _scrollToTop() {
+    _scrollController.animateTo(
+      0,
+      duration: const Duration(milliseconds: 500),
+      curve: Curves.easeInOut,
+    );
   }
 
   @override
@@ -56,7 +154,18 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         title: Text('Comic Garden'),
       ),
+      floatingActionButton: _showBackToTopButton
+          ? FloatingActionButton(
+              onPressed: _scrollToTop,
+              backgroundColor: AppColors.secondaryPink,
+              child: const Icon(
+                Icons.arrow_upward,
+                color: Colors.white,
+              ),
+            )
+          : null,
       body: SingleChildScrollView(
+        controller: _scrollController,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -72,22 +181,22 @@ class _HomeScreenState extends State<HomeScreen> {
                     horizontal: 20,
                   ),
                   child: Text(
-                    '◈ Truyện mới nhất ◈',
+                    '◈ Truyện có thể bạn thích ◈',
                     style: TextStyle(
                       color: AppColors.secondaryPink,
                       fontSize: 25,
                     ),
                   ),
                 ),
-                // Xử lý hiển thị UI dựa theo trạng thái dữ liệu
-                if (_isLoading)
+                if (_isLoadingRandom)
                   const SizedBox(
                     height: 320,
                     child: Center(
                       child: CircularProgressIndicator(),
                     ),
                   )
-                else if (comics == null || comics!.isEmpty)
+                else if (randomComics == null ||
+                    randomComics!.isEmpty)
                   const SizedBox(
                     height: 320,
                     child: Center(
@@ -113,7 +222,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           });
                         },
                       ),
-                      items: comics!.map((comic) {
+                      items: randomComics!.map((comic) {
                         return Padding(
                           padding:
                               const EdgeInsets.symmetric(
@@ -135,7 +244,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   Center(
                     child: AnimatedSmoothIndicator(
                       activeIndex: _currentIndex,
-                      count: comics!.length,
+                      count: randomComics!.length,
                       effect: ExpandingDotsEffect(
                         activeDotColor:
                             AppColors.secondaryPink,
@@ -154,6 +263,86 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ),
                 ],
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 20,
+                    horizontal: 20,
+                  ),
+                  child: Text(
+                    '◈ Truyện mới nhất ◈',
+                    style: TextStyle(
+                      color: AppColors.secondaryPink,
+                      fontSize: 25,
+                    ),
+                  ),
+                ),
+                if (_isLoadingNewest)
+                  const SizedBox(
+                    height: 320,
+                    child: Center(
+                      child: CircularProgressIndicator(),
+                    ),
+                  )
+                else if (newestComics == null ||
+                    newestComics!.isEmpty)
+                  const SizedBox(
+                    height: 320,
+                    child: Center(
+                      child: Text('Không có dữ liệu'),
+                    ),
+                  )
+                else ...[
+                  GridView.builder(
+                    shrinkWrap: true,
+                    physics:
+                        const NeverScrollableScrollPhysics(),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                    ),
+                    itemCount: newestComics!.length,
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          crossAxisSpacing: 16,
+                          mainAxisSpacing: 16,
+                          mainAxisExtent: 320,
+                        ),
+                    itemBuilder: (context, index) {
+                      return ComicCard(
+                        title: newestComics![index].title,
+                        thumbnailUrl: newestComics![index]
+                            .thumbnailUrl,
+                        timeAgo:
+                            newestComics![index].timeAgo,
+                        newestChapter: newestComics![index]
+                            .newestChapter,
+                      );
+                    },
+                  ),
+                ],
+                if (_isFetchingMore)
+                  const Padding(
+                    padding: EdgeInsets.symmetric(
+                      vertical: 20.0,
+                    ),
+                    child: Center(
+                      child: CircularProgressIndicator(),
+                    ),
+                  ),
+                if (!_hasMore)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 20.0,
+                    ),
+                    child: Center(
+                      child: Text(
+                        'Đã tải hết truyện',
+                        style: TextStyle(
+                          color: AppColors.textColor,
+                        ),
+                      ),
+                    ),
+                  ),
               ],
             ),
           ],

@@ -1,10 +1,7 @@
 import 'package:comic_app/theme/app_dark_colors.dart';
 import 'package:comic_app/theme/app_light_colors.dart';
-import 'package:comic_app/user/login_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:okcolor/converters/rgb_oklab.dart';
-import 'package:okcolor/models/oklab.dart';
 
 class UserScreen extends StatefulWidget {
   const UserScreen({super.key});

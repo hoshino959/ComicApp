@@ -1,5 +1,4 @@
 import 'package:comic_app/auth_gate.dart';
-import 'package:comic_app/user/login_page.dart';
 import 'package:comic_app/theme/app_colors.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
