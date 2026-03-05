@@ -1,5 +1,8 @@
 import 'package:comic_app/auth_gate.dart';
+import 'package:comic_app/screens/main_screen.dart';
+import 'package:comic_app/user/login_page.dart';
 import 'package:comic_app/theme/app_colors.dart';
+import 'package:comic_app/user/profile_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
