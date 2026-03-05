@@ -30,8 +30,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void fetchComics() async {
     try {
-      final result =
-          await ApiService.fetchRecentlyUpdatedComics();
+      final result = await ApiService.fetchRecentlyUpdatedComics();
       if (!mounted) return;
       setState(() {
         comics = result;
@@ -52,7 +51,9 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: AppBar(
         leading: Padding(
           padding: const EdgeInsets.fromLTRB(15, 8, 0, 8),
-          child: Image.asset('assets/images/logo.png'),
+          child: ClipOval(
+            child: Image.asset('assets/images/logo.png', fit: BoxFit.cover),
+          ),
         ),
         title: Text('Comic Garden'),
       ),
@@ -83,25 +84,18 @@ class _HomeScreenState extends State<HomeScreen> {
                 if (_isLoading)
                   const SizedBox(
                     height: 320,
-                    child: Center(
-                      child: CircularProgressIndicator(),
-                    ),
+                    child: Center(child: CircularProgressIndicator()),
                   )
                 else if (comics == null || comics!.isEmpty)
                   const SizedBox(
                     height: 320,
-                    child: Center(
-                      child: Text('Không có dữ liệu'),
-                    ),
+                    child: Center(child: Text('Không có dữ liệu')),
                   )
                 else ...[
                   Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                    ),
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
                     child: CarouselSlider(
-                      carouselController:
-                          _carouselController,
+                      carouselController: _carouselController,
                       options: CarouselOptions(
                         height: 320,
                         viewportFraction: 0.5,
@@ -115,17 +109,12 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                       items: comics!.map((comic) {
                         return Padding(
-                          padding:
-                              const EdgeInsets.symmetric(
-                                horizontal: 8.0,
-                              ),
+                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
                           child: ComicCard(
-                            thumbnailUrl:
-                                comic.thumbnailUrl,
+                            thumbnailUrl: comic.thumbnailUrl,
                             title: comic.title,
                             timeAgo: comic.timeAgo,
-                            newestChapter:
-                                comic.newestChapter,
+                            newestChapter: comic.newestChapter,
                           ),
                         );
                       }).toList(),
@@ -137,19 +126,14 @@ class _HomeScreenState extends State<HomeScreen> {
                       activeIndex: _currentIndex,
                       count: comics!.length,
                       effect: ExpandingDotsEffect(
-                        activeDotColor:
-                            AppColors.secondaryPink,
-                        dotColor: Colors.grey.withValues(
-                          alpha: 0.3,
-                        ),
+                        activeDotColor: AppColors.secondaryPink,
+                        dotColor: Colors.grey.withValues(alpha: 0.3),
                         dotHeight: 6,
                         dotWidth: 6,
                         expansionFactor: 3,
                       ),
                       onDotClicked: (index) {
-                        _carouselController.animateToPage(
-                          index,
-                        );
+                        _carouselController.animateToPage(index);
                       },
                     ),
                   ),

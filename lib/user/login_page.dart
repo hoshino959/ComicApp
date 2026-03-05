@@ -61,29 +61,7 @@ class LoginPageState extends State<LoginPage> {
                     children: [
                       SizedBox(height: 40),
                       //Logo và tên app
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          ClipOval(
-                            child: Image.asset(
-                              'assets/images/logo.png',
-                              width: 70,
-                              height: 70,
-                              fit: BoxFit.cover,
-                            ),
-                          ),
-                          Text(
-                            '  Comic Garden',
-                            style: TextStyle(
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold,
-                              color: isDark
-                                  ? Color.fromRGBO(246, 51, 154, 1.0)
-                                  : Color.fromRGBO(230, 0, 118, 1.0),
-                            ),
-                          ),
-                        ],
-                      ),
+                      logoWidget(isDark: isDark),
                       SizedBox(height: 30),
 
                       //Nút bấm đăng nhập đăng ký
@@ -711,35 +689,39 @@ class LoginPageState extends State<LoginPage> {
                                                 return;
                                               } else {
                                                 try {
-                                                  // UserCredential
-                                                  // userCredential =
-                                                  await FirebaseAuth.instance
-                                                      .createUserWithEmailAndPassword(
-                                                        email: emailController
-                                                            .text
-                                                            .trim(),
-                                                        password: passController
-                                                            .text
-                                                            .trim(),
-                                                      );
-                                                  // User? user =
-                                                  //     userCredential.user;
-                                                  // if (user != null) {
-                                                  //   await FirebaseFirestore
-                                                  //       .instance
-                                                  //       .collection('Users')
-                                                  //       .doc(user.uid)
-                                                  //       .set({
-                                                  //         'uid': user.uid,
-                                                  //         'email':
-                                                  //             emailController
-                                                  //                 .text
-                                                  //                 .trim(),
-                                                  //         'password':
-                                                  //             passController
-                                                  //                 .text,
-                                                  //       });
-                                                  // }
+                                                  UserCredential
+                                                  userCredential =
+                                                      await FirebaseAuth
+                                                          .instance
+                                                          .createUserWithEmailAndPassword(
+                                                            email:
+                                                                emailController
+                                                                    .text
+                                                                    .trim(),
+                                                            password:
+                                                                passController
+                                                                    .text
+                                                                    .trim(),
+                                                          );
+                                                  User? user =
+                                                      userCredential.user;
+                                                  if (user != null) {
+                                                    await FirebaseFirestore
+                                                        .instance
+                                                        .collection('Users')
+                                                        .doc(user.uid)
+                                                        .set({
+                                                          'uid': user.uid,
+                                                          'email':
+                                                              emailController
+                                                                  .text
+                                                                  .trim(),
+                                                          'password':
+                                                              passController
+                                                                  .text,
+                                                          'theme': 'light',
+                                                        });
+                                                  }
                                                   ScaffoldMessenger.of(
                                                     context,
                                                   ).showSnackBar(
@@ -846,6 +828,39 @@ class LoginPageState extends State<LoginPage> {
           ],
         ),
       ),
+    );
+  }
+}
+
+class logoWidget extends StatelessWidget {
+  const logoWidget({super.key, required this.isDark});
+
+  final bool isDark;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        ClipOval(
+          child: Image.asset(
+            'assets/images/logo.png',
+            width: 70,
+            height: 70,
+            fit: BoxFit.cover,
+          ),
+        ),
+        Text(
+          '  Comic Garden',
+          style: TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+            color: isDark
+                ? Color.fromRGBO(246, 51, 154, 1.0)
+                : Color.fromRGBO(230, 0, 118, 1.0),
+          ),
+        ),
+      ],
     );
   }
 }
