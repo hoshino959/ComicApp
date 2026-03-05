@@ -17,7 +17,6 @@ class ComicModel {
     final attributes = json['attributes'] ?? {};
     final id = json['id'] ?? '';
 
-    // 1. Lấy Title (Ưu tiên tiếng Anh, nếu không có thì lấy ngôn ngữ đầu tiên)
     String parsedTitle = 'Unknown Title';
     if (attributes['title'] != null && attributes['title'].isNotEmpty) {
       parsedTitle = attributes['title']['en'] ?? attributes['title'].values.first.toString();
@@ -62,6 +61,6 @@ class ComicModel {
     if (diff.inDays > 0) return '${diff.inDays} ngày trước';
     if (diff.inHours > 0) return '${diff.inHours} tiếng trước';
     if (diff.inMinutes > 0) return '${diff.inMinutes} phút trước';
-    return 'Just now';
+    return 'Vừa xong';
   }
 }
