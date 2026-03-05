@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:comic_app/theme/app_dark_colors.dart';
 import 'package:comic_app/theme/app_light_colors.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -12,13 +13,38 @@ class UserScreen extends StatefulWidget {
   }
 }
 
+String uid = FirebaseAuth.instance.currentUser!.uid;
+
 class UserScreenState extends State<UserScreen> {
+  bool? isDark;
+
+  @override
+  void initState() {
+    super.initState();
+    loadTheme();
+  }
+
+  loadTheme() async {
+    var doc = await FirebaseFirestore.instance
+        .collection("Users")
+        .doc(uid)
+        .get();
+    String theme = doc.data()!["theme"];
+
+    setState(() {
+      if (theme == "light") {
+        isDark = false;
+      } else if (theme == "dark") {
+        isDark = false;
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    final isDark =
-        Theme.of(context).brightness == Brightness.dark;
-
-    final gradient = isDark
+    final darkMode =
+        isDark ?? (Theme.of(context).brightness == Brightness.dark);
+    final gradient = darkMode
         ? AppColorsDark.gradientBackground
         : AppColorsLight.gradientBackground;
 
@@ -29,10 +55,10 @@ class UserScreenState extends State<UserScreen> {
           backgroundColor: Colors.transparent,
           body: Center(
             child: Container(
-              margin: EdgeInsets.all(30),
               child: Column(
                 children: [
-                  SizedBox(height: 30),
+                  SizedBox(height: 60),
+                  //logoApp
                   ClipOval(
                     child: Image.asset(
                       'assets/images/logo.png',
@@ -41,223 +67,190 @@ class UserScreenState extends State<UserScreen> {
                       fit: BoxFit.cover,
                     ),
                   ),
-                  SizedBox(height: 60),
-                  Container(height: 2, color: Colors.grey),
-                  SizedBox(height: 20),
-                  GestureDetector(
-                    child: Row(
-                      mainAxisAlignment:
-                          MainAxisAlignment.start,
-                      children: [
-                        Icon(
-                          Icons.account_circle,
-                          size: 40,
-                          color: !isDark
-                              ? Color.fromRGBO(
-                                  130,
-                                  0,
-                                  219,
-                                  1.0,
-                                )
-                              : Color.fromRGBO(
-                                  255,
-                                  121,
-                                  172,
-                                  1,
+
+                  SizedBox(height: 50),
+                  dashLine(),
+                  SizedBox(height: 4),
+
+                  //userInfo
+                  InkWell(
+                    onTap: () {},
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 30,
+                        vertical: 16,
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          Icon(
+                            Icons.account_circle,
+                            size: 40,
+                            color: !darkMode
+                                ? Color.fromRGBO(130, 0, 219, 1.0)
+                                : Color.fromRGBO(255, 121, 172, 1),
+                          ),
+                          SizedBox(width: 20),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Hồ sơ',
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  color: !darkMode
+                                      ? Color.fromRGBO(130, 0, 219, 1.0)
+                                      : Color.fromRGBO(255, 121, 172, 1),
                                 ),
-                        ),
-                        SizedBox(width: 20),
-                        Column(
-                          crossAxisAlignment:
-                              CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Hồ sơ',
-                              style: TextStyle(
-                                fontSize: 18,
-                                color: !isDark
-                                    ? Color.fromRGBO(
-                                        130,
-                                        0,
-                                        219,
-                                        1.0,
-                                      )
-                                    : Color.fromRGBO(
-                                        255,
-                                        121,
-                                        172,
-                                        1,
-                                      ),
                               ),
-                            ),
-                            Text(
-                              'Chỉnh sửa hồ sơ của bạn',
-                              style: TextStyle(
-                                color: isDark
-                                    ? Colors.white
-                                    : Colors.black,
+                              Text(
+                                'Chỉnh sửa hồ sơ của bạn',
+                                style: TextStyle(
+                                  color: darkMode ? Colors.white : Colors.black,
+                                ),
                               ),
-                            ),
-                          ],
-                        ),
-                      ],
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
                   ),
-                  SizedBox(height: 40),
-                  GestureDetector(
-                    child: Row(
-                      mainAxisAlignment:
-                          MainAxisAlignment.start,
-                      children: [
-                        Icon(
-                          Icons.library_books,
-                          size: 40,
-                          color: !isDark
-                              ? Color.fromRGBO(
-                                  130,
-                                  0,
-                                  219,
-                                  1.0,
-                                )
-                              : Color.fromRGBO(
-                                  255,
-                                  121,
-                                  172,
-                                  1,
+                  SizedBox(height: 8),
+
+                  //userLibrary
+                  InkWell(
+                    onTap: () {},
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 30,
+                        vertical: 16,
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          Icon(
+                            Icons.library_books,
+                            size: 40,
+                            color: !darkMode
+                                ? Color.fromRGBO(130, 0, 219, 1.0)
+                                : Color.fromRGBO(255, 121, 172, 1),
+                          ),
+                          SizedBox(width: 20),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Thư viện',
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  color: !darkMode
+                                      ? Color.fromRGBO(130, 0, 219, 1.0)
+                                      : Color.fromRGBO(255, 121, 172, 1),
                                 ),
-                        ),
-                        SizedBox(width: 20),
-                        Column(
-                          crossAxisAlignment:
-                              CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Thư viện',
-                              style: TextStyle(
-                                fontSize: 18,
-                                color: !isDark
-                                    ? Color.fromRGBO(
-                                        130,
-                                        0,
-                                        219,
-                                        1.0,
-                                      )
-                                    : Color.fromRGBO(
-                                        255,
-                                        121,
-                                        172,
-                                        1,
-                                      ),
                               ),
-                            ),
-                            Text(
-                              'Xem lại những bộ truyện của bạn',
-                              style: TextStyle(
-                                color: isDark
-                                    ? Colors.white
-                                    : Colors.black,
+                              Text(
+                                'Xem lại những bộ truyện của bạn',
+                                style: TextStyle(
+                                  color: darkMode ? Colors.white : Colors.black,
+                                ),
                               ),
-                            ),
-                          ],
-                        ),
-                      ],
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
                   ),
-                  SizedBox(height: 40),
-                  GestureDetector(
-                    child: Row(
-                      mainAxisAlignment:
-                          MainAxisAlignment.start,
-                      children: [
-                        Icon(
-                          Icons.settings,
-                          size: 40,
-                          color: !isDark
-                              ? Color.fromRGBO(
-                                  130,
-                                  0,
-                                  219,
-                                  1.0,
-                                )
-                              : Color.fromRGBO(
-                                  255,
-                                  121,
-                                  172,
-                                  1,
+                  SizedBox(height: 8),
+
+                  //userSetting
+                  InkWell(
+                    onTap: () async {
+                      var doc = await FirebaseFirestore.instance
+                          .collection("Users")
+                          .doc(uid)
+                          .get();
+                      String theme = doc.data()!["theme"];
+                      updateTheme(theme);
+                      setState(() {
+                        if (theme == "light") {
+                          isDark = true;
+                        } else {
+                          isDark = false;
+                        }
+                      });
+                    },
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 30,
+                        vertical: 16,
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          Icon(
+                            Icons.settings,
+                            size: 40,
+                            color: !darkMode
+                                ? Color.fromRGBO(130, 0, 219, 1.0)
+                                : Color.fromRGBO(255, 121, 172, 1),
+                          ),
+                          SizedBox(width: 20),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Cài đặt',
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  color: !darkMode
+                                      ? Color.fromRGBO(130, 0, 219, 1.0)
+                                      : Color.fromRGBO(255, 121, 172, 1),
                                 ),
-                        ),
-                        SizedBox(width: 20),
-                        Column(
-                          crossAxisAlignment:
-                              CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Cài đặt',
-                              style: TextStyle(
-                                fontSize: 18,
-                                color: !isDark
-                                    ? Color.fromRGBO(
-                                        130,
-                                        0,
-                                        219,
-                                        1.0,
-                                      )
-                                    : Color.fromRGBO(
-                                        255,
-                                        121,
-                                        172,
-                                        1,
-                                      ),
                               ),
-                            ),
-                            Text(
-                              'Chỉnh nền sáng tối tại đây',
-                              style: TextStyle(
-                                color: isDark
-                                    ? Colors.white
-                                    : Colors.black,
+                              Text(
+                                'Chỉnh nền sáng tối tại đây',
+                                style: TextStyle(
+                                  color: darkMode ? Colors.white : Colors.black,
+                                ),
                               ),
-                            ),
-                          ],
-                        ),
-                      ],
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
                   ),
-                  SizedBox(height: 20),
-                  Container(height: 2, color: Colors.grey),
-                  SizedBox(height: 20),
-                  GestureDetector(
+                  SizedBox(height: 4),
+
+                  dashLine(),
+                  SizedBox(height: 4),
+
+                  InkWell(
                     onTap: () async {
                       await FirebaseAuth.instance.signOut();
                     },
-                    child: Row(
-                      mainAxisAlignment:
-                          MainAxisAlignment.start,
-                      children: [
-                        Icon(
-                          Icons.logout,
-                          size: 40,
-                          color: Color.fromRGBO(
-                            251,
-                            44,
-                            54,
-                            1.0,
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 30,
+                        vertical: 16,
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          Icon(
+                            Icons.logout,
+                            size: 40,
+                            color: Color.fromRGBO(251, 44, 54, 1.0),
                           ),
-                        ),
-                        SizedBox(width: 20),
-                        Text(
-                          'Đăng xuất',
-                          style: TextStyle(
-                            fontSize: 18,
-                            color: Color.fromRGBO(
-                              251,
-                              44,
-                              54,
-                              1.0,
+                          SizedBox(width: 20),
+                          Text(
+                            'Đăng xuất',
+                            style: TextStyle(
+                              fontSize: 18,
+                              color: Color.fromRGBO(251, 44, 54, 1.0),
                             ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
                 ],
@@ -266,6 +259,37 @@ class UserScreenState extends State<UserScreen> {
           ),
         ),
       ),
+    );
+  }
+
+  void updateTheme(String theme) async {
+    var doc = await FirebaseFirestore.instance
+        .collection("Users")
+        .doc(uid)
+        .get();
+    String theme = doc.data()!["theme"];
+
+    if (theme == "light") {
+      FirebaseFirestore.instance.collection("Users").doc(uid).update({
+        "theme": "dark",
+      });
+    } else {
+      FirebaseFirestore.instance.collection("Users").doc(uid).update({
+        "theme": "light",
+      });
+    }
+  }
+}
+
+class dashLine extends StatelessWidget {
+  const dashLine({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 2,
+      color: Colors.grey,
+      margin: EdgeInsets.symmetric(horizontal: 30),
     );
   }
 }

@@ -1056,3 +1056,36 @@ class LoginPageState extends State<LoginPage> {
     );
   }
 }
+
+class logoWidget extends StatelessWidget {
+  const logoWidget({super.key, required this.isDark});
+
+  final bool isDark;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        ClipOval(
+          child: Image.asset(
+            'assets/images/logo.png',
+            width: 70,
+            height: 70,
+            fit: BoxFit.cover,
+          ),
+        ),
+        Text(
+          '  Comic Garden',
+          style: TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+            color: isDark
+                ? Color.fromRGBO(246, 51, 154, 1.0)
+                : Color.fromRGBO(230, 0, 118, 1.0),
+          ),
+        ),
+      ],
+    );
+  }
+}

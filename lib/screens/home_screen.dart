@@ -150,7 +150,12 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: AppBar(
         leading: Padding(
           padding: const EdgeInsets.fromLTRB(15, 8, 0, 8),
-          child: Image.asset('assets/images/logo.png'),
+          child: ClipOval(
+            child: Image.asset(
+              'assets/images/logo.png',
+              fit: BoxFit.cover,
+            ),
+          ),
         ),
         title: Text('Comic Garden'),
       ),
