@@ -13,15 +13,10 @@ import 'package:provider/provider.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
+  final themeProvider = ThemeProvider();
+  await themeProvider.loadTheme();
   runApp(
-    ChangeNotifierProvider(
-      create: (_) {
-        final provider = ThemeProvider();
-        provider.loadTheme();
-        return provider;
-      },
-      child: const MyApp(),
-    ),
+    ChangeNotifierProvider(create: (_) => themeProvider, child: const MyApp()),
   );
 }
 
@@ -32,7 +27,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
     return MaterialApp(
-      home: AuthGate(),
+      home: MainScreen(),
       debugShowCheckedModeBanner: false,
 
       theme: ThemeData(

@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:comic_app/screens/main_screen.dart';
 import 'package:comic_app/theme/app_dark_colors.dart';
 import 'package:comic_app/theme/app_light_colors.dart';
+import 'package:comic_app/user/user_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
@@ -50,13 +51,26 @@ class LoginPageState extends State<LoginPage> {
     return Stack(
       children: [
         SafeArea(
-          child: Container(
-            decoration: BoxDecoration(gradient: gradient),
-            child: Stack(
-              children: [
-                Scaffold(
+          child: Stack(
+            children: [
+              Scaffold(
+                extendBodyBehindAppBar: true,
+                appBar: AppBar(
                   backgroundColor: Colors.transparent,
-                  body: Center(
+                  elevation: 0,
+                  leading: IconButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    icon: Icon(
+                      Icons.arrow_back,
+                      color: isDark ? Colors.white : Colors.black,
+                    ),
+                  ),
+                ),
+                body: Container(
+                  decoration: BoxDecoration(gradient: gradient),
+                  child: Center(
                     child: SingleChildScrollView(
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -74,10 +88,12 @@ class LoginPageState extends State<LoginPage> {
                                   fit: BoxFit.cover,
                                 ),
                               ),
+                              SizedBox(width: 10),
                               Text(
-                                '  Comic Garden',
+                                'Comic Garden',
                                 style: TextStyle(
-                                  fontSize: 24,
+                                  fontSize: 50,
+                                  fontFamily: 'Brush_Script_MT_Italic',
                                   fontWeight: FontWeight.bold,
                                   color: isDark
                                       ? Color.fromRGBO(246, 51, 154, 1.0)
@@ -889,8 +905,8 @@ class LoginPageState extends State<LoginPage> {
                     ),
                   ),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
         if (isLoading)

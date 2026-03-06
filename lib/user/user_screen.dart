@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:comic_app/main.dart';
+import 'package:comic_app/screens/main_screen.dart';
 import 'package:comic_app/theme/app_dark_colors.dart';
 import 'package:comic_app/theme/app_light_colors.dart';
 import 'package:comic_app/theme/theme_provider.dart';
@@ -254,6 +255,9 @@ class UserScreenState extends State<UserScreen> {
                               isLoading = true;
                             });
                             await FirebaseAuth.instance.signOut();
+                            Navigator.of(context).pushReplacement(
+                              MaterialPageRoute(builder: (_) => MainScreen()),
+                            );
                             setState(() {
                               isLoading = false;
                             });
