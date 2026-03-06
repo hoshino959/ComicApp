@@ -161,12 +161,19 @@ class _HomeScreenState extends State<HomeScreen> {
               child: Image.asset('assets/images/logo.png', fit: BoxFit.cover),
             ),
           ),
-          title: Text(
-            'Comic Garden',
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              fontFamily: 'Brush_Script_MT_Italic',
-              fontSize: 30,
+          title: ShaderMask(
+            shaderCallback: (boudns) => LinearGradient(
+              colors: darkMode
+                  ? [Color(0xffec4899), Color(0xff93339a)]
+                  : [Color(0xFFEC4899), Color(0xFF9333EA)],
+            ).createShader(boudns),
+            child: Text(
+              'Comic Garden',
+              style: TextStyle(
+                fontSize: 40,
+                fontWeight: FontWeight.bold,
+                fontFamily: 'Brush_Script_MT_Italic',
+              ),
             ),
           ),
           flexibleSpace: Container(
