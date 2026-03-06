@@ -33,7 +33,8 @@ class UserScreenState extends State<UserScreen> {
   @override
   Widget build(BuildContext context) {
     final darkMode =
-        Provider.of<ThemeProvider>(context).themeMode == ThemeMode.dark;
+        Provider.of<ThemeProvider>(context).themeMode ==
+        ThemeMode.dark;
     final gradient = darkMode
         ? AppColorsDark.gradientBackground
         : AppColorsLight.gradientBackground;
@@ -68,14 +69,21 @@ class UserScreenState extends State<UserScreen> {
                       InkWell(
                         onTap: () {
                           if (user != null)
-                            Navigator.of(context).pushReplacement(
+                            Navigator.of(
+                              context,
+                            ).pushReplacement(
                               MaterialPageRoute(
-                                builder: (_) => ProfileScreen(),
+                                builder: (_) =>
+                                    ProfileScreen(),
                               ),
                             );
-                          Navigator.of(context).push(
-                            MaterialPageRoute(builder: (_) => LoginPage()),
-                          );
+                          if (user == null) {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (_) => LoginPage(),
+                              ),
+                            );
+                          }
                         },
                         child: Padding(
                           padding: EdgeInsets.symmetric(
@@ -83,27 +91,50 @@ class UserScreenState extends State<UserScreen> {
                             vertical: 16,
                           ),
                           child: Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
+                            mainAxisAlignment:
+                                MainAxisAlignment.start,
                             children: [
                               Icon(
                                 Icons.account_circle,
                                 size: 40,
                                 color: !darkMode
-                                    ? Color.fromRGBO(130, 0, 219, 1.0)
-                                    : Color.fromRGBO(255, 121, 172, 1),
+                                    ? Color.fromRGBO(
+                                        130,
+                                        0,
+                                        219,
+                                        1.0,
+                                      )
+                                    : Color.fromRGBO(
+                                        255,
+                                        121,
+                                        172,
+                                        1,
+                                      ),
                               ),
                               SizedBox(width: 20),
                               if (user != null)
                                 ?Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  crossAxisAlignment:
+                                      CrossAxisAlignment
+                                          .start,
                                   children: [
                                     Text(
                                       'Hồ sơ',
                                       style: TextStyle(
                                         fontSize: 18,
                                         color: !darkMode
-                                            ? Color.fromRGBO(130, 0, 219, 1.0)
-                                            : Color.fromRGBO(255, 121, 172, 1),
+                                            ? Color.fromRGBO(
+                                                130,
+                                                0,
+                                                219,
+                                                1.0,
+                                              )
+                                            : Color.fromRGBO(
+                                                255,
+                                                121,
+                                                172,
+                                                1,
+                                              ),
                                       ),
                                     ),
                                     Text(
@@ -118,15 +149,27 @@ class UserScreenState extends State<UserScreen> {
                                 ),
                               if (user == null)
                                 Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  crossAxisAlignment:
+                                      CrossAxisAlignment
+                                          .start,
                                   children: [
                                     Text(
                                       'Đăng nhập',
                                       style: TextStyle(
                                         fontSize: 18,
                                         color: !darkMode
-                                            ? Color.fromRGBO(130, 0, 219, 1.0)
-                                            : Color.fromRGBO(255, 121, 172, 1),
+                                            ? Color.fromRGBO(
+                                                130,
+                                                0,
+                                                219,
+                                                1.0,
+                                              )
+                                            : Color.fromRGBO(
+                                                255,
+                                                121,
+                                                172,
+                                                1,
+                                              ),
                                       ),
                                     ),
                                   ],
@@ -147,26 +190,49 @@ class UserScreenState extends State<UserScreen> {
                               vertical: 16,
                             ),
                             child: Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
+                              mainAxisAlignment:
+                                  MainAxisAlignment.start,
                               children: [
                                 Icon(
                                   Icons.library_books,
                                   size: 40,
                                   color: !darkMode
-                                      ? Color.fromRGBO(130, 0, 219, 1.0)
-                                      : Color.fromRGBO(255, 121, 172, 1),
+                                      ? Color.fromRGBO(
+                                          130,
+                                          0,
+                                          219,
+                                          1.0,
+                                        )
+                                      : Color.fromRGBO(
+                                          255,
+                                          121,
+                                          172,
+                                          1,
+                                        ),
                                 ),
                                 SizedBox(width: 20),
                                 Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  crossAxisAlignment:
+                                      CrossAxisAlignment
+                                          .start,
                                   children: [
                                     Text(
                                       'Thư viện',
                                       style: TextStyle(
                                         fontSize: 18,
                                         color: !darkMode
-                                            ? Color.fromRGBO(130, 0, 219, 1.0)
-                                            : Color.fromRGBO(255, 121, 172, 1),
+                                            ? Color.fromRGBO(
+                                                130,
+                                                0,
+                                                219,
+                                                1.0,
+                                              )
+                                            : Color.fromRGBO(
+                                                255,
+                                                121,
+                                                172,
+                                                1,
+                                              ),
                                       ),
                                     ),
                                     Text(
@@ -207,26 +273,49 @@ class UserScreenState extends State<UserScreen> {
                             vertical: 16,
                           ),
                           child: Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
+                            mainAxisAlignment:
+                                MainAxisAlignment.start,
                             children: [
                               Icon(
                                 Icons.settings,
                                 size: 40,
                                 color: !darkMode
-                                    ? Color.fromRGBO(130, 0, 219, 1.0)
-                                    : Color.fromRGBO(255, 121, 172, 1),
+                                    ? Color.fromRGBO(
+                                        130,
+                                        0,
+                                        219,
+                                        1.0,
+                                      )
+                                    : Color.fromRGBO(
+                                        255,
+                                        121,
+                                        172,
+                                        1,
+                                      ),
                               ),
                               SizedBox(width: 20),
                               Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
+                                crossAxisAlignment:
+                                    CrossAxisAlignment
+                                        .start,
                                 children: [
                                   Text(
                                     'Cài đặt',
                                     style: TextStyle(
                                       fontSize: 18,
                                       color: !darkMode
-                                          ? Color.fromRGBO(130, 0, 219, 1.0)
-                                          : Color.fromRGBO(255, 121, 172, 1),
+                                          ? Color.fromRGBO(
+                                              130,
+                                              0,
+                                              219,
+                                              1.0,
+                                            )
+                                          : Color.fromRGBO(
+                                              255,
+                                              121,
+                                              172,
+                                              1,
+                                            ),
                                     ),
                                   ),
                                   Text(
@@ -254,9 +343,15 @@ class UserScreenState extends State<UserScreen> {
                             setState(() {
                               isLoading = true;
                             });
-                            await FirebaseAuth.instance.signOut();
-                            Navigator.of(context).pushReplacement(
-                              MaterialPageRoute(builder: (_) => MainScreen()),
+                            await FirebaseAuth.instance
+                                .signOut();
+                            Navigator.of(
+                              context,
+                            ).pushReplacement(
+                              MaterialPageRoute(
+                                builder: (_) =>
+                                    MainScreen(),
+                              ),
                             );
                             setState(() {
                               isLoading = false;
@@ -268,19 +363,30 @@ class UserScreenState extends State<UserScreen> {
                               vertical: 16,
                             ),
                             child: Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
+                              mainAxisAlignment:
+                                  MainAxisAlignment.start,
                               children: [
                                 Icon(
                                   Icons.logout,
                                   size: 40,
-                                  color: Color.fromRGBO(251, 44, 54, 1.0),
+                                  color: Color.fromRGBO(
+                                    251,
+                                    44,
+                                    54,
+                                    1.0,
+                                  ),
                                 ),
                                 SizedBox(width: 20),
                                 Text(
                                   'Đăng xuất',
                                   style: TextStyle(
                                     fontSize: 18,
-                                    color: Color.fromRGBO(251, 44, 54, 1.0),
+                                    color: Color.fromRGBO(
+                                      251,
+                                      44,
+                                      54,
+                                      1.0,
+                                    ),
                                   ),
                                 ),
                               ],
@@ -297,7 +403,9 @@ class UserScreenState extends State<UserScreen> {
         if (isLoading)
           Container(
             color: Colors.black.withOpacity(0.3),
-            child: Center(child: CircularProgressIndicator()),
+            child: Center(
+              child: CircularProgressIndicator(),
+            ),
           ),
       ],
     );
