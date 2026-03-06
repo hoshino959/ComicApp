@@ -1,12 +1,15 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:comic_app/main.dart';
 import 'package:comic_app/theme/app_dark_colors.dart';
 import 'package:comic_app/theme/app_light_colors.dart';
+import 'package:comic_app/theme/theme_provider.dart';
 import 'package:comic_app/user/login_page.dart';
 import 'package:comic_app/user/profile_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:okcolor/converters/rgb_oklab.dart';
 import 'package:okcolor/models/oklab.dart';
+import 'package:provider/provider.dart';
 
 class UserScreen extends StatefulWidget {
   const UserScreen({super.key});
@@ -17,42 +20,19 @@ class UserScreen extends StatefulWidget {
   }
 }
 
-String uid = FirebaseAuth.instance.currentUser!.uid;
-
 class UserScreenState extends State<UserScreen> {
-  bool? isDark;
   bool isLoading = false;
+  var user = FirebaseAuth.instance.currentUser;
 
   @override
   void initState() {
     super.initState();
-    setState(() {
-      loadTheme();
-      isLoading = true;
-    });
-  }
-
-  loadTheme() async {
-    var doc = await FirebaseFirestore.instance
-        .collection("Users")
-        .doc(uid)
-        .get();
-    String theme = doc.data()!["theme"];
-
-    setState(() {
-      if (theme == "light") {
-        isDark = false;
-      } else if (theme == "dark") {
-        isDark = true;
-      }
-      isLoading = false;
-    });
   }
 
   @override
   Widget build(BuildContext context) {
     final darkMode =
-        isDark ?? (Theme.of(context).brightness == Brightness.dark);
+        Provider.of<ThemeProvider>(context).themeMode == ThemeMode.dark;
     final gradient = darkMode
         ? AppColorsDark.gradientBackground
         : AppColorsLight.gradientBackground;
@@ -86,8 +66,14 @@ class UserScreenState extends State<UserScreen> {
                       //userInfo
                       InkWell(
                         onTap: () {
-                          Navigator.of(context).pushReplacement(
-                            MaterialPageRoute(builder: (_) => ProfileScreen()),
+                          if (user != null)
+                            Navigator.of(context).pushReplacement(
+                              MaterialPageRoute(
+                                builder: (_) => ProfileScreen(),
+                              ),
+                            );
+                          Navigator.of(context).push(
+                            MaterialPageRoute(builder: (_) => LoginPage()),
                           );
                         },
                         child: Padding(
@@ -106,28 +92,44 @@ class UserScreenState extends State<UserScreen> {
                                     : Color.fromRGBO(255, 121, 172, 1),
                               ),
                               SizedBox(width: 20),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'Hồ sơ',
-                                    style: TextStyle(
-                                      fontSize: 18,
-                                      color: !darkMode
-                                          ? Color.fromRGBO(130, 0, 219, 1.0)
-                                          : Color.fromRGBO(255, 121, 172, 1),
+                              if (user != null)
+                                ?Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Hồ sơ',
+                                      style: TextStyle(
+                                        fontSize: 18,
+                                        color: !darkMode
+                                            ? Color.fromRGBO(130, 0, 219, 1.0)
+                                            : Color.fromRGBO(255, 121, 172, 1),
+                                      ),
                                     ),
-                                  ),
-                                  Text(
-                                    'Chỉnh sửa hồ sơ của bạn',
-                                    style: TextStyle(
-                                      color: darkMode
-                                          ? Colors.white
-                                          : Colors.black,
+                                    Text(
+                                      'Chỉnh sửa hồ sơ của bạn',
+                                      style: TextStyle(
+                                        color: darkMode
+                                            ? Colors.white
+                                            : Colors.black,
+                                      ),
                                     ),
-                                  ),
-                                ],
-                              ),
+                                  ],
+                                ),
+                              if (user == null)
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Đăng nhập',
+                                      style: TextStyle(
+                                        fontSize: 18,
+                                        color: !darkMode
+                                            ? Color.fromRGBO(130, 0, 219, 1.0)
+                                            : Color.fromRGBO(255, 121, 172, 1),
+                                      ),
+                                    ),
+                                  ],
+                                ),
                             ],
                           ),
                         ),
@@ -135,51 +137,52 @@ class UserScreenState extends State<UserScreen> {
                       SizedBox(height: 8),
 
                       //userLibrary
-                      InkWell(
-                        onTap: () {},
-                        child: Padding(
-                          padding: EdgeInsets.symmetric(
-                            horizontal: 30,
-                            vertical: 16,
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: [
-                              Icon(
-                                Icons.library_books,
-                                size: 40,
-                                color: !darkMode
-                                    ? Color.fromRGBO(130, 0, 219, 1.0)
-                                    : Color.fromRGBO(255, 121, 172, 1),
-                              ),
-                              SizedBox(width: 20),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'Thư viện',
-                                    style: TextStyle(
-                                      fontSize: 18,
-                                      color: !darkMode
-                                          ? Color.fromRGBO(130, 0, 219, 1.0)
-                                          : Color.fromRGBO(255, 121, 172, 1),
+                      if (user != null)
+                        InkWell(
+                          onTap: () {},
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 30,
+                              vertical: 16,
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                Icon(
+                                  Icons.library_books,
+                                  size: 40,
+                                  color: !darkMode
+                                      ? Color.fromRGBO(130, 0, 219, 1.0)
+                                      : Color.fromRGBO(255, 121, 172, 1),
+                                ),
+                                SizedBox(width: 20),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Thư viện',
+                                      style: TextStyle(
+                                        fontSize: 18,
+                                        color: !darkMode
+                                            ? Color.fromRGBO(130, 0, 219, 1.0)
+                                            : Color.fromRGBO(255, 121, 172, 1),
+                                      ),
                                     ),
-                                  ),
-                                  Text(
-                                    'Xem lại những bộ truyện của bạn',
-                                    style: TextStyle(
-                                      color: darkMode
-                                          ? Colors.white
-                                          : Colors.black,
+                                    Text(
+                                      'Xem lại những bộ truyện của bạn',
+                                      style: TextStyle(
+                                        color: darkMode
+                                            ? Colors.white
+                                            : Colors.black,
+                                      ),
                                     ),
-                                  ),
-                                ],
-                              ),
-                            ],
+                                  ],
+                                ),
+                              ],
+                            ),
                           ),
                         ),
-                      ),
-                      SizedBox(height: 8),
+                      if (user != null) SizedBox(height: 8),
 
                       //userSetting
                       InkWell(
@@ -187,18 +190,13 @@ class UserScreenState extends State<UserScreen> {
                           setState(() {
                             isLoading = true;
                           });
-                          var doc = await FirebaseFirestore.instance
-                              .collection("Users")
-                              .doc(uid)
-                              .get();
-                          String theme = doc.data()!["theme"];
-                          updateTheme(theme);
+
+                          await Provider.of<ThemeProvider>(
+                            context,
+                            listen: false,
+                          ).toggleTheme();
+
                           setState(() {
-                            if (theme == "light") {
-                              isDark = true;
-                            } else {
-                              isDark = false;
-                            }
                             isLoading = false;
                           });
                         },
@@ -249,41 +247,42 @@ class UserScreenState extends State<UserScreen> {
                       dashLine(),
                       SizedBox(height: 4),
 
-                      InkWell(
-                        onTap: () async {
-                          setState(() {
-                            isLoading = true;
-                          });
-                          await FirebaseAuth.instance.signOut();
-                          setState(() {
-                            isLoading = false;
-                          });
-                        },
-                        child: Padding(
-                          padding: EdgeInsets.symmetric(
-                            horizontal: 30,
-                            vertical: 16,
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: [
-                              Icon(
-                                Icons.logout,
-                                size: 40,
-                                color: Color.fromRGBO(251, 44, 54, 1.0),
-                              ),
-                              SizedBox(width: 20),
-                              Text(
-                                'Đăng xuất',
-                                style: TextStyle(
-                                  fontSize: 18,
+                      if (user != null)
+                        InkWell(
+                          onTap: () async {
+                            setState(() {
+                              isLoading = true;
+                            });
+                            await FirebaseAuth.instance.signOut();
+                            setState(() {
+                              isLoading = false;
+                            });
+                          },
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 30,
+                              vertical: 16,
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                Icon(
+                                  Icons.logout,
+                                  size: 40,
                                   color: Color.fromRGBO(251, 44, 54, 1.0),
                                 ),
-                              ),
-                            ],
+                                SizedBox(width: 20),
+                                Text(
+                                  'Đăng xuất',
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    color: Color.fromRGBO(251, 44, 54, 1.0),
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
-                      ),
                     ],
                   ),
                 ),
@@ -298,24 +297,6 @@ class UserScreenState extends State<UserScreen> {
           ),
       ],
     );
-  }
-
-  void updateTheme(String theme) async {
-    var doc = await FirebaseFirestore.instance
-        .collection("Users")
-        .doc(uid)
-        .get();
-    String theme = doc.data()!["theme"];
-
-    if (theme == "light") {
-      FirebaseFirestore.instance.collection("Users").doc(uid).update({
-        "theme": "dark",
-      });
-    } else {
-      FirebaseFirestore.instance.collection("Users").doc(uid).update({
-        "theme": "light",
-      });
-    }
   }
 }
 

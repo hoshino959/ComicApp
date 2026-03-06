@@ -1,15 +1,28 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:comic_app/auth_gate.dart';
 import 'package:comic_app/screens/main_screen.dart';
+import 'package:comic_app/theme/theme_provider.dart';
 import 'package:comic_app/user/login_page.dart';
 import 'package:comic_app/theme/app_colors.dart';
 import 'package:comic_app/user/profile_screen.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-  runApp(const MyApp());
+  runApp(
+    ChangeNotifierProvider(
+      create: (_) {
+        final provider = ThemeProvider();
+        provider.loadTheme();
+        return provider;
+      },
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -17,6 +30,7 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
     return MaterialApp(
       home: AuthGate(),
       debugShowCheckedModeBanner: false,
@@ -39,7 +53,7 @@ class MyApp extends StatelessWidget {
           foregroundColor: Colors.white,
         ),
       ),
-      themeMode: ThemeMode.system,
+      themeMode: themeProvider.themeMode,
     );
   }
 }
