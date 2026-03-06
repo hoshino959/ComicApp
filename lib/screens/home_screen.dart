@@ -28,7 +28,8 @@ class _HomeScreenState extends State<HomeScreen> {
   List<ComicModel>? randomComics;
   List<ComicModel>? newestComics;
 
-  final ScrollController _scrollController = ScrollController();
+  final ScrollController _scrollController =
+      ScrollController();
   int _currentOffset = 0;
   bool _isFetchingMore = false;
   bool _hasMore = true;
@@ -43,8 +44,11 @@ class _HomeScreenState extends State<HomeScreen> {
 
     _scrollController.addListener(() {
       if (_scrollController.position.pixels >=
-          _scrollController.position.maxScrollExtent - 200) {
-        if (!_isFetchingMore && !_isLoadingNewest && _hasMore) {
+          _scrollController.position.maxScrollExtent -
+              200) {
+        if (!_isFetchingMore &&
+            !_isLoadingNewest &&
+            _hasMore) {
           fetchNewestComics(isLoadMore: true);
         }
       }
@@ -73,7 +77,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void fetchRandomComics() async {
     try {
-      final result = await ApiService.fetchRandomComicsFromList();
+      final result =
+          await ApiService.fetchRandomComicsFromList();
       if (!mounted) return;
       setState(() {
         randomComics = result;
@@ -101,10 +106,11 @@ class _HomeScreenState extends State<HomeScreen> {
     }
 
     try {
-      final result = await ApiService.fetchRecentlyUpdatedComics(
-        limit: 20,
-        offset: _currentOffset,
-      );
+      final result =
+          await ApiService.fetchRecentlyUpdatedComics(
+            limit: 20,
+            offset: _currentOffset,
+          );
 
       if (!mounted) return;
 
@@ -145,7 +151,8 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     final darkMode =
-        Provider.of<ThemeProvider>(context).themeMode == ThemeMode.dark;
+        Provider.of<ThemeProvider>(context).themeMode ==
+        ThemeMode.dark;
 
     final gradient = darkMode
         ? AppColorsDark.gradientBackground
@@ -158,7 +165,10 @@ class _HomeScreenState extends State<HomeScreen> {
           leading: Padding(
             padding: const EdgeInsets.fromLTRB(15, 8, 0, 8),
             child: ClipOval(
-              child: Image.asset('assets/images/logo.png', fit: BoxFit.cover),
+              child: Image.asset(
+                'assets/images/logo.png',
+                fit: BoxFit.cover,
+              ),
             ),
           ),
           title: ShaderMask(
@@ -167,12 +177,15 @@ class _HomeScreenState extends State<HomeScreen> {
                   ? [Color(0xffec4899), Color(0xff93339a)]
                   : [Color(0xFFEC4899), Color(0xFF9333EA)],
             ).createShader(boudns),
-            child: Text(
-              'Comic Garden',
-              style: TextStyle(
-                fontSize: 40,
-                fontWeight: FontWeight.bold,
-                fontFamily: 'Brush_Script_MT_Italic',
+            child: Padding(
+              padding: const EdgeInsets.only(right: 4),
+              child: Text(
+                'Comic Garden',
+                style: TextStyle(
+                  fontSize: 40,
+                  fontWeight: FontWeight.bold,
+                  fontFamily: 'Brush_Script_MT_Italic',
+                ),
               ),
             ),
           ),
@@ -184,7 +197,10 @@ class _HomeScreenState extends State<HomeScreen> {
             ? FloatingActionButton(
                 onPressed: _scrollToTop,
                 backgroundColor: AppColors.secondaryPink,
-                child: const Icon(Icons.arrow_upward, color: Colors.white),
+                child: const Icon(
+                  Icons.arrow_upward,
+                  color: Colors.white,
+                ),
               )
             : null,
         body: Container(
@@ -200,7 +216,8 @@ class _HomeScreenState extends State<HomeScreen> {
                       : 'https://scontent.fsgn5-10.fna.fbcdn.net/v/t39.30808-6/640581554_1426507742184068_2348786958898076064_n.png?stp=dst-jpg_tt6&_nc_cat=106&ccb=1-7&_nc_sid=25d718&_nc_ohc=deyjMKOGcDkQ7kNvwFjrEBo&_nc_oc=Adl6-OD-UqmucQ2mOdCqsvS_BDmwpf9vYcZedBfaO9QivS2iahKg3uOGzL9MpD_bSwA&_nc_zt=23&_nc_ht=scontent.fsgn5-10.fna&_nc_gid=eFA8QgjnZWBh4FuovzXGOg&_nc_ss=8&oh=00_AfwQ6y1EFrxAlIHJufBWxscg0yhifyOhn0q9Zs8AlnWeRA&oe=69B07254',
                 ),
                 Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  crossAxisAlignment:
+                      CrossAxisAlignment.start,
                   children: [
                     Padding(
                       padding: const EdgeInsets.symmetric(
@@ -218,18 +235,27 @@ class _HomeScreenState extends State<HomeScreen> {
                     if (_isLoadingRandom)
                       const SizedBox(
                         height: 320,
-                        child: Center(child: CircularProgressIndicator()),
+                        child: Center(
+                          child:
+                              CircularProgressIndicator(),
+                        ),
                       )
-                    else if (randomComics == null || randomComics!.isEmpty)
+                    else if (randomComics == null ||
+                        randomComics!.isEmpty)
                       const SizedBox(
                         height: 320,
-                        child: Center(child: Text('Không có dữ liệu')),
+                        child: Center(
+                          child: Text('Không có dữ liệu'),
+                        ),
                       )
                     else ...[
                       Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 12),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                        ),
                         child: CarouselSlider(
-                          carouselController: _carouselController,
+                          carouselController:
+                              _carouselController,
                           options: CarouselOptions(
                             height: 320,
                             viewportFraction: 0.5,
@@ -243,14 +269,17 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                           items: randomComics!.map((comic) {
                             return Padding(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 8.0,
-                              ),
+                              padding:
+                                  const EdgeInsets.symmetric(
+                                    horizontal: 8.0,
+                                  ),
                               child: ComicCard(
-                                thumbnailUrl: comic.thumbnailUrl,
+                                thumbnailUrl:
+                                    comic.thumbnailUrl,
                                 title: comic.title,
                                 timeAgo: comic.timeAgo,
-                                newestChapter: comic.newestChapter,
+                                newestChapter:
+                                    comic.newestChapter,
                               ),
                             );
                           }).toList(),
@@ -262,14 +291,17 @@ class _HomeScreenState extends State<HomeScreen> {
                           activeIndex: _currentIndex,
                           count: randomComics!.length,
                           effect: ExpandingDotsEffect(
-                            activeDotColor: AppColors.secondaryPink,
-                            dotColor: Colors.grey.withValues(alpha: 0.3),
+                            activeDotColor:
+                                AppColors.secondaryPink,
+                            dotColor: Colors.grey
+                                .withValues(alpha: 0.3),
                             dotHeight: 6,
                             dotWidth: 6,
                             expansionFactor: 3,
                           ),
                           onDotClicked: (index) {
-                            _carouselController.animateToPage(index);
+                            _carouselController
+                                .animateToPage(index);
                           },
                         ),
                       ),
@@ -290,18 +322,27 @@ class _HomeScreenState extends State<HomeScreen> {
                     if (_isLoadingNewest)
                       const SizedBox(
                         height: 320,
-                        child: Center(child: CircularProgressIndicator()),
+                        child: Center(
+                          child:
+                              CircularProgressIndicator(),
+                        ),
                       )
-                    else if (newestComics == null || newestComics!.isEmpty)
+                    else if (newestComics == null ||
+                        newestComics!.isEmpty)
                       const SizedBox(
                         height: 320,
-                        child: Center(child: Text('Không có dữ liệu')),
+                        child: Center(
+                          child: Text('Không có dữ liệu'),
+                        ),
                       )
                     else ...[
                       GridView.builder(
                         shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        physics:
+                            const NeverScrollableScrollPhysics(),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 20,
+                        ),
                         itemCount: newestComics!.length,
                         gridDelegate:
                             const SliverGridDelegateWithFixedCrossAxisCount(
@@ -312,26 +353,41 @@ class _HomeScreenState extends State<HomeScreen> {
                             ),
                         itemBuilder: (context, index) {
                           return ComicCard(
-                            title: newestComics![index].title,
-                            thumbnailUrl: newestComics![index].thumbnailUrl,
-                            timeAgo: newestComics![index].timeAgo,
-                            newestChapter: newestComics![index].newestChapter,
+                            title:
+                                newestComics![index].title,
+                            thumbnailUrl:
+                                newestComics![index]
+                                    .thumbnailUrl,
+                            timeAgo: newestComics![index]
+                                .timeAgo,
+                            newestChapter:
+                                newestComics![index]
+                                    .newestChapter,
                           );
                         },
                       ),
                     ],
                     if (_isFetchingMore)
                       const Padding(
-                        padding: EdgeInsets.symmetric(vertical: 20.0),
-                        child: Center(child: CircularProgressIndicator()),
+                        padding: EdgeInsets.symmetric(
+                          vertical: 20.0,
+                        ),
+                        child: Center(
+                          child:
+                              CircularProgressIndicator(),
+                        ),
                       ),
                     if (!_hasMore)
                       Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 20.0),
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 20.0,
+                        ),
                         child: Center(
                           child: Text(
                             'Đã tải hết truyện',
-                            style: TextStyle(color: AppColors.textColor),
+                            style: TextStyle(
+                              color: AppColors.textColor,
+                            ),
                           ),
                         ),
                       ),
