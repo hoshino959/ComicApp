@@ -1,5 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:comic_app/auth_gate.dart';
+import 'package:comic_app/screens/detail_screen.dart';
+import 'package:comic_app/screens/home_screen.dart';
 import 'package:comic_app/screens/main_screen.dart';
 import 'package:comic_app/theme/theme_provider.dart';
 import 'package:comic_app/user/login_page.dart';
@@ -16,7 +18,10 @@ void main() async {
   final themeProvider = ThemeProvider();
   await themeProvider.loadTheme();
   runApp(
-    ChangeNotifierProvider(create: (_) => themeProvider, child: const MyApp()),
+    ChangeNotifierProvider(
+      create: (_) => themeProvider,
+      child: const MyApp(),
+    ),
   );
 }
 
@@ -25,7 +30,9 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final themeProvider = Provider.of<ThemeProvider>(context);
+    final themeProvider = Provider.of<ThemeProvider>(
+      context,
+    );
     return MaterialApp(
       home: MainScreen(),
       debugShowCheckedModeBanner: false,

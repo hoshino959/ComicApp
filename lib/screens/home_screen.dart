@@ -1,5 +1,6 @@
 import 'package:comic_app/api/api_service.dart';
 import 'package:comic_app/models/comic_model.dart';
+import 'package:comic_app/screens/detail_screen.dart';
 import 'package:comic_app/theme/app_colors.dart';
 import 'package:comic_app/theme/app_dark_colors.dart';
 import 'package:comic_app/theme/app_light_colors.dart';
@@ -273,13 +274,24 @@ class _HomeScreenState extends State<HomeScreen> {
                                   const EdgeInsets.symmetric(
                                     horizontal: 8.0,
                                   ),
-                              child: ComicCard(
-                                thumbnailUrl:
-                                    comic.thumbnailUrl,
-                                title: comic.title,
-                                timeAgo: comic.timeAgo,
-                                newestChapter:
-                                    comic.newestChapter,
+                              child: InkWell(
+                                onTap: () => {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          DetailScreen(),
+                                    ),
+                                  ),
+                                },
+                                child: ComicCard(
+                                  thumbnailUrl:
+                                      comic.thumbnailUrl,
+                                  title: comic.title,
+                                  timeAgo: comic.timeAgo,
+                                  newestChapter:
+                                      comic.newestChapter,
+                                ),
                               ),
                             );
                           }).toList(),
@@ -352,17 +364,28 @@ class _HomeScreenState extends State<HomeScreen> {
                               mainAxisExtent: 320,
                             ),
                         itemBuilder: (context, index) {
-                          return ComicCard(
-                            title:
-                                newestComics![index].title,
-                            thumbnailUrl:
-                                newestComics![index]
-                                    .thumbnailUrl,
-                            timeAgo: newestComics![index]
-                                .timeAgo,
-                            newestChapter:
-                                newestComics![index]
-                                    .newestChapter,
+                          return InkWell(
+                            onTap: () => {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      DetailScreen(),
+                                ),
+                              ),
+                            },
+                            child: ComicCard(
+                              title: newestComics![index]
+                                  .title,
+                              thumbnailUrl:
+                                  newestComics![index]
+                                      .thumbnailUrl,
+                              timeAgo: newestComics![index]
+                                  .timeAgo,
+                              newestChapter:
+                                  newestComics![index]
+                                      .newestChapter,
+                            ),
                           );
                         },
                       ),
