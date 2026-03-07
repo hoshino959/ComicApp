@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:comic_app/screens/main_screen.dart';
 import 'package:comic_app/theme/app_dark_colors.dart';
 import 'package:comic_app/theme/app_light_colors.dart';
@@ -720,6 +721,9 @@ class LoginPageState extends State<LoginPage> {
                                             } on FirebaseAuthException catch (
                                               e
                                             ) {
+                                              setState(() {
+                                                isLoading = false;
+                                              });
                                               ScaffoldMessenger.of(
                                                 context,
                                               ).showSnackBar(
@@ -797,6 +801,33 @@ class LoginPageState extends State<LoginPage> {
                                                                     .text
                                                                     .trim(),
                                                           );
+                                                      await FirebaseFirestore
+                                                          .instance
+                                                          .collection("Users")
+                                                          .doc(
+                                                            FirebaseAuth
+                                                                .instance
+                                                                .currentUser!
+                                                                .uid,
+                                                          )
+                                                          .set({
+                                                            'email':
+                                                                emailController
+                                                                    .text
+                                                                    .trim(),
+                                                            'password':
+                                                                passController
+                                                                    .text,
+                                                            'uid': FirebaseAuth
+                                                                .instance
+                                                                .currentUser!
+                                                                .uid,
+                                                            'name':
+                                                                'Người dùng mới',
+                                                            'theme': isDark
+                                                                ? 'dark'
+                                                                : 'light',
+                                                          });
                                                       ScaffoldMessenger.of(
                                                         context,
                                                       ).showSnackBar(
@@ -832,6 +863,9 @@ class LoginPageState extends State<LoginPage> {
                                                           message =
                                                               'Đã có lỗi xảy ra, vui lòng thử lại';
                                                       }
+                                                      setState(() {
+                                                        isLoading = false;
+                                                      });
                                                       ScaffoldMessenger.of(
                                                         context,
                                                       ).showSnackBar(

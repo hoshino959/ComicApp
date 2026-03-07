@@ -68,14 +68,16 @@ class UserScreenState extends State<UserScreen> {
                       InkWell(
                         onTap: () {
                           if (user != null)
-                            Navigator.of(context).pushReplacement(
+                            Navigator.of(context).push(
                               MaterialPageRoute(
                                 builder: (_) => ProfileScreen(),
                               ),
                             );
-                          Navigator.of(context).push(
-                            MaterialPageRoute(builder: (_) => LoginPage()),
-                          );
+                          if (user == null) {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(builder: (_) => LoginPage()),
+                            );
+                          }
                         },
                         child: Padding(
                           padding: EdgeInsets.symmetric(
