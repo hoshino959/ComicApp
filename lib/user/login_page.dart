@@ -827,6 +827,8 @@ class LoginPageState extends State<LoginPage> {
                                                             'theme': isDark
                                                                 ? 'dark'
                                                                 : 'light',
+                                                            'gender': '',
+                                                            'avatar': '',
                                                           });
                                                       ScaffoldMessenger.of(
                                                         context,
