@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:comic_app/models/comic_detail_model.dart';
 import 'package:comic_app/models/comic_model.dart';
 import 'package:http/http.dart' as http;
 
@@ -72,6 +73,51 @@ class ApiService {
       }
     } catch (e) {
       return [];
+    }
+  }
+
+  static Future<ComicDetailModel?> fetchComicDetail(
+    String id,
+  ) async {
+    try {
+      final Uri mangaUrl = Uri.parse(
+        '$_baseUrl/manga/$id'
+        '?includes[]=author'
+        '&includes[]=artist'
+        '&includes[]=cover_art',
+      );
+
+      final mangaResponse = await http.get(mangaUrl);
+
+      if (mangaResponse.statusCode == 200) {
+        final Map<String, dynamic> mangaData = json.decode(
+          mangaResponse.body,
+        );
+        final mangaJson = mangaData['data'];
+
+        final Uri statsUrl = Uri.parse(
+          '$_baseUrl/statistics/manga/$id',
+        );
+        final statsResponse = await http.get(statsUrl);
+
+        Map<String, dynamic>? statsJson;
+        if (statsResponse.statusCode == 200) {
+          final Map<String, dynamic> statsData = json
+              .decode(statsResponse.body);
+          statsJson = statsData['statistics'];
+        }
+
+        return ComicDetailModel.fromJson(
+          mangaJson,
+          statsJson,
+        );
+      } else {
+        throw Exception(
+          'Failed to load comic details. Status Code: ${mangaResponse.statusCode}',
+        );
+      }
+    } catch (e) {
+      return null;
     }
   }
 }
