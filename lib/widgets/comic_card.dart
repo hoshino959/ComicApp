@@ -21,12 +21,16 @@ class ComicCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final darkMode =
-        Provider.of<ThemeProvider>(context).themeMode == ThemeMode.dark;
+        Provider.of<ThemeProvider>(context).themeMode ==
+        ThemeMode.dark;
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.secondaryPink, width: 3),
+        border: Border.all(
+          color: AppColors.secondaryPink,
+          width: 3,
+        ),
       ),
       child: Column(
         children: [
@@ -38,11 +42,11 @@ class ComicCard extends StatelessWidget {
             child: CachedNetworkImage(
               imageUrl: thumbnailUrl,
               width: double.infinity,
-              height: 220,
+              height: 219,
               fit: BoxFit.cover,
               memCacheHeight: 300,
               placeholder: (context, url) => Container(
-                height: 220,
+                height: 219,
                 color: Colors.grey.withValues(alpha: 0.1),
                 child: Center(
                   child: CircularProgressIndicator(
@@ -50,15 +54,18 @@ class ComicCard extends StatelessWidget {
                   ),
                 ),
               ),
-              errorWidget: (context, url, error) => Container(
-                height: 220,
-                color: Colors.grey.withValues(alpha: 0.1),
-                child: const Icon(
-                  Icons.broken_image,
-                  color: Colors.grey,
-                  size: 40,
-                ),
-              ),
+              errorWidget: (context, url, error) =>
+                  Container(
+                    height: 219,
+                    color: Colors.grey.withValues(
+                      alpha: 0.1,
+                    ),
+                    child: const Icon(
+                      Icons.broken_image,
+                      color: Colors.grey,
+                      size: 40,
+                    ),
+                  ),
             ),
           ),
 
@@ -71,14 +78,18 @@ class ComicCard extends StatelessWidget {
                   children: [
                     Icon(
                       Icons.history,
-                      color: !darkMode ? Colors.black : Colors.white,
+                      color: !darkMode
+                          ? Colors.black
+                          : Colors.white,
                       size: 16,
                     ),
                     const SizedBox(width: 5),
                     Text(
                       timeAgo,
                       style: TextStyle(
-                        color: !darkMode ? Colors.black : Colors.white,
+                        color: !darkMode
+                            ? Colors.black
+                            : Colors.white,
                       ),
                     ),
                   ],
@@ -108,7 +119,9 @@ class ComicCard extends StatelessWidget {
                         overflow: TextOverflow.ellipsis,
                         maxLines: 1,
                         style: TextStyle(
-                          color: !darkMode ? Colors.black : Colors.white,
+                          color: !darkMode
+                              ? Colors.black
+                              : Colors.white,
                         ),
                       ),
                     ),

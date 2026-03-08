@@ -17,25 +17,35 @@ class ComicModel {
     final attributes = json['attributes'] ?? {};
     final id = json['id'] ?? '';
 
-    String parsedTitle = 'Unknown Title';
-    if (attributes['title'] != null && attributes['title'].isNotEmpty) {
-      parsedTitle = attributes['title']['en'] ?? attributes['title'].values.first.toString();
+    String parsedTitle = 'Đang cập nhật';
+    if (attributes['title'] != null &&
+        attributes['title'].isNotEmpty) {
+      parsedTitle =
+          attributes['title']['vi'] ??
+          attributes['title']['en'] ??
+          attributes['title'].values.first.toString();
     }
 
-    String lastChapter = attributes['lastChapter'] != null && attributes['lastChapter'].toString().isNotEmpty
+    String lastChapter =
+        attributes['lastChapter'] != null &&
+            attributes['lastChapter'].toString().isNotEmpty
         ? 'Chương ${attributes['lastChapter']}'
         : 'Đang cập nhật...';
 
     String parsedTimeAgo = '';
     if (attributes['updatedAt'] != null) {
-      DateTime updatedAt = DateTime.parse(attributes['updatedAt']).toLocal();
+      DateTime updatedAt = DateTime.parse(
+        attributes['updatedAt'],
+      ).toLocal();
       parsedTimeAgo = _calculateTimeAgo(updatedAt);
     }
 
     String coverFileName = '';
-    final relationships = json['relationships'] as List<dynamic>? ?? [];
+    final relationships =
+        json['relationships'] as List<dynamic>? ?? [];
     for (var rel in relationships) {
-      if (rel['type'] == 'cover_art' && rel['attributes'] != null) {
+      if (rel['type'] == 'cover_art' &&
+          rel['attributes'] != null) {
         coverFileName = rel['attributes']['fileName'] ?? '';
         break;
       }
@@ -43,7 +53,7 @@ class ComicModel {
 
     String coverUrl = coverFileName.isNotEmpty
         ? 'https://uploads.mangadex.org/covers/$id/$coverFileName.256.jpg'
-        : 'https://mangadex.org/img/avatar.png'; 
+        : 'https://mangadex.org/img/avatar.png';
 
     return ComicModel(
       id: id,
@@ -56,11 +66,15 @@ class ComicModel {
 
   static String _calculateTimeAgo(DateTime date) {
     final Duration diff = DateTime.now().difference(date);
-    if (diff.inDays > 365) return '${(diff.inDays / 365).floor()} năm trước';
-    if (diff.inDays > 30) return '${(diff.inDays / 30).floor()} tháng trước';
+    if (diff.inDays > 365)
+      return '${(diff.inDays / 365).floor()} năm trước';
+    if (diff.inDays > 30)
+      return '${(diff.inDays / 30).floor()} tháng trước';
     if (diff.inDays > 0) return '${diff.inDays} ngày trước';
-    if (diff.inHours > 0) return '${diff.inHours} tiếng trước';
-    if (diff.inMinutes > 0) return '${diff.inMinutes} phút trước';
+    if (diff.inHours > 0)
+      return '${diff.inHours} tiếng trước';
+    if (diff.inMinutes > 0)
+      return '${diff.inMinutes} phút trước';
     return 'Vừa xong';
   }
 }

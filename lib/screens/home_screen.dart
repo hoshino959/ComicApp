@@ -280,7 +280,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                     context,
                                     MaterialPageRoute(
                                       builder: (context) =>
-                                          DetailScreen(),
+                                          DetailScreen(
+                                            id: comic.id,
+                                          ),
                                     ),
                                   ),
                                 },
@@ -370,7 +372,10 @@ class _HomeScreenState extends State<HomeScreen> {
                                 context,
                                 MaterialPageRoute(
                                   builder: (context) =>
-                                      DetailScreen(),
+                                      DetailScreen(
+                                        id: newestComics![index]
+                                            .id,
+                                      ),
                                 ),
                               ),
                             },
