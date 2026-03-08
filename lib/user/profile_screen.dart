@@ -245,13 +245,12 @@ class ProfileScreenState extends State<ProfileScreen> {
                       Container(
                         width: double.infinity,
                         decoration: BoxDecoration(
-                          color: !isDark ? Colors.white : Colors.black87,
+                          color: isDark
+                              ? AppColorsDark.background3
+                              : AppColorsLight.background2,
                           borderRadius: BorderRadius.circular(20),
                           boxShadow: [
-                            BoxShadow(
-                              blurRadius: 10,
-                              color: !isDark ? Colors.black12 : Colors.grey,
-                            ),
+                            BoxShadow(blurRadius: 10, color: Colors.black26),
                           ],
                         ),
                         padding: EdgeInsets.all(20),
@@ -393,13 +392,12 @@ class ProfileScreenState extends State<ProfileScreen> {
                       Container(
                         width: double.infinity,
                         decoration: BoxDecoration(
-                          color: !isDark ? Colors.white : Colors.black87,
+                          color: isDark
+                              ? AppColorsDark.background3
+                              : AppColorsLight.background2,
                           borderRadius: BorderRadius.circular(20),
                           boxShadow: [
-                            BoxShadow(
-                              blurRadius: 10,
-                              color: !isDark ? Colors.black12 : Colors.grey,
-                            ),
+                            BoxShadow(blurRadius: 10, color: Colors.black26),
                           ],
                         ),
                         padding: EdgeInsets.all(20),
