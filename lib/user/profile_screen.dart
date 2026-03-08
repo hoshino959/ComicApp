@@ -360,13 +360,21 @@ class ProfileScreenState extends State<ProfileScreen> {
                                   children: [
                                     Icon(
                                       Icons.logout,
-                                      color: Color.fromRGBO(251, 44, 54, 1.0),
+                                      color:
+                                          Theme.of(context).brightness ==
+                                              ThemeMode.light
+                                          ? OkLab(0.64, 0.21, 0.1).toColor()
+                                          : OkLab(0.7, 0.18, 0.07).toColor(),
                                     ),
                                     SizedBox(width: 15),
                                     Text(
                                       'Đăng xuất',
                                       style: TextStyle(
-                                        color: Color.fromRGBO(251, 44, 54, 1.0),
+                                        color:
+                                            Theme.of(context).brightness ==
+                                                ThemeMode.light
+                                            ? OkLab(0.64, 0.21, 0.1).toColor()
+                                            : OkLab(0.7, 0.18, 0.07).toColor(),
                                         fontWeight: FontWeight.bold,
                                         fontSize: 16,
                                       ),
