@@ -1,9 +1,13 @@
+import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloudinary_public/cloudinary_public.dart';
 import 'package:comic_app/screens/main_screen.dart';
 import 'package:comic_app/theme/app_dark_colors.dart';
 import 'package:comic_app/theme/app_light_colors.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:okcolor/models/oklab.dart';
 
 class ProfileScreen extends StatefulWidget {
   @override
@@ -13,10 +17,162 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class ProfileScreenState extends State<ProfileScreen> {
-  // bool isLoading;
+  File? avatarImage;
+  final ImagePicker picker = ImagePicker();
+
+  final cloudinary = CloudinaryPublic("dxbtuad7u", "Avatar_Upload");
+
+  bool isLoading = false;
   bool isEditing = false;
+  String nameFS = "";
   String gender = "";
+  String emailFS = "";
+  String imgUrl = "";
   TextEditingController nameController = TextEditingController();
+
+  getUserData() async {
+    setState(() {
+      isLoading = true;
+    });
+    var doc = await FirebaseFirestore.instance
+        .collection("Users")
+        .doc(FirebaseAuth.instance.currentUser!.uid)
+        .get();
+
+    setState(() {
+      nameFS = doc.data()!["name"];
+      gender = doc.data()!["gender"];
+      emailFS = doc.data()!["email"];
+      nameController.text = nameFS;
+      imgUrl = doc.data()!["avatar"];
+      isLoading = false;
+    });
+  }
+
+  pickAndUploadImage() async {
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+    if (pickedFile == null) {
+      return;
+    }
+    File image = File(pickedFile.path);
+    showDialog(
+      context: context,
+      builder: (context) {
+        return Dialog(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Padding(
+                padding: EdgeInsets.fromLTRB(0, 10, 0, 10),
+                child: Text(
+                  'Thay đổi avatar',
+                  style: TextStyle(
+                    color: Theme.of(context).brightness == Brightness.dark
+                        ? Colors.white
+                        : Colors.black,
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+              ClipRRect(
+                borderRadius: BorderRadius.circular(10),
+                child: Image.file(
+                  image,
+                  width: 250,
+                  height: 250,
+                  fit: BoxFit.cover,
+                ),
+              ),
+              SizedBox(height: 10),
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 30),
+                child: Container(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor:
+                          Theme.of(context).brightness == Brightness.light
+                          ? OkLab(0.75, 0.17, -0.0).toColor()
+                          : OkLab(0.75, 0.17, -0.01).toColor(),
+                      side: BorderSide(color: OkLab(0.88, 0.04, 0).toColor()),
+                    ),
+                    onPressed: () async {
+                      Navigator.pop(context);
+
+                      String imageUrl = await uploadToCloudinary(image);
+
+                      await FirebaseFirestore.instance
+                          .collection("Users")
+                          .doc(FirebaseAuth.instance.currentUser!.uid)
+                          .update({"avatar": imageUrl});
+
+                      setState(() {
+                        avatarImage = image;
+                        getUserData();
+                      });
+                    },
+                    child: Text('Save', style: TextStyle(color: Colors.white)),
+                  ),
+                ),
+              ),
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 30),
+                child: Container(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      side: BorderSide(color: OkLab(0.88, 0.04, 0).toColor()),
+                    ),
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    child: Text(
+                      'Back',
+                      style: TextStyle(
+                        color: Theme.of(context).brightness == Brightness.dark
+                            ? Colors.white
+                            : Colors.black,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              SizedBox(height: 10),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  uploadToCloudinary(File imageFile) async {
+    try {
+      setState(() {
+        isLoading = true;
+      });
+      String uid = FirebaseAuth.instance.currentUser!.uid;
+      CloudinaryResponse response = await cloudinary.uploadFile(
+        CloudinaryFile.fromFile(
+          imageFile.path,
+          identifier: uid,
+          resourceType: CloudinaryResourceType.Image,
+        ),
+      );
+      setState(() {
+        isLoading = false;
+      });
+      return response.secureUrl;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    getUserData();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -60,9 +216,9 @@ class ProfileScreenState extends State<ProfileScreen> {
                                 Text(
                                   'Hồ sơ của tôi',
                                   style: TextStyle(
-                                    color: !isDark
-                                        ? Color.fromRGBO(130, 0, 219, 1.0)
-                                        : Color.fromRGBO(255, 121, 172, 1),
+                                    color: isDark
+                                        ? OkLab(0.83, 0.07, -0.1).toColor()
+                                        : OkLab(0.5, 0.14, -0.22).toColor(),
                                     fontSize: 30,
                                     fontWeight: FontWeight.bold,
                                   ),
@@ -101,21 +257,54 @@ class ProfileScreenState extends State<ProfileScreen> {
                         padding: EdgeInsets.all(20),
                         child: Column(
                           children: [
-                            ClipOval(
-                              child: Image.asset(
-                                'assets/images/logo.png',
-                                width: 100,
-                                height: 100,
-                                fit: BoxFit.cover,
-                              ),
+                            Stack(
+                              children: [
+                                if (imgUrl.isEmpty)
+                                  ClipOval(
+                                    child: Image.asset(
+                                      'assets/images/logo.png',
+                                      width: 100,
+                                      height: 100,
+                                      fit: BoxFit.cover,
+                                    ),
+                                  ),
+                                if (imgUrl.isNotEmpty)
+                                  ClipOval(
+                                    child: Image.network(
+                                      imgUrl,
+                                      width: 100,
+                                      height: 100,
+                                      fit: BoxFit.cover,
+                                    ),
+                                  ),
+                                Positioned(
+                                  bottom: 0,
+                                  right: 0,
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      pickAndUploadImage();
+                                    },
+                                    child: CircleAvatar(
+                                      backgroundColor: Color(0xff7d60fb),
+                                      child: Icon(
+                                        Icons.camera_alt,
+                                        size: 18,
+                                        color: isDark
+                                            ? Colors.black
+                                            : Colors.white,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
                             SizedBox(height: 10),
                             Text(
-                              'ZhazF1',
+                              nameFS,
                               style: TextStyle(
-                                color: !isDark
-                                    ? Color(0xff7B1FA2)
-                                    : Color(0xffba68c8),
+                                color: isDark
+                                    ? OkLab(0.83, 0.07, -0.1).toColor()
+                                    : OkLab(0.5, 0.14, -0.22).toColor(),
                                 fontSize: 25,
                                 fontWeight: FontWeight.bold,
                               ),
@@ -132,7 +321,9 @@ class ProfileScreenState extends State<ProfileScreen> {
                                 vertical: 10,
                               ),
                               decoration: BoxDecoration(
-                                color: Color.fromRGBO(255, 121, 172, 1),
+                                color: isDark
+                                    ? OkLab(0.41, 0.15, 0.01).toColor()
+                                    : OkLab(0.72, 0.2, -0.04).toColor(),
                                 borderRadius: BorderRadius.circular(15),
                               ),
                               child: Row(
@@ -216,9 +407,17 @@ class ProfileScreenState extends State<ProfileScreen> {
                                       Text(
                                         'Thông tin hồ sơ',
                                         style: TextStyle(
-                                          color: !isDark
-                                              ? Color(0xff7B1FA2)
-                                              : Color(0xffba68c8),
+                                          color: isDark
+                                              ? OkLab(
+                                                  0.83,
+                                                  0.07,
+                                                  -0.1,
+                                                ).toColor()
+                                              : OkLab(
+                                                  0.5,
+                                                  0.14,
+                                                  -0.22,
+                                                ).toColor(),
                                           fontWeight: FontWeight.bold,
                                           fontSize: 20,
                                         ),
@@ -287,8 +486,21 @@ class ProfileScreenState extends State<ProfileScreen> {
                                                   ? Colors.pink
                                                   : Colors.pinkAccent,
                                             ),
-                                            onPressed: () {
+                                            onPressed: () async {
+                                              await FirebaseFirestore.instance
+                                                  .collection("Users")
+                                                  .doc(
+                                                    FirebaseAuth
+                                                        .instance
+                                                        .currentUser!
+                                                        .uid,
+                                                  )
+                                                  .update({
+                                                    "name": nameController.text,
+                                                    "gender": gender,
+                                                  });
                                               setState(() {
+                                                getUserData();
                                                 isEditing = false;
                                               });
                                             },
@@ -318,37 +530,68 @@ class ProfileScreenState extends State<ProfileScreen> {
                               ],
                             ),
                             SizedBox(height: 5),
-                            Row(
-                              children: [
-                                Icon(
-                                  Icons.account_circle,
-                                  color: isDark ? Colors.white : Colors.black,
-                                ),
-                                SizedBox(width: 5),
-                                Expanded(
-                                  child: isEditing
-                                      ? TextField(
-                                          controller: nameController,
-                                          decoration: InputDecoration(
-                                            border: OutlineInputBorder(),
-                                            isDense: true,
-                                            contentPadding:
-                                                EdgeInsets.symmetric(
-                                                  vertical: 10,
-                                                ),
+                            !isEditing
+                                ? Row(
+                                    children: [
+                                      Icon(
+                                        Icons.account_circle,
+                                        color: isDark
+                                            ? Colors.white
+                                            : Colors.black,
+                                      ),
+                                      SizedBox(width: 10),
+                                      Text(
+                                        nameFS,
+                                        style: TextStyle(
+                                          color: isDark
+                                              ? Colors.white
+                                              : Colors.black,
+                                        ),
+                                      ),
+                                    ],
+                                  )
+                                : Column(
+                                    children: [
+                                      TextField(
+                                        controller: nameController,
+                                        decoration: InputDecoration(
+                                          prefixIcon: Icon(
+                                            Icons.account_circle,
                                           ),
-                                        )
-                                      : Text(
-                                          'ZhazF1',
-                                          style: TextStyle(
-                                            color: isDark
-                                                ? Colors.white
-                                                : Colors.black,
+                                          contentPadding: EdgeInsets.symmetric(
+                                            vertical: 10,
+                                          ),
+                                          enabledBorder: OutlineInputBorder(
+                                            borderRadius: BorderRadius.circular(
+                                              15,
+                                            ),
+                                            borderSide: BorderSide(
+                                              color: Color.fromRGBO(
+                                                246,
+                                                51,
+                                                154,
+                                                1.0,
+                                              ),
+                                            ),
+                                          ),
+                                          focusedBorder: OutlineInputBorder(
+                                            borderRadius: BorderRadius.circular(
+                                              15,
+                                            ),
+                                            borderSide: BorderSide(
+                                              color: Color.fromRGBO(
+                                                246,
+                                                51,
+                                                154,
+                                                1.0,
+                                              ),
+                                              width: 3.0,
+                                            ),
                                           ),
                                         ),
-                                ),
-                              ],
-                            ),
+                                      ),
+                                    ],
+                                  ),
                             SizedBox(height: 5),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.center,
@@ -428,7 +671,7 @@ class ProfileScreenState extends State<ProfileScreen> {
                                 ),
                                 SizedBox(width: 10),
                                 Text(
-                                  'thepig6704@gmail.com',
+                                  emailFS,
                                   style: TextStyle(
                                     color: isDark ? Colors.white : Colors.black,
                                   ),
@@ -444,6 +687,11 @@ class ProfileScreenState extends State<ProfileScreen> {
               ),
             ),
           ),
+          if (isLoading)
+            Container(
+              color: Colors.black.withOpacity(0.3),
+              child: Center(child: CircularProgressIndicator()),
+            ),
         ],
       ),
     );

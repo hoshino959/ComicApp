@@ -91,8 +91,8 @@ class UserScreenState extends State<UserScreen> {
                                 Icons.account_circle,
                                 size: 40,
                                 color: !darkMode
-                                    ? Color.fromRGBO(130, 0, 219, 1.0)
-                                    : Color.fromRGBO(255, 121, 172, 1),
+                                    ? OkLab(0.5, 0.14, -0.22).toColor()
+                                    : OkLab(0.83, 0.07, -0.1).toColor(),
                               ),
                               SizedBox(width: 20),
                               if (user != null)
@@ -104,8 +104,8 @@ class UserScreenState extends State<UserScreen> {
                                       style: TextStyle(
                                         fontSize: 18,
                                         color: !darkMode
-                                            ? Color.fromRGBO(130, 0, 219, 1.0)
-                                            : Color.fromRGBO(255, 121, 172, 1),
+                                            ? OkLab(0.5, 0.14, -0.22).toColor()
+                                            : OkLab(0.83, 0.07, -0.1).toColor(),
                                       ),
                                     ),
                                     Text(
@@ -127,8 +127,8 @@ class UserScreenState extends State<UserScreen> {
                                       style: TextStyle(
                                         fontSize: 18,
                                         color: !darkMode
-                                            ? Color.fromRGBO(130, 0, 219, 1.0)
-                                            : Color.fromRGBO(255, 121, 172, 1),
+                                            ? OkLab(0.5, 0.14, -0.22).toColor()
+                                            : OkLab(0.83, 0.07, -0.1).toColor(),
                                       ),
                                     ),
                                   ],
@@ -155,8 +155,8 @@ class UserScreenState extends State<UserScreen> {
                                   Icons.library_books,
                                   size: 40,
                                   color: !darkMode
-                                      ? Color.fromRGBO(130, 0, 219, 1.0)
-                                      : Color.fromRGBO(255, 121, 172, 1),
+                                      ? OkLab(0.5, 0.14, -0.22).toColor()
+                                      : OkLab(0.83, 0.07, -0.1).toColor(),
                                 ),
                                 SizedBox(width: 20),
                                 Column(
@@ -167,8 +167,8 @@ class UserScreenState extends State<UserScreen> {
                                       style: TextStyle(
                                         fontSize: 18,
                                         color: !darkMode
-                                            ? Color.fromRGBO(130, 0, 219, 1.0)
-                                            : Color.fromRGBO(255, 121, 172, 1),
+                                            ? OkLab(0.5, 0.14, -0.22).toColor()
+                                            : OkLab(0.83, 0.07, -0.1).toColor(),
                                       ),
                                     ),
                                     Text(
@@ -215,8 +215,8 @@ class UserScreenState extends State<UserScreen> {
                                 Icons.settings,
                                 size: 40,
                                 color: !darkMode
-                                    ? Color.fromRGBO(130, 0, 219, 1.0)
-                                    : Color.fromRGBO(255, 121, 172, 1),
+                                    ? OkLab(0.5, 0.14, -0.22).toColor()
+                                    : OkLab(0.83, 0.07, -0.1).toColor(),
                               ),
                               SizedBox(width: 20),
                               Column(
@@ -227,8 +227,8 @@ class UserScreenState extends State<UserScreen> {
                                     style: TextStyle(
                                       fontSize: 18,
                                       color: !darkMode
-                                          ? Color.fromRGBO(130, 0, 219, 1.0)
-                                          : Color.fromRGBO(255, 121, 172, 1),
+                                          ? OkLab(0.5, 0.14, -0.22).toColor()
+                                          : OkLab(0.83, 0.07, -0.1).toColor(),
                                     ),
                                   ),
                                   Text(
@@ -275,14 +275,18 @@ class UserScreenState extends State<UserScreen> {
                                 Icon(
                                   Icons.logout,
                                   size: 40,
-                                  color: Color.fromRGBO(251, 44, 54, 1.0),
+                                  color: !darkMode
+                                      ? OkLab(0.64, 0.21, 0.1).toColor()
+                                      : OkLab(0.7, 0.18, 0.07).toColor(),
                                 ),
                                 SizedBox(width: 20),
                                 Text(
                                   'Đăng xuất',
                                   style: TextStyle(
                                     fontSize: 18,
-                                    color: Color.fromRGBO(251, 44, 54, 1.0),
+                                    color: !darkMode
+                                        ? OkLab(0.64, 0.21, 0.1).toColor()
+                                        : OkLab(0.7, 0.18, 0.07).toColor(),
                                   ),
                                 ),
                               ],
