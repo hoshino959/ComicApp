@@ -213,8 +213,8 @@ class _HomeScreenState extends State<HomeScreen> {
               children: [
                 Image.network(
                   !darkMode
-                      ? 'https://scontent.fsgn5-5.fna.fbcdn.net/v/t39.30808-6/623426145_1407740497394126_4920768692675398143_n.jpg?_nc_cat=108&ccb=1-7&_nc_sid=b895b5&_nc_ohc=N2Jbt0WABU8Q7kNvwHwX_S9&_nc_oc=Admwok3cU2hnrTA2093NgoxUURapScRx0I3bgLje-kH87IFSdWMSNQeHfvF3DIVsjdw&_nc_zt=23&_nc_ht=scontent.fsgn5-5.fna&_nc_gid=TLKuWd02XB_1R9tUnCPDaQ&_nc_ss=8&oh=00_AfyPmpx3AWj9A3YcsEeTpUPWPA4UmKpOSsdCmXjq_vG9xA&oe=69AEBD21'
-                      : 'https://scontent.fsgn5-10.fna.fbcdn.net/v/t39.30808-6/640581554_1426507742184068_2348786958898076064_n.png?stp=dst-jpg_tt6&_nc_cat=106&ccb=1-7&_nc_sid=25d718&_nc_ohc=deyjMKOGcDkQ7kNvwFjrEBo&_nc_oc=Adl6-OD-UqmucQ2mOdCqsvS_BDmwpf9vYcZedBfaO9QivS2iahKg3uOGzL9MpD_bSwA&_nc_zt=23&_nc_ht=scontent.fsgn5-10.fna&_nc_gid=eFA8QgjnZWBh4FuovzXGOg&_nc_ss=8&oh=00_AfwQ6y1EFrxAlIHJufBWxscg0yhifyOhn0q9Zs8AlnWeRA&oe=69B07254',
+                      ? 'https://res.cloudinary.com/dxbtuad7u/image/upload/v1773077544/light_bg_e1z6ud.jpg'
+                      : 'https://res.cloudinary.com/dxbtuad7u/image/upload/v1773077520/dark_bg_dwxatc.jpg',
                 ),
                 Column(
                   crossAxisAlignment:
