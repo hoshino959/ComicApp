@@ -639,7 +639,10 @@ class _DetailScreenState extends State<DetailScreen> {
                               width: 1,
                             ),
                           ),
-                          padding: EdgeInsets.all(16),
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 8,
+                          ),
                           child: Column(
                             children: [
                               Row(
@@ -676,9 +679,6 @@ class _DetailScreenState extends State<DetailScreen> {
                                           size: 18,
                                         ),
                                       ),
-                                      const SizedBox(
-                                        width: 16,
-                                      ),
                                       IconButton(
                                         onPressed: () {},
                                         icon: Icon(
@@ -693,7 +693,7 @@ class _DetailScreenState extends State<DetailScreen> {
                                   ),
                                 ],
                               ),
-                              const SizedBox(height: 16),
+                              const SizedBox(height: 8),
                               isLoadingChapter
                                   ? const SizedBox(
                                       height: 300,

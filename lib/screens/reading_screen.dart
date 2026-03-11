@@ -124,7 +124,10 @@ class _ReadingScreenState extends State<ReadingScreen> {
           decoration: BoxDecoration(
             color: Color(0xFF16151A),
           ),
-          padding: EdgeInsets.symmetric(vertical: 13),
+          padding: EdgeInsets.symmetric(
+            vertical: 13,
+            horizontal: 5,
+          ),
           child: Row(
             children: [
               IconButton(
@@ -157,6 +160,7 @@ class _ReadingScreenState extends State<ReadingScreen> {
                       : Colors.white.withValues(alpha: 0.3),
                 ),
               ),
+              const SizedBox(width: 5),
               Expanded(
                 child: Container(
                   decoration: BoxDecoration(
@@ -184,16 +188,12 @@ class _ReadingScreenState extends State<ReadingScreen> {
                             overflow: TextOverflow.ellipsis,
                           ),
                         ),
-                        const SizedBox(width: 8),
-                        Icon(
-                          Icons.keyboard_arrow_down,
-                          color: Colors.white,
-                        ),
                       ],
                     ),
                   ),
                 ),
               ),
+              const SizedBox(width: 5),
               IconButton(
                 onPressed: currentIndex! > 0
                     ? () {
@@ -249,7 +249,12 @@ class _ReadingScreenState extends State<ReadingScreen> {
                           borderRadius:
                               BorderRadius.circular(20),
                         ),
-                        padding: EdgeInsets.all(16),
+                        padding: EdgeInsets.fromLTRB(
+                          16,
+                          5,
+                          16,
+                          16,
+                        ),
                         child: Column(
                           crossAxisAlignment:
                               CrossAxisAlignment.start,
@@ -262,17 +267,28 @@ class _ReadingScreenState extends State<ReadingScreen> {
                                     style: TextStyle(
                                       color: Colors.white,
                                     ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow
+                                        .ellipsis,
                                   ),
                                 ),
-                                const SizedBox(width: 8),
-                                Icon(
-                                  Icons.sync,
-                                  size: 20,
-                                  color: Color(0xFFFF2E7E),
+                                IconButton(
+                                  onPressed: () {
+                                    setState(() {
+                                      isLoading = true;
+                                      _fetchData();
+                                    });
+                                  },
+                                  icon: Icon(
+                                    Icons.sync,
+                                    size: 20,
+                                    color: Color(
+                                      0xFFFF2E7E,
+                                    ),
+                                  ),
                                 ),
                               ],
                             ),
-                            const SizedBox(height: 8),
                             Text(
                               currentChapterTitle!,
                               style: TextStyle(

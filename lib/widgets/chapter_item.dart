@@ -47,11 +47,15 @@ class ChapterItem extends StatelessWidget {
                   children: [
                     Icon(Icons.person_outline, size: 14),
                     const SizedBox(width: 4),
-                    Text(
-                      uploaderName,
-                      style: TextStyle(color: Colors.white),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
+                    Expanded(
+                      child: Text(
+                        uploaderName,
+                        style: TextStyle(
+                          color: Colors.white,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
                     ),
                   ],
                 ),
