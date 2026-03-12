@@ -122,9 +122,9 @@ class _HomeScreenState extends State<HomeScreen> {
           newestComics = result;
         }
 
-        _currentOffset += 10;
+        _currentOffset += 20;
 
-        if (result.length < 10) {
+        if (result.length < 20) {
           _hasMore = false;
         }
 

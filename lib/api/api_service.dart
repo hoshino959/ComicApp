@@ -191,4 +191,48 @@ class ApiService {
       return null;
     }
   }
+
+  static Future<List<ComicModel>> searchComics(
+    String query, {
+    int limit = 20,
+    int offset = 0,
+  }) async {
+    try {
+      if (query.trim().isEmpty) {
+        return await fetchRecentlyUpdatedComics(
+          limit: limit,
+          offset: offset,
+        );
+      }
+
+      final Uri url = Uri.parse(
+        '$_baseUrl/manga'
+        '?title=$query'
+        '&limit=$limit'
+        '&offset=$offset'
+        '&includes[]=cover_art'
+        '&hasAvailableChapters=true'
+        '&order[relevance]=desc',
+      );
+
+      final response = await http.get(url);
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> data = json.decode(
+          response.body,
+        );
+        final List<dynamic> mangaList = data['data'] ?? [];
+
+        return mangaList
+            .map((json) => ComicModel.fromJson(json))
+            .toList();
+      } else {
+        throw Exception(
+          'Failed to search comics. Status Code: ${response.statusCode}',
+        );
+      }
+    } catch (e) {
+      return [];
+    }
+  }
 }
