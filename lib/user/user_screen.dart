@@ -4,6 +4,7 @@ import 'package:comic_app/screens/main_screen.dart';
 import 'package:comic_app/theme/app_dark_colors.dart';
 import 'package:comic_app/theme/app_light_colors.dart';
 import 'package:comic_app/theme/theme_provider.dart';
+import 'package:comic_app/user/library_screen.dart';
 import 'package:comic_app/user/login_page.dart';
 import 'package:comic_app/user/profile_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -142,7 +143,13 @@ class UserScreenState extends State<UserScreen> {
                       //userLibrary
                       if (user != null)
                         InkWell(
-                          onTap: () {},
+                          onTap: () {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (_) => LibraryScreen(),
+                              ),
+                            );
+                          },
                           child: Padding(
                             padding: EdgeInsets.symmetric(
                               horizontal: 30,

@@ -71,10 +71,14 @@ flutter:
   assets:
     - assets/images/
     - assets/fonts/Brush_Script_MT_Italic.ttf
+    - assets/fonts/Merienda-ExtraBold.ttf
   fonts:
     - family: Brush_Script_MT_Italic
       fonts:
         - asset: assets/fonts/Brush_Script_MT_Italic.ttf
+    - family: Merienda-ExtraBold
+      fonts:
+        - asset: assets/fonts/Merienda-ExtraBold.ttf
 
   
   # To add assets to your application, add an assets section, like this:
