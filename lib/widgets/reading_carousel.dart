@@ -45,6 +45,7 @@ class _ReadingCarouselState extends State<ReadingCarousel> {
         .doc(user!.uid)
         .collection('Reading')
         .orderBy('updatedAt', descending: true)
+        .limit(10)
         .snapshots();
   }
 
