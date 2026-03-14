@@ -1,6 +1,7 @@
 import 'package:comic_app/theme/app_dark_colors.dart';
 import 'package:comic_app/theme/app_light_colors.dart';
 import 'package:comic_app/theme/theme_provider.dart';
+import 'package:comic_app/widgets/reading_carousel.dart';
 import 'package:flutter/material.dart';
 import 'package:okcolor/models/oklab.dart';
 import 'package:provider/provider.dart';
@@ -96,8 +97,9 @@ class _LibraryScreenState extends State<LibraryScreen> {
                     ),
                   ],
                 ),
+                SizedBox(height: 20),
                 //SizedBox thay thế = Carousel truyện đã đọc
-                SizedBox(height: 200),
+                SizedBox(height: 230, child: ReadingCarousel()),
                 Row(
                   children: [
                     Icon(
@@ -146,7 +148,10 @@ class _LibraryScreenState extends State<LibraryScreen> {
                             color: OkLab(0.62, -0.04, -0.21).toColor(),
                             borderRadius: BorderRadius.circular(15),
                           ),
-                          child: Icon(Icons.bookmark_border_outlined),
+                          child: Icon(
+                            Icons.bookmark_border_outlined,
+                            color: Colors.white,
+                          ),
                         ),
                         SizedBox(width: 10),
                         Text(
@@ -189,7 +194,10 @@ class _LibraryScreenState extends State<LibraryScreen> {
                             color: OkLab(0.65, 0.24, 0.07).toColor(),
                             borderRadius: BorderRadius.circular(15),
                           ),
-                          child: Icon(Icons.favorite_border),
+                          child: Icon(
+                            Icons.favorite_border,
+                            color: Colors.white,
+                          ),
                         ),
                         SizedBox(width: 10),
                         Text(
