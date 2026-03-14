@@ -80,7 +80,9 @@ class _LibraryAllState extends State<LibraryAll> {
                   Text(
                     'Tất cả truyện bạn đã đọc',
                     style: TextStyle(
-                      color: OkLab(0.71, 0, -0.02).toColor(),
+                      color: isDark
+                          ? OkLab(0.71, 0, -0.02).toColor()
+                          : OkLab(0.55, 0.06, -0.24).toColor(),
                       fontSize: 16,
                       fontWeight: FontWeight.w500,
                     ),
@@ -91,9 +93,21 @@ class _LibraryAllState extends State<LibraryAll> {
                     child: Container(
                       padding: EdgeInsets.all(10),
                       decoration: BoxDecoration(
-                        border: Border.all(color: Colors.grey),
+                        border: Border.all(
+                          color: isDark
+                              ? Colors.grey
+                              : OkLab(0.88, 0.04, 0).toColor(),
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.1),
+                            blurRadius: 10,
+                          ),
+                        ],
                         borderRadius: BorderRadius.circular(20),
-                        color: Colors.grey.withOpacity(0.1),
+                        color: isDark
+                            ? Colors.grey.withOpacity(0.1)
+                            : AppColorsLight.background1,
                       ),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,

@@ -1,5 +1,7 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:comic_app/theme/app_dark_colors.dart';
+import 'package:comic_app/theme/app_light_colors.dart';
 import 'package:comic_app/theme/theme_provider.dart';
 import 'package:comic_app/widgets/status_chip.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -125,9 +127,20 @@ class _ReadingListState extends State<ReadingList> {
               decoration: BoxDecoration(
                 border: Border.all(
                   width: 1,
-                  color: OkLab(0.88, 0.04, 0).toColor(),
+                  color: isDark
+                      ? OkLab(0.37, -0.01, -0.04).toColor().withOpacity(0.8)
+                      : OkLab(0.88, 0.04, 0).toColor(),
                 ),
                 borderRadius: BorderRadius.circular(20),
+                color: isDark
+                    ? AppColorsDark.background2
+                    : AppColorsLight.background2,
+                boxShadow: [
+                  BoxShadow(
+                    blurRadius: 10,
+                    color: Colors.black.withOpacity(0.1),
+                  ),
+                ],
               ),
               child: ListView.builder(
                 shrinkWrap: true,
@@ -149,168 +162,176 @@ class _ReadingListState extends State<ReadingList> {
                   return Container(
                     padding: EdgeInsets.all(10),
                     margin: EdgeInsets.symmetric(horizontal: 5, vertical: 5),
-                    decoration: BoxDecoration(
-                      border: Border.all(
-                        width: 1,
-                        color: isDark
-                            ? OkLab(0.63, 0.24, 0).toColor().withOpacity(0.4)
-                            : OkLab(0.88, 0.04, 0).toColor(),
-                      ),
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
+                    child: Column(
                       children: [
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(10),
-                          child: Image.network(
-                            coverUrl,
-                            width: 100,
-                            height: 200,
-                            fit: BoxFit.cover,
-                            errorBuilder: (context, error, stackTrace) {
-                              return Container(
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(10),
+                              child: Image.network(
+                                coverUrl,
                                 width: 100,
                                 height: 200,
-                                color: Colors.grey[300],
-                                child: Icon(Icons.broken_image),
-                              );
-                            },
-                          ),
-                        ),
-                        SizedBox(width: 12),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                comicTitle,
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 14,
-                                  color: isDark
-                                      ? OkLab(0.83, 0.07, -0.1).toColor()
-                                      : OkLab(0.5, 0.14, -0.22).toColor(),
-                                ),
+                                fit: BoxFit.cover,
+                                errorBuilder: (context, error, stackTrace) {
+                                  return Container(
+                                    width: 100,
+                                    height: 200,
+                                    color: Colors.grey[300],
+                                    child: Icon(Icons.broken_image),
+                                  );
+                                },
                               ),
-                              SizedBox(height: 6),
-                              Row(
+                            ),
+                            SizedBox(width: 12),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  StatusChip(status: status),
-                                  SizedBox(width: 10),
-                                  Expanded(
-                                    child: Text(
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                      getTimeText(updatedAt),
-                                      style: TextStyle(
-                                        fontSize: 12,
-                                        color: isDark
-                                            ? OkLab(
-                                                0.55,
-                                                -0.01,
-                                                -0.04,
-                                              ).toColor()
-                                            : OkLab(
-                                                0.7,
-                                                -0.01,
-                                                -0.04,
-                                              ).toColor(),
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              SizedBox(height: 6),
-                              Row(
-                                children: [
-                                  Expanded(
-                                    child: Text(
-                                      overflow: TextOverflow.ellipsis,
-                                      maxLines: 1,
-                                      "$chapterTitle",
-                                      style: TextStyle(
-                                        fontSize: 12,
-                                        color: isDark
-                                            ? Colors.white
-                                            : Colors.black,
-                                      ),
-                                    ),
-                                  ),
-                                  Spacer(),
                                   Text(
-                                    "${(progress * 100).toInt()}%",
+                                    comicTitle,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
                                     style: TextStyle(
-                                      fontSize: 12,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 14,
                                       color: isDark
-                                          ? Colors.white
-                                          : Colors.black,
+                                          ? OkLab(0.83, 0.07, -0.1).toColor()
+                                          : OkLab(0.5, 0.14, -0.22).toColor(),
                                     ),
+                                  ),
+                                  SizedBox(height: 6),
+                                  Row(
+                                    children: [
+                                      StatusChip(status: status),
+                                      SizedBox(width: 10),
+                                      Expanded(
+                                        child: Text(
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                          getTimeText(updatedAt),
+                                          style: TextStyle(
+                                            fontSize: 12,
+                                            color: isDark
+                                                ? OkLab(
+                                                    0.55,
+                                                    -0.01,
+                                                    -0.04,
+                                                  ).toColor()
+                                                : OkLab(
+                                                    0.7,
+                                                    -0.01,
+                                                    -0.04,
+                                                  ).toColor(),
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  SizedBox(height: 6),
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                        child: Text(
+                                          overflow: TextOverflow.ellipsis,
+                                          maxLines: 1,
+                                          "$chapterTitle",
+                                          style: TextStyle(
+                                            fontSize: 12,
+                                            color: isDark
+                                                ? Colors.white
+                                                : Colors.black,
+                                          ),
+                                        ),
+                                      ),
+                                      Spacer(),
+                                      Text(
+                                        "${(progress * 100).toInt()}%",
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                          color: isDark
+                                              ? Colors.white
+                                              : Colors.black,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  SizedBox(height: 6),
+                                  LinearProgressIndicator(
+                                    value: progress,
+                                    minHeight: 6,
+                                    borderRadius: BorderRadius.circular(10),
+                                    color: isDark
+                                        ? OkLab(0.55, 0.06, -0.24).toColor()
+                                        : OkLab(0.75, 0.17, -0.01).toColor(),
+                                  ),
+                                  SizedBox(height: 10),
+                                  Row(
+                                    children: [
+                                      IconButton(
+                                        onPressed: () {},
+                                        icon: Icon(
+                                          Icons.delete_outline,
+                                          color: isDark
+                                              ? Colors.white
+                                              : Colors.black,
+                                        ),
+                                      ),
+                                      Expanded(
+                                        child: ElevatedButton(
+                                          onPressed: progress.toInt() == 1
+                                              ? () {}
+                                              : () {},
+                                          style: ElevatedButton.styleFrom(
+                                            backgroundColor: !isDark
+                                                ? OkLab(
+                                                    0.75,
+                                                    0.17,
+                                                    -0.01,
+                                                  ).toColor()
+                                                : OkLab(
+                                                    0.63,
+                                                    0.24,
+                                                    0,
+                                                  ).toColor(),
+                                          ),
+                                          child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            children: [
+                                              Icon(
+                                                progress.toInt() == 1
+                                                    ? Icons.replay
+                                                    : Icons.play_arrow_sharp,
+                                                color: Colors.white,
+                                              ),
+                                              Text(
+                                                progress.toInt() == 1
+                                                    ? " Đọc lại"
+                                                    : " Đọc tiếp tục",
+                                                style: TextStyle(
+                                                  fontSize: 12,
+                                                  color: Colors.white,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ],
                               ),
-                              SizedBox(height: 6),
-                              LinearProgressIndicator(
-                                value: progress,
-                                minHeight: 6,
-                                borderRadius: BorderRadius.circular(10),
-                                color: isDark
-                                    ? OkLab(0.55, 0.06, -0.24).toColor()
-                                    : OkLab(0.75, 0.17, -0.01).toColor(),
-                              ),
-                              SizedBox(height: 10),
-                              Row(
-                                children: [
-                                  IconButton(
-                                    onPressed: () {},
-                                    icon: Icon(
-                                      Icons.delete_outline,
-                                      color: isDark
-                                          ? Colors.white
-                                          : Colors.black,
-                                    ),
-                                  ),
-                                  Expanded(
-                                    child: ElevatedButton(
-                                      onPressed: progress.toInt() == 1
-                                          ? () {}
-                                          : () {},
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: !isDark
-                                            ? OkLab(0.75, 0.17, -0.01).toColor()
-                                            : OkLab(0.63, 0.24, 0).toColor(),
-                                      ),
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          Icon(
-                                            progress.toInt() == 1
-                                                ? Icons.replay
-                                                : Icons.play_arrow_sharp,
-                                            color: Colors.white,
-                                          ),
-                                          Text(
-                                            progress.toInt() == 1
-                                                ? " Đọc lại"
-                                                : " Đọc tiếp tục",
-                                            style: TextStyle(
-                                              fontSize: 12,
-                                              color: Colors.white,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: 30),
+                        Container(
+                          color: Colors.grey.withOpacity(0.3),
+                          height: 1,
                         ),
                       ],
                     ),
