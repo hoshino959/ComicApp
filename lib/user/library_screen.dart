@@ -1,6 +1,7 @@
 import 'package:comic_app/theme/app_dark_colors.dart';
 import 'package:comic_app/theme/app_light_colors.dart';
 import 'package:comic_app/theme/theme_provider.dart';
+import 'package:comic_app/user/library_all.dart';
 import 'package:comic_app/widgets/reading_carousel.dart';
 import 'package:flutter/material.dart';
 import 'package:okcolor/models/oklab.dart';
@@ -85,7 +86,11 @@ class _LibraryScreenState extends State<LibraryScreen> {
                     ),
                     Spacer(),
                     GestureDetector(
-                      onTap: () {},
+                      onTap: () {
+                        Navigator.of(context).pushReplacement(
+                          MaterialPageRoute(builder: (_) => LibraryAll()),
+                        );
+                      },
                       child: Text(
                         'Xem tất cả',
                         style: TextStyle(

@@ -8,17 +8,18 @@ import 'package:flutter/material.dart';
 import 'package:okcolor/models/oklab.dart';
 import 'package:provider/provider.dart';
 
-class ReadingCarousel extends StatefulWidget {
-  const ReadingCarousel({super.key});
+class ReadingList extends StatefulWidget {
+  const ReadingList({super.key});
 
   @override
   State<StatefulWidget> createState() {
-    return _ReadingCarouselState();
+    return _ReadingListState();
   }
 }
 
-class _ReadingCarouselState extends State<ReadingCarousel> {
-  int currentIndex = 0;
+class _ReadingListState extends State<ReadingList> {
+  int currentPage = 1;
+  final int pageSize = 10;
 
   late Stream<QuerySnapshot> readingStream;
 
@@ -107,6 +108,17 @@ class _ReadingCarouselState extends State<ReadingCarousel> {
           );
         }
         final docs = snapshot.data!.docs;
+
+        final totalPages = (docs.length / pageSize).ceil();
+
+        int start = (currentPage - 1) * pageSize;
+
+        int end = start + pageSize;
+
+        if (end > docs.length) end = docs.length;
+
+        final pageDocs = docs.sublist(start, end);
+
         return Column(
           children: [
             Container(
@@ -117,10 +129,12 @@ class _ReadingCarouselState extends State<ReadingCarousel> {
                 ),
                 borderRadius: BorderRadius.circular(20),
               ),
-              child: CarouselSlider.builder(
-                itemCount: docs.length,
-                itemBuilder: (context, index, realIndex) {
-                  final data = docs[index].data() as Map<String, dynamic>;
+              child: ListView.builder(
+                shrinkWrap: true,
+                physics: NeverScrollableScrollPhysics(),
+                itemCount: pageDocs.length,
+                itemBuilder: (context, index) {
+                  final data = pageDocs[index].data() as Map<String, dynamic>;
                   final comicId = data['comicId'];
                   final comicTitle = data['comicTitle'];
                   final coverUrl = data['coverUrl'];
@@ -302,34 +316,52 @@ class _ReadingCarouselState extends State<ReadingCarousel> {
                     ),
                   );
                 },
-                options: CarouselOptions(
-                  height: 200,
-                  autoPlay: true,
-                  autoPlayInterval: Duration(seconds: 5),
-                  autoPlayAnimationDuration: Duration(seconds: 1),
-                  viewportFraction: 1,
-                  onPageChanged: (index, reason) {
-                    setState(() {
-                      currentIndex = index;
-                    });
-                  },
-                ),
               ),
             ),
             SizedBox(height: 10),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                for (int i = 0; i < docs.length; i++)
-                  Container(
-                    width: 8,
-                    height: 8,
-                    margin: EdgeInsets.symmetric(horizontal: 4),
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: currentIndex == i ? Colors.pink : Colors.grey,
+                IconButton(
+                  onPressed: currentPage > 1
+                      ? () {
+                          setState(() {
+                            currentPage--;
+                          });
+                        }
+                      : null,
+                  icon: Icon(Icons.arrow_back_ios),
+                ),
+                for (int i = 1; i <= totalPages; i++)
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 6),
+                    child: GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          currentPage = i;
+                        });
+                      },
+                      child: Text(
+                        '$i',
+                        style: TextStyle(
+                          fontWeight: currentPage == i
+                              ? FontWeight.bold
+                              : FontWeight.normal,
+                          fontSize: 16,
+                        ),
+                      ),
                     ),
                   ),
+                IconButton(
+                  onPressed: currentPage < totalPages
+                      ? () {
+                          setState(() {
+                            currentPage++;
+                          });
+                        }
+                      : null,
+                  icon: Icon(Icons.arrow_forward_ios),
+                ),
               ],
             ),
           ],
