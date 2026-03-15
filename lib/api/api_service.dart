@@ -196,25 +196,38 @@ class ApiService {
     String query, {
     int limit = 20,
     int offset = 0,
+    List<String>? statuses,
   }) async {
     try {
-      if (query.trim().isEmpty) {
+      if (query.trim().isEmpty &&
+          (statuses == null || statuses.isEmpty)) {
         return await fetchRecentlyUpdatedComics(
           limit: limit,
           offset: offset,
         );
       }
 
-      final Uri url = Uri.parse(
-        '$_baseUrl/manga'
-        '?title=$query'
-        '&limit=$limit'
-        '&offset=$offset'
-        '&includes[]=cover_art'
-        '&hasAvailableChapters=true'
-        '&order[relevance]=desc',
-      );
+      String urlString =
+          '$_baseUrl/manga'
+          '?limit=$limit'
+          '&offset=$offset'
+          '&includes[]=cover_art'
+          '&hasAvailableChapters=true';
 
+      if (query.trim().isNotEmpty) {
+        urlString +=
+            '&title=${Uri.encodeComponent(query.trim())}&order[relevance]=desc';
+      } else {
+        urlString += '&order[updatedAt]=desc';
+      }
+
+      if (statuses != null && statuses.isNotEmpty) {
+        for (String status in statuses) {
+          urlString += '&status[]=$status';
+        }
+      }
+
+      final Uri url = Uri.parse(urlString);
       final response = await http.get(url);
 
       if (response.statusCode == 200) {
