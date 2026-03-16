@@ -29,6 +29,7 @@ class _SearchScreenState extends State<SearchScreen> {
   Timer? _debounce;
 
   List<String> statuses = [];
+  String orderBy = 'default';
   String currentSearchValue = '';
 
   String selectedStatus = 'Tất cả';
@@ -80,10 +81,7 @@ class _SearchScreenState extends State<SearchScreen> {
     });
   }
 
-  void searchComics({
-    bool isLoadMore = false,
-    String query = '',
-  }) async {
+  void searchComics({bool isLoadMore = false}) async {
     if (isLoadMore) {
       setState(() {
         isFetchingMore = true;
@@ -97,10 +95,11 @@ class _SearchScreenState extends State<SearchScreen> {
 
     try {
       final result = await ApiService.searchComics(
-        query,
+        currentSearchValue,
         limit: 20,
         offset: currentOffset,
         statuses: statuses,
+        orderBy: orderBy,
       );
 
       if (!mounted) return;
@@ -191,21 +190,33 @@ class _SearchScreenState extends State<SearchScreen> {
                   prefixIcon: Icon(Icons.search),
                   hintText: 'Tìm kiếm',
                 ),
+
                 onChanged: (value) {
-                  currentSearchValue = value;
+                  setState(() {
+                    currentSearchValue = value;
+
+                    if (value.trim().isNotEmpty &&
+                        (orderBy == 'default' ||
+                            orderBy == 'updatedAt')) {
+                      selectedSort = 'Liên quan nhất';
+                      orderBy = 'relevance';
+                    } else if (value.trim().isEmpty &&
+                        (orderBy == 'default' ||
+                            orderBy == 'relevance')) {
+                      selectedSort = 'Mới cập nhật';
+                      orderBy = 'updatedAt';
+                    }
+                  });
+
                   if (_debounce?.isActive ?? false) {
                     _debounce!.cancel();
                   }
+
                   _debounce = Timer(
                     const Duration(milliseconds: 500),
                     () {
-                      if (value.trim().isNotEmpty) {
-                        hasMore = true;
-                        searchComics(query: value);
-                      } else {
-                        hasMore = true;
-                        searchComics();
-                      }
+                      hasMore = true;
+                      searchComics();
                     },
                   );
                 },
@@ -365,15 +376,303 @@ class _SearchScreenState extends State<SearchScreen> {
     );
   }
 
-  void _showFilterModal(BuildContext context) {
-    showModalBottomSheet(
+  void _showFilterModal(BuildContext context) async {
+    String tempStatus = selectedStatus;
+    String tempSort = selectedSort;
+
+    final result = await showModalBottomSheet<Map<String, String>>(
       context: context,
       backgroundColor: Colors.transparent,
       isScrollControlled: true,
       builder: (context) {
-        return _buildFilterBottomSheet();
+        return StatefulBuilder(
+          builder: (context, setModalState) {
+            return SafeArea(
+              child: Container(
+                padding: const EdgeInsets.all(20),
+                decoration: const BoxDecoration(
+                  color: Color(0xFF1E1528),
+                  borderRadius: BorderRadius.vertical(
+                    top: Radius.circular(24),
+                  ),
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment:
+                      CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: const [
+                        Icon(
+                          Icons.filter_alt_outlined,
+                          color: Color(0xFFFF2E7E),
+                        ),
+                        SizedBox(width: 6),
+                        Text(
+                          'Bộ lọc',
+                          style: TextStyle(
+                            color: Color(0xFFFF2E7E),
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                    Divider(
+                      color: Colors.white.withValues(
+                        alpha: 0.1,
+                      ),
+                      height: 32,
+                    ),
+
+                    Row(
+                      mainAxisAlignment:
+                          MainAxisAlignment.spaceBetween,
+                      children: [
+                        Column(
+                          crossAxisAlignment:
+                              CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              'Thể loại',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            Text(
+                              'Chọn một hoặc nhiều thể loại',
+                              style: TextStyle(
+                                color: Colors.white
+                                    .withValues(alpha: 0.7),
+                              ),
+                            ),
+                          ],
+                        ),
+                        Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            border: Border.all(
+                              color: Colors.white
+                                  .withValues(alpha: 0.3),
+                              width: 1,
+                            ),
+                            shape: BoxShape.circle,
+                            color: Colors.transparent,
+                          ),
+                          child: const Icon(
+                            Icons.add,
+                            size: 18,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 6,
+                      ),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(
+                          20,
+                        ),
+                        color: const Color(0xFF16151A),
+                        border: Border.all(
+                          color: Colors.white.withValues(
+                            alpha: 0.5,
+                          ),
+                        ),
+                      ),
+                      child: const Text(
+                        'No categories selected',
+                        style: TextStyle(fontSize: 12),
+                      ),
+                    ),
+                    Divider(
+                      color: Colors.white.withValues(
+                        alpha: 0.1,
+                      ),
+                      height: 32,
+                    ),
+
+                    const Text(
+                      'Trạng thái',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    CustomDropdown(
+                      value: tempStatus,
+                      items: statusList,
+                      onChanged: (newValue) {
+                        setModalState(() {
+                          tempStatus = newValue!;
+                        });
+                      },
+                    ),
+                    Divider(
+                      color: Colors.white.withValues(
+                        alpha: 0.1,
+                      ),
+                      height: 32,
+                    ),
+
+                    const Text(
+                      'Sắp xếp theo',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    CustomDropdown(
+                      value: tempSort,
+                      items: sortList,
+                      onChanged: (newValue) {
+                        setModalState(() {
+                          tempSort = newValue!;
+                        });
+                      },
+                    ),
+                    Divider(
+                      color: Colors.white.withValues(
+                        alpha: 0.1,
+                      ),
+                      height: 32,
+                    ),
+
+                    Row(
+                      mainAxisAlignment:
+                          MainAxisAlignment.end,
+                      children: [
+                        InkWell(
+                          onTap: () {
+                            Navigator.pop(context, {
+                              'status': 'Tất cả',
+                              'sort':
+                                  currentSearchValue.isEmpty
+                                  ? 'Mới cập nhật'
+                                  : 'Liên quan nhất',
+                            });
+                          },
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: const Color(
+                                0xFFEF4444,
+                              ),
+                              borderRadius:
+                                  BorderRadius.circular(24),
+                            ),
+                            padding:
+                                const EdgeInsets.symmetric(
+                                  horizontal: 16,
+                                  vertical: 10,
+                                ),
+                            child: Row(
+                              mainAxisSize:
+                                  MainAxisSize.min,
+                              children: const [
+                                Icon(
+                                  Icons.close,
+                                  size: 16,
+                                  color: Colors.white,
+                                ),
+                                SizedBox(width: 4),
+                                Text(
+                                  'Xoá tất cả',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight:
+                                        FontWeight.bold,
+                                    fontSize: 13,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+
+                        InkWell(
+                          onTap: () {
+                            Navigator.pop(context, {
+                              'status': tempStatus,
+                              'sort': tempSort,
+                            });
+                          },
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: const Color(
+                                0xFFFF2E7E,
+                              ),
+                              borderRadius:
+                                  BorderRadius.circular(24),
+                            ),
+                            padding:
+                                const EdgeInsets.symmetric(
+                                  horizontal: 20,
+                                  vertical: 10,
+                                ),
+                            child: const Text(
+                              'Áp dụng bộ lọc',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 13,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
       },
     );
+
+    if (result != null) {
+      setState(() {
+        selectedStatus = result['status']!;
+        selectedSort = result['sort']!;
+
+        if (selectedStatus == 'Tất cả') {
+          statuses = [];
+        } else if (selectedStatus == 'Đang tiến hành') {
+          statuses = ['ongoing'];
+        } else if (selectedStatus == 'Đã hoàn thành') {
+          statuses = ['completed'];
+        } else if (selectedStatus == 'Tạm ngưng') {
+          statuses = ['hiatus'];
+        } else if (selectedStatus == 'Đã hủy') {
+          statuses = ['cancelled'];
+        }
+
+        if (selectedSort == 'Mới cập nhật') {
+          orderBy = 'updatedAt';
+        } else if (selectedSort == 'Đánh giá cao nhất') {
+          orderBy = 'rating';
+        } else if (selectedSort ==
+            'Nhiều người theo dõi nhất') {
+          orderBy = 'followedCount';
+        } else if (selectedSort == 'Truyện mới đăng') {
+          orderBy = 'createdAt';
+        } else if (selectedSort == 'Tên A-Z') {
+          orderBy = 'title';
+        } else if (selectedSort == 'Liên quan nhất') {
+          orderBy = 'relevance';
+        }
+
+        hasMore = true;
+        searchComics();
+      });
+    }
   }
 
   void _showConfModal(BuildContext context) {
@@ -383,271 +682,6 @@ class _SearchScreenState extends State<SearchScreen> {
       isScrollControlled: true,
       builder: (context) {
         return _buildConfBottomSheet();
-      },
-    );
-  }
-
-  Widget _buildFilterBottomSheet() {
-    return StatefulBuilder(
-      builder: (context, setModalState) {
-        return SafeArea(
-          child: Container(
-            padding: EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              color: Color(0xFF1E1528),
-              borderRadius: BorderRadius.vertical(
-                top: Radius.circular(24),
-              ),
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Icon(
-                      Icons.filter_alt_outlined,
-                      color: Color(0xFFFF2E7E),
-                    ),
-                    const SizedBox(width: 6),
-                    Text(
-                      'Bộ lọc',
-                      style: TextStyle(
-                        color: Color(0xFFFF2E7E),
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
-                ),
-                Divider(
-                  color: Colors.white.withValues(
-                    alpha: 0.1,
-                  ),
-                  height: 32,
-                ),
-                Row(
-                  mainAxisAlignment:
-                      MainAxisAlignment.spaceBetween,
-                  children: [
-                    Column(
-                      crossAxisAlignment:
-                          CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Thể loại',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        Text(
-                          'Chọn một hoặc nhiều thể loại',
-                          style: TextStyle(
-                            color: Colors.white.withValues(
-                              alpha: 0.7,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    Container(
-                      padding: EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        border: Border.all(
-                          color: Colors.white.withValues(
-                            alpha: 0.3,
-                          ),
-                          width: 1,
-                        ),
-                        shape: BoxShape.circle,
-                        color: Colors.transparent,
-                      ),
-                      child: Icon(Icons.add, size: 18),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 12),
-                Container(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 6,
-                  ),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(20),
-                    color: Color(0xFF16151A),
-                    border: Border.all(
-                      color: Colors.white.withValues(
-                        alpha: 0.5,
-                      ),
-                    ),
-                  ),
-                  child: Text(
-                    'No categories selected',
-                    style: TextStyle(fontSize: 12),
-                  ),
-                ),
-                Divider(
-                  color: Colors.white.withValues(
-                    alpha: 0.1,
-                  ),
-                  height: 32,
-                ),
-                Text(
-                  'Trạng thái',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 10),
-                CustomDropdown(
-                  value: selectedStatus,
-                  items: statusList,
-                  onChanged: (newValue) {
-                    setModalState(() {
-                      selectedStatus = newValue!;
-                    });
-                  },
-                ),
-
-                Divider(
-                  color: Colors.white.withValues(
-                    alpha: 0.1,
-                  ),
-                  height: 32,
-                ),
-                Text(
-                  'Sắp xếp theo',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 10),
-                CustomDropdown(
-                  value: selectedSort,
-                  items: sortList,
-                  onChanged: (newValue) {
-                    setModalState(() {
-                      selectedSort = newValue!;
-                    });
-                  },
-                ),
-                Divider(
-                  color: Colors.white.withValues(
-                    alpha: 0.1,
-                  ),
-                  height: 32,
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    InkWell(
-                      onTap: () {
-                        setModalState(() {
-                          Navigator.pop(context);
-                          selectedStatus = 'Tất cả';
-                          statuses = [];
-                          setState(() {
-                            hasMore = true;
-                            searchComics(
-                              query: currentSearchValue,
-                            );
-                          });
-                        });
-                      },
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: Color(0xFFEF4444),
-                          borderRadius:
-                              BorderRadius.circular(24),
-                        ),
-                        padding: EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 10,
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(
-                              Icons.close,
-                              size: 16,
-                              color: Colors.white,
-                            ),
-                            const SizedBox(width: 4),
-                            Text(
-                              'Xoá tất cả',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 13,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    InkWell(
-                      onTap: () {
-                        setModalState(() {
-                          if (selectedStatus == 'Tất cả') {
-                            statuses = [];
-                          } else if (selectedStatus ==
-                              'Đang tiến hành') {
-                            statuses = ['ongoing'];
-                          } else if (selectedStatus ==
-                              'Đã hoàn thành') {
-                            statuses = ['completed'];
-                          } else if (selectedStatus ==
-                              'Tạm ngưng') {
-                            statuses = ['hiatus'];
-                          } else if (selectedStatus ==
-                              'Đã hủy') {
-                            statuses = ['cancelled'];
-                          }
-
-                          Navigator.pop(context);
-                          setState(() {
-                            hasMore = true;
-                            searchComics(
-                              query: currentSearchValue,
-                            );
-                          });
-                        });
-                      },
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: Color(0xFFFF2E7E),
-                          borderRadius:
-                              BorderRadius.circular(24),
-                        ),
-                        padding: EdgeInsets.symmetric(
-                          horizontal: 20,
-                          vertical: 10,
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text(
-                              'Áp dụng bộ lọc',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 13,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        );
       },
     );
   }

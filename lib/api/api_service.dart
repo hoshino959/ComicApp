@@ -197,16 +197,9 @@ class ApiService {
     int limit = 20,
     int offset = 0,
     List<String>? statuses,
+    String? orderBy,
   }) async {
     try {
-      if (query.trim().isEmpty &&
-          (statuses == null || statuses.isEmpty)) {
-        return await fetchRecentlyUpdatedComics(
-          limit: limit,
-          offset: offset,
-        );
-      }
-
       String urlString =
           '$_baseUrl/manga'
           '?limit=$limit'
@@ -216,9 +209,7 @@ class ApiService {
 
       if (query.trim().isNotEmpty) {
         urlString +=
-            '&title=${Uri.encodeComponent(query.trim())}&order[relevance]=desc';
-      } else {
-        urlString += '&order[updatedAt]=desc';
+            '&title=${Uri.encodeComponent(query.trim())}';
       }
 
       if (statuses != null && statuses.isNotEmpty) {
@@ -226,6 +217,35 @@ class ApiService {
           urlString += '&status[]=$status';
         }
       }
+
+      String sortQuery = '';
+      switch (orderBy) {
+        case 'updatedAt':
+          sortQuery = '&order[updatedAt]=desc';
+          break;
+        case 'rating':
+          sortQuery = '&order[rating]=desc';
+          break;
+        case 'followedCount':
+          sortQuery = '&order[followedCount]=desc';
+          break;
+        case 'createdAt':
+          sortQuery = '&order[createdAt]=desc';
+          break;
+        case 'title':
+          sortQuery = '&order[title]=asc';
+          break;
+        case 'relevance':
+          sortQuery = '&order[relevance]=desc';
+          break;
+        default:
+          if (query.trim().isNotEmpty) {
+            sortQuery = '&order[relevance]=desc';
+          } else {
+            sortQuery = '&order[updatedAt]=desc';
+          }
+      }
+      urlString += sortQuery;
 
       final Uri url = Uri.parse(urlString);
       final response = await http.get(url);
