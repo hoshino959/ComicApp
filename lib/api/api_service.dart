@@ -3,6 +3,7 @@ import 'package:comic_app/models/chapter_model.dart';
 import 'package:comic_app/models/chapter_page_model.dart';
 import 'package:comic_app/models/comic_detail_model.dart';
 import 'package:comic_app/models/comic_model.dart';
+import 'package:comic_app/models/genre_model.dart';
 import 'package:http/http.dart' as http;
 
 class ApiService {
@@ -198,8 +199,22 @@ class ApiService {
     int offset = 0,
     List<String>? statuses,
     String? orderBy,
+    List<String>? includedGenreIds,
   }) async {
     try {
+      bool hasNoFilters =
+          query.trim().isEmpty &&
+          (statuses == null || statuses.isEmpty) &&
+          (includedGenreIds == null ||
+              includedGenreIds.isEmpty);
+
+      if (hasNoFilters) {
+        return await fetchRecentlyUpdatedComics(
+          limit: limit,
+          offset: offset,
+        );
+      }
+
       String urlString =
           '$_baseUrl/manga'
           '?limit=$limit'
@@ -216,6 +231,15 @@ class ApiService {
         for (String status in statuses) {
           urlString += '&status[]=$status';
         }
+      }
+
+      if (includedGenreIds != null &&
+          includedGenreIds.isNotEmpty) {
+        for (String tagId in includedGenreIds) {
+          urlString += '&includedTags[]=$tagId';
+        }
+
+        //urlString += '&includedTagsMode=OR';
       }
 
       String sortQuery = '';
@@ -262,6 +286,34 @@ class ApiService {
       } else {
         throw Exception(
           'Failed to search comics. Status Code: ${response.statusCode}',
+        );
+      }
+    } catch (e) {
+      return [];
+    }
+  }
+
+  static Future<List<GenreModel>> fetchAllGenres() async {
+    try {
+      final Uri url = Uri.parse('$_baseUrl/manga/tag');
+      final response = await http.get(url);
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> data = json.decode(
+          response.body,
+        );
+        final List<dynamic> tagList = data['data'] ?? [];
+
+        List<GenreModel> genres = tagList
+            .map((json) => GenreModel.fromJson(json))
+            .toList();
+
+        genres.sort((a, b) => a.name.compareTo(b.name));
+
+        return genres;
+      } else {
+        throw Exception(
+          'Failed to load genres. Status Code: ${response.statusCode}',
         );
       }
     } catch (e) {

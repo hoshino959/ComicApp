@@ -2,10 +2,13 @@ import 'dart:async';
 
 import 'package:comic_app/api/api_service.dart';
 import 'package:comic_app/models/comic_model.dart';
+import 'package:comic_app/models/genre_model.dart';
 import 'package:comic_app/screens/detail_screen.dart';
 import 'package:comic_app/theme/app_colors.dart';
 import 'package:comic_app/widgets/comic_card.dart';
 import 'package:comic_app/widgets/custom_dropdown.dart';
+import 'package:comic_app/widgets/genre_tag.dart';
+import 'package:comic_app/widgets/status_chip.dart';
 import 'package:flutter/material.dart';
 
 class SearchScreen extends StatefulWidget {
@@ -26,11 +29,20 @@ class _SearchScreenState extends State<SearchScreen> {
       ScrollController();
   final TextEditingController _searchController =
       TextEditingController();
+  final TextEditingController _searchGenreController =
+      TextEditingController();
   Timer? _debounce;
 
   List<String> statuses = [];
   String orderBy = 'default';
   String currentSearchValue = '';
+
+  List<GenreModel> allGenres = [];
+  List<GenreModel> displayedGenres = [];
+  List<String> selectedGenres = [];
+  List<String> selectedGenreIds = [];
+  bool isLoadingGenre = true;
+  bool isFetchedGenres = false;
 
   String selectedStatus = 'Tất cả';
   final List<String> statusList = [
@@ -100,6 +112,7 @@ class _SearchScreenState extends State<SearchScreen> {
         offset: currentOffset,
         statuses: statuses,
         orderBy: orderBy,
+        includedGenreIds: selectedGenreIds,
       );
 
       if (!mounted) return;
@@ -380,7 +393,10 @@ class _SearchScreenState extends State<SearchScreen> {
     String tempStatus = selectedStatus;
     String tempSort = selectedSort;
 
-    final result = await showModalBottomSheet<Map<String, String>>(
+    List<String> tempGenres = List.from(selectedGenres);
+    List<String> tempIdGenres = List.from(selectedGenreIds);
+
+    final result = await showModalBottomSheet<Map<String, dynamic>>(
       context: context,
       backgroundColor: Colors.transparent,
       isScrollControlled: true,
@@ -449,46 +465,95 @@ class _SearchScreenState extends State<SearchScreen> {
                             ),
                           ],
                         ),
-                        Container(
-                          padding: const EdgeInsets.all(8),
-                          decoration: BoxDecoration(
-                            border: Border.all(
-                              color: Colors.white
-                                  .withValues(alpha: 0.3),
-                              width: 1,
+                        InkWell(
+                          onTap: () {
+                            _showGenreDialog(
+                              context,
+                              tempGenres,
+                              tempIdGenres,
+                              (
+                                Map<String, List<String>>
+                                returnedGenres,
+                              ) {
+                                setModalState(() {
+                                  tempGenres =
+                                      returnedGenres['nameGenres']!;
+                                  tempIdGenres =
+                                      returnedGenres['idGenres']!;
+                                });
+                              },
+                            );
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.all(
+                              8,
                             ),
-                            shape: BoxShape.circle,
-                            color: Colors.transparent,
-                          ),
-                          child: const Icon(
-                            Icons.add,
-                            size: 18,
+                            decoration: BoxDecoration(
+                              border: Border.all(
+                                color: Colors.white
+                                    .withValues(alpha: 0.3),
+                                width: 1,
+                              ),
+                              shape: BoxShape.circle,
+                              color: Colors.transparent,
+                            ),
+                            child: const Icon(
+                              Icons.add,
+                              size: 18,
+                            ),
                           ),
                         ),
                       ],
                     ),
                     const SizedBox(height: 12),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 6,
+                    if (tempGenres.isEmpty)
+                      GenreTag(
+                        title: 'No categories selected',
+                      )
+                    else
+                      Wrap(
+                        spacing: 8,
+                        runSpacing: 8,
+                        children: [
+                          ...tempGenres.take(10).map((
+                            genre,
+                          ) {
+                            return GenreTag(title: genre);
+                          }),
+
+                          if (tempGenres.length > 10)
+                            Container(
+                              padding:
+                                  const EdgeInsets.symmetric(
+                                    horizontal: 12,
+                                    vertical: 6,
+                                  ),
+                              decoration: BoxDecoration(
+                                borderRadius:
+                                    BorderRadius.circular(
+                                      20,
+                                    ),
+                                color: const Color(
+                                  0xFFFF2E7E,
+                                ).withValues(alpha: 0.2),
+                                border: Border.all(
+                                  color: const Color(
+                                    0xFFFF2E7E,
+                                  ),
+                                ),
+                              ),
+                              child: Text(
+                                '+${tempGenres.length - 10}',
+                                style: const TextStyle(
+                                  fontSize: 12,
+                                  fontWeight:
+                                      FontWeight.bold,
+                                  color: Color(0xFFFF2E7E),
+                                ),
+                              ),
+                            ),
+                        ],
                       ),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(
-                          20,
-                        ),
-                        color: const Color(0xFF16151A),
-                        border: Border.all(
-                          color: Colors.white.withValues(
-                            alpha: 0.5,
-                          ),
-                        ),
-                      ),
-                      child: const Text(
-                        'No categories selected',
-                        style: TextStyle(fontSize: 12),
-                      ),
-                    ),
                     Divider(
                       color: Colors.white.withValues(
                         alpha: 0.1,
@@ -556,6 +621,8 @@ class _SearchScreenState extends State<SearchScreen> {
                                   currentSearchValue.isEmpty
                                   ? 'Mới cập nhật'
                                   : 'Liên quan nhất',
+                              'genreNames': [],
+                              'genreIds': [],
                             });
                           },
                           child: Container(
@@ -601,6 +668,8 @@ class _SearchScreenState extends State<SearchScreen> {
                             Navigator.pop(context, {
                               'status': tempStatus,
                               'sort': tempSort,
+                              'genreNames': tempGenres,
+                              'genreIds': tempIdGenres,
                             });
                           },
                           child: Container(
@@ -642,6 +711,13 @@ class _SearchScreenState extends State<SearchScreen> {
         selectedStatus = result['status']!;
         selectedSort = result['sort']!;
 
+        selectedGenres = List<String>.from(
+          result['genreNames'],
+        );
+        selectedGenreIds = List<String>.from(
+          result['genreIds'],
+        );
+
         if (selectedStatus == 'Tất cả') {
           statuses = [];
         } else if (selectedStatus == 'Đang tiến hành') {
@@ -673,6 +749,207 @@ class _SearchScreenState extends State<SearchScreen> {
         searchComics();
       });
     }
+  }
+
+  Future<void> _showGenreDialog(
+    BuildContext context,
+    List<String> currentSelectedName,
+    List<String> currentSelectedId,
+    Function(Map<String, List<String>>) onConfirm,
+  ) async {
+    List<String> tempSelectedName = List.from(
+      currentSelectedName,
+    );
+
+    List<String> tempSelectedId = List.from(
+      currentSelectedId,
+    );
+
+    displayedGenres = List.from(allGenres);
+    _searchGenreController.clear();
+
+    await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (context, setDialogState) {
+            if (!isFetchedGenres) {
+              isFetchedGenres = true;
+
+              ApiService.fetchAllGenres()
+                  .then((result) {
+                    setDialogState(() {
+                      allGenres = result;
+                      displayedGenres = result;
+                      isLoadingGenre = false;
+                    });
+                  })
+                  .catchError((e) {
+                    setDialogState(() {
+                      isLoadingGenre = false;
+                    });
+                  });
+            }
+            return AlertDialog(
+              backgroundColor: const Color(0xFF1E1528),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+              title: const Text(
+                'Chọn thể loại',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              content: SizedBox(
+                width: double.maxFinite,
+                height: 400,
+                child: Column(
+                  children: [
+                    TextField(
+                      controller: _searchGenreController,
+                      decoration: InputDecoration(
+                        filled: true,
+                        fillColor: Color(0xFF231A2F),
+                        border: OutlineInputBorder(
+                          borderRadius:
+                              BorderRadius.circular(30),
+                          borderSide: BorderSide.none,
+                        ),
+                        prefixIcon: Icon(Icons.search),
+                        hintText: 'Tìm kiếm',
+                      ),
+                      onChanged: (query) {
+                        setDialogState(() {
+                          if (query.isEmpty) {
+                            displayedGenres = allGenres;
+                          } else {
+                            displayedGenres = allGenres
+                                .where((genre) {
+                                  return genre.name
+                                      .toLowerCase()
+                                      .contains(
+                                        query.toLowerCase(),
+                                      );
+                                })
+                                .toList();
+                          }
+                        });
+                      },
+                    ),
+                    const SizedBox(height: 8),
+                    if (isLoadingGenre)
+                      const SizedBox(
+                        height: 300,
+                        child: Center(
+                          child:
+                              CircularProgressIndicator(),
+                        ),
+                      )
+                    else if (displayedGenres.isEmpty)
+                      const SizedBox(
+                        height: 300,
+                        child: Center(
+                          child: Text('Không có thể loại'),
+                        ),
+                      )
+                    else ...[
+                      Expanded(
+                        child: ListView.builder(
+                          itemCount: displayedGenres.length,
+                          itemBuilder: (context, index) {
+                            final genre =
+                                displayedGenres[index].name;
+                            final id =
+                                displayedGenres[index].id;
+                            final isChecked =
+                                tempSelectedName.contains(
+                                  genre,
+                                );
+
+                            return CheckboxListTile(
+                              title: Text(
+                                genre,
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 15,
+                                ),
+                              ),
+                              value: isChecked,
+                              activeColor: const Color(
+                                0xFFFF2E7E,
+                              ),
+                              checkColor: Colors.white,
+                              side: BorderSide(
+                                color: Colors.white
+                                    .withValues(alpha: 0.5),
+                              ),
+                              contentPadding:
+                                  EdgeInsets.zero,
+                              onChanged: (bool? value) {
+                                setDialogState(() {
+                                  if (value == true) {
+                                    tempSelectedName.add(
+                                      genre,
+                                    );
+                                    tempSelectedId.add(id);
+                                  } else {
+                                    tempSelectedName.remove(
+                                      genre,
+                                    );
+                                    tempSelectedId.remove(
+                                      id,
+                                    );
+                                  }
+                                });
+                              },
+                            );
+                          },
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text(
+                    'Hủy',
+                    style: TextStyle(color: Colors.grey),
+                  ),
+                ),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(
+                      0xFFFF2E7E,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(
+                        20,
+                      ),
+                    ),
+                  ),
+                  onPressed: () {
+                    Navigator.pop(context);
+                    onConfirm({
+                      'idGenres': tempSelectedId,
+                      'nameGenres': tempSelectedName,
+                    });
+                  },
+                  child: const Text(
+                    'Xong',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
   }
 
   void _showConfModal(BuildContext context) {

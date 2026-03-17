@@ -41,7 +41,7 @@ class ComicDetailModel {
           attributes['title'].values.first.toString();
     }
 
-    String parsedAltTitle = '';
+    String parsedAltTitle = 'Không có tên thay thế';
     final altTitles =
         attributes['altTitles'] as List<dynamic>? ?? [];
     if (altTitles.isNotEmpty) {
