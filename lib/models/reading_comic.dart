@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 
 class ReadingComic {
   static Future<void> saveProgress({
@@ -107,5 +108,40 @@ class ReadingComic {
       progress: (data['progress'] as num).toDouble(),
       status: data['status'],
     );
+  }
+
+  static Future<void> pushNew({
+    required String comicId,
+    required String comicTitle,
+    required String coverUrl,
+    required String chapterId,
+    required String chapterTitle,
+    required int chapterIndex,
+    required int totalChapters,
+    required String status,
+  }) async {
+    double progress = chapterIndex / totalChapters;
+
+    final user = FirebaseAuth.instance.currentUser;
+
+    if (user == null) return;
+
+    await FirebaseFirestore.instance
+        .collection('Users')
+        .doc(user.uid)
+        .collection('Reading')
+        .doc(comicId)
+        .set({
+          'comicId': comicId,
+          'comicTitle': comicTitle,
+          'coverUrl': coverUrl,
+          'chapterId': chapterId,
+          'chapterTitle': chapterTitle,
+          'chapterIndex': chapterIndex,
+          'totalChapters': totalChapters,
+          'progress': progress,
+          'updatedAt': FieldValue.serverTimestamp(),
+          'status': status,
+        });
   }
 }

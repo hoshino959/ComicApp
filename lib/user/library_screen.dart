@@ -87,9 +87,9 @@ class _LibraryScreenState extends State<LibraryScreen> {
                     Spacer(),
                     GestureDetector(
                       onTap: () {
-                        Navigator.of(context).pushReplacement(
-                          MaterialPageRoute(builder: (_) => LibraryAll()),
-                        );
+                        Navigator.of(
+                          context,
+                        ).push(MaterialPageRoute(builder: (_) => LibraryAll()));
                       },
                       child: Text(
                         'Xem tất cả',

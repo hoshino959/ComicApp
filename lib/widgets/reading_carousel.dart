@@ -1,5 +1,8 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:comic_app/api/api_service.dart';
+import 'package:comic_app/models/reading_comic.dart';
+import 'package:comic_app/screens/reading_screen.dart';
 import 'package:comic_app/theme/theme_provider.dart';
 import 'package:comic_app/widgets/status_chip.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -270,27 +273,100 @@ class _ReadingCarouselState extends State<ReadingCarousel> {
                                             ? OkLab(0.75, 0.17, -0.01).toColor()
                                             : OkLab(0.63, 0.24, 0).toColor(),
                                       ),
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          Icon(
-                                            progress.toInt() == 1
-                                                ? Icons.replay
-                                                : Icons.play_arrow_sharp,
-                                            color: Colors.white,
-                                          ),
-                                          Text(
-                                            progress.toInt() == 1
-                                                ? " Đọc lại"
-                                                : " Đọc tiếp tục",
-                                            style: TextStyle(
-                                              fontSize: 12,
+                                      child: GestureDetector(
+                                        onTap: () async {
+                                          if (progress.toInt() != 1) {
+                                            final chapters =
+                                                await ApiService.fetchComicChapters(
+                                                  comicId,
+                                                );
+                                            final index = chapters.indexWhere(
+                                              (c) => c.id == chapterId,
+                                            );
+                                            if (index == -1) return;
+                                            await ReadingComic.saveProgress(
+                                              comicId: comicId,
+                                              comicTitle: comicTitle,
+                                              coverUrl: coverUrl,
+                                              chapterId: chapterId,
+                                              chapterTitle: chapterTitle,
+                                              chapterIndex: chapterIndex,
+                                              totalChapters: totalChapters,
+                                              status: status,
+                                            );
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (_) => ReadingScreen(
+                                                  chapterId: chapterId,
+                                                  title: comicTitle,
+                                                  chapterTitle: chapterTitle,
+                                                  uploaderName: chapters[index]
+                                                      .uploaderName,
+                                                  chapters: chapters,
+                                                  index: index,
+                                                ),
+                                              ),
+                                            );
+                                          }
+                                          if (progress.toInt() == 1) {
+                                            final chapters =
+                                                await ApiService.fetchComicChapters(
+                                                  comicId,
+                                                );
+                                            final index = chapters.length - 1;
+
+                                            await ReadingComic.pushNew(
+                                              comicId: comicId,
+                                              comicTitle: comicTitle,
+                                              coverUrl: coverUrl,
+                                              chapterId: chapters[index].id,
+                                              chapterTitle:
+                                                  chapters[index].chapterTitle,
+                                              chapterIndex: index,
+                                              totalChapters: totalChapters,
+                                              status: status,
+                                            );
+
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (_) => ReadingScreen(
+                                                  chapterId: chapters[index].id,
+                                                  title: comicTitle,
+                                                  chapterTitle: chapters[index]
+                                                      .chapterTitle,
+                                                  uploaderName: chapters[index]
+                                                      .uploaderName,
+                                                  chapters: chapters,
+                                                  index: index,
+                                                ),
+                                              ),
+                                            );
+                                          }
+                                        },
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            Icon(
+                                              progress.toInt() == 1
+                                                  ? Icons.replay
+                                                  : Icons.play_arrow_sharp,
                                               color: Colors.white,
-                                              fontWeight: FontWeight.bold,
                                             ),
-                                          ),
-                                        ],
+                                            Text(
+                                              progress.toInt() == 1
+                                                  ? " Đọc lại"
+                                                  : " Đọc tiếp tục",
+                                              style: TextStyle(
+                                                fontSize: 12,
+                                                color: Colors.white,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
                                       ),
                                     ),
                                   ),
@@ -305,10 +381,13 @@ class _ReadingCarouselState extends State<ReadingCarousel> {
                 },
                 options: CarouselOptions(
                   height: 200,
-                  autoPlay: true,
+                  autoPlay: docs.length > 1,
                   autoPlayInterval: Duration(seconds: 5),
                   autoPlayAnimationDuration: Duration(seconds: 1),
                   viewportFraction: 1,
+                  scrollPhysics: docs.length == 1
+                      ? NeverScrollableScrollPhysics()
+                      : BouncingScrollPhysics(),
                   onPageChanged: (index, reason) {
                     setState(() {
                       currentIndex = index;
