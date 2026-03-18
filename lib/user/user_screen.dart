@@ -107,7 +107,7 @@ class UserScreenState extends State<UserScreen> {
                               ),
                               SizedBox(width: 20),
                               if (user != null)
-                                ?Column(
+                                Column(
                                   crossAxisAlignment:
                                       CrossAxisAlignment
                                           .start,
