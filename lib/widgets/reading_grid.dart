@@ -1,14 +1,10 @@
 import 'dart:math';
 
-import 'package:carousel_slider/carousel_slider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:comic_app/screens/detail_screen.dart';
-import 'package:comic_app/theme/app_dark_colors.dart';
-import 'package:comic_app/theme/app_light_colors.dart';
 import 'package:comic_app/theme/theme_provider.dart';
 import 'package:comic_app/widgets/status_chip.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:okcolor/models/oklab.dart';
 import 'package:provider/provider.dart';
@@ -57,10 +53,14 @@ class _ReadingGridState extends State<ReadingGrid> {
   String formatViews(int views) {
     if (views >= 1000000) {
       double val = views / 1000000;
-      return val % 1 == 0 ? '${val.toInt()}M' : '${val.toStringAsFixed(1)}M';
+      return val % 1 == 0
+          ? '${val.toInt()}M'
+          : '${val.toStringAsFixed(1)}M';
     } else if (views >= 1000) {
       double val = views / 1000;
-      return val % 1 == 0 ? '${val.toInt()}K' : '${val.toStringAsFixed(1)}K';
+      return val % 1 == 0
+          ? '${val.toInt()}K'
+          : '${val.toStringAsFixed(1)}K';
     } else {
       return views.toString();
     }
@@ -69,11 +69,13 @@ class _ReadingGridState extends State<ReadingGrid> {
   @override
   Widget build(BuildContext context) {
     final isDark =
-        Provider.of<ThemeProvider>(context).themeMode == ThemeMode.dark;
+        Provider.of<ThemeProvider>(context).themeMode ==
+        ThemeMode.dark;
     return StreamBuilder<QuerySnapshot>(
       stream: readingStream,
       builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
+        if (snapshot.connectionState ==
+            ConnectionState.waiting) {
           return Center(child: CircularProgressIndicator());
         }
         if (snapshot.hasError) {
@@ -83,14 +85,19 @@ class _ReadingGridState extends State<ReadingGrid> {
                 width: double.infinity,
                 height: 210,
                 decoration: BoxDecoration(
-                  border: Border.all(width: 1, color: Colors.grey),
+                  border: Border.all(
+                    width: 1,
+                    color: Colors.grey,
+                  ),
                   borderRadius: BorderRadius.circular(50),
                 ),
                 child: Center(
                   child: Text(
                     'Lỗi tải dữ liệu',
                     style: TextStyle(
-                      color: isDark ? Colors.white : Colors.black,
+                      color: isDark
+                          ? Colors.white
+                          : Colors.black,
                       fontWeight: FontWeight.bold,
                       fontSize: 20,
                     ),
@@ -100,21 +107,27 @@ class _ReadingGridState extends State<ReadingGrid> {
             ],
           );
         }
-        if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+        if (!snapshot.hasData ||
+            snapshot.data!.docs.isEmpty) {
           return Column(
             children: [
               Container(
                 width: double.infinity,
                 height: 210,
                 decoration: BoxDecoration(
-                  border: Border.all(width: 1, color: Colors.grey),
+                  border: Border.all(
+                    width: 1,
+                    color: Colors.grey,
+                  ),
                   borderRadius: BorderRadius.circular(50),
                 ),
                 child: Center(
                   child: Text(
                     'Bạn chưa có truyện từng đọc',
                     style: TextStyle(
-                      color: isDark ? Colors.white : Colors.black,
+                      color: isDark
+                          ? Colors.white
+                          : Colors.black,
                       fontWeight: FontWeight.bold,
                       fontSize: 20,
                     ),
@@ -142,12 +155,15 @@ class _ReadingGridState extends State<ReadingGrid> {
               shrinkWrap: true,
               physics: NeverScrollableScrollPhysics(),
               itemCount: pageDocs.length,
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                childAspectRatio: 0.54,
-              ),
+              gridDelegate:
+                  SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    childAspectRatio: 0.54,
+                  ),
               itemBuilder: (context, index) {
-                final data = pageDocs[index].data() as Map<String, dynamic>;
+                final data =
+                    pageDocs[index].data()
+                        as Map<String, dynamic>;
                 final comicId = data['comicId'];
                 final comicTitle = data['comicTitle'];
                 final coverUrl = data['coverUrl'];
@@ -159,7 +175,8 @@ class _ReadingGridState extends State<ReadingGrid> {
                   onTap: () {
                     Navigator.of(context).push(
                       MaterialPageRoute(
-                        builder: (_) => DetailScreen(id: comicId),
+                        builder: (_) =>
+                            DetailScreen(id: comicId),
                       ),
                     );
                   },
@@ -172,48 +189,76 @@ class _ReadingGridState extends State<ReadingGrid> {
                           -0.01,
                           -0.03,
                         ).toColor().withOpacity(0.8),
-                        borderRadius: BorderRadius.circular(15),
+                        borderRadius: BorderRadius.circular(
+                          15,
+                        ),
                       ),
                       child: Column(
                         children: [
                           Stack(
                             children: [
                               ClipRRect(
-                                borderRadius: BorderRadius.circular(10),
+                                borderRadius:
+                                    BorderRadius.circular(
+                                      10,
+                                    ),
                                 child: Image.network(
                                   coverUrl,
                                   width: double.infinity,
                                   height: 200,
                                   fit: BoxFit.cover,
-                                  errorBuilder: (context, error, stackTrace) {
-                                    return Container(
-                                      width: 100,
-                                      height: 200,
-                                      color: Colors.grey[300],
-                                      child: Icon(Icons.broken_image),
-                                    );
-                                  },
+                                  errorBuilder:
+                                      (
+                                        context,
+                                        error,
+                                        stackTrace,
+                                      ) {
+                                        return Container(
+                                          width: 100,
+                                          height: 200,
+                                          color: Colors
+                                              .grey[300],
+                                          child: Icon(
+                                            Icons
+                                                .broken_image,
+                                          ),
+                                        );
+                                      },
                                 ),
                               ),
                               Positioned(
-                                child: StatusChip(status: status),
+                                child: StatusChip(
+                                  status: status,
+                                ),
                                 bottom: 10,
                                 right: 10,
                               ),
                             ],
                           ),
                           Container(
-                            padding: EdgeInsets.fromLTRB(10, 15, 10, 0),
+                            padding: EdgeInsets.fromLTRB(
+                              10,
+                              15,
+                              10,
+                              0,
+                            ),
                             child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
+                              crossAxisAlignment:
+                                  CrossAxisAlignment.start,
                               children: [
                                 Text(
                                   comicTitle,
                                   maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
+                                  overflow:
+                                      TextOverflow.ellipsis,
                                   style: TextStyle(
-                                    color: OkLab(0.83, 0.07, -0.1).toColor(),
-                                    fontWeight: FontWeight.bold,
+                                    color: OkLab(
+                                      0.83,
+                                      0.07,
+                                      -0.1,
+                                    ).toColor(),
+                                    fontWeight:
+                                        FontWeight.bold,
                                     fontSize: 16,
                                   ),
                                 ),
@@ -221,9 +266,14 @@ class _ReadingGridState extends State<ReadingGrid> {
                                 Text(
                                   chapterTitle,
                                   maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
+                                  overflow:
+                                      TextOverflow.ellipsis,
                                   style: TextStyle(
-                                    color: OkLab(0.71, 0.12, -0.17).toColor(),
+                                    color: OkLab(
+                                      0.71,
+                                      0.12,
+                                      -0.17,
+                                    ).toColor(),
                                     fontSize: 14,
                                   ),
                                 ),
@@ -231,13 +281,19 @@ class _ReadingGridState extends State<ReadingGrid> {
                                 Row(
                                   children: [
                                     Icon(
-                                      Icons.menu_book_outlined,
-                                      color: OkLab(0.84, 0.05, 0.12).toColor(),
+                                      Icons
+                                          .menu_book_outlined,
+                                      color: OkLab(
+                                        0.84,
+                                        0.05,
+                                        0.12,
+                                      ).toColor(),
                                       size: 16,
                                     ),
                                     SizedBox(width: 5),
                                     Text(
-                                      totalChapters.toString(),
+                                      totalChapters
+                                          .toString(),
                                       style: TextStyle(
                                         color: Colors.white,
                                         fontSize: 14,
@@ -256,8 +312,12 @@ class _ReadingGridState extends State<ReadingGrid> {
                                     SizedBox(width: 5),
                                     Text(
                                       formatViews(
-                                        totalChapters * 10000 +
-                                            Random().nextInt(9999),
+                                        totalChapters *
+                                                10000 +
+                                            Random()
+                                                .nextInt(
+                                                  9999,
+                                                ),
                                       ),
                                       style: TextStyle(
                                         color: Colors.white,
@@ -292,7 +352,9 @@ class _ReadingGridState extends State<ReadingGrid> {
                 ),
                 for (int i = 1; i <= totalPages; i++)
                   Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 6),
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 6,
+                    ),
                     child: GestureDetector(
                       onTap: () {
                         setState(() {
