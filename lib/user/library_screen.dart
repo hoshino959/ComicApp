@@ -134,7 +134,7 @@ class _LibraryScreenState extends State<LibraryScreen> {
                         0.71,
                         -0.04,
                         -0.16,
-                      ).toColor().withOpacity(0.1),
+                      ).toColor().withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(20),
                       border: Border.all(
                         width: 1,
@@ -142,7 +142,7 @@ class _LibraryScreenState extends State<LibraryScreen> {
                           0.81,
                           -0.03,
                           -0.1,
-                        ).toColor().withOpacity(0.3),
+                        ).toColor().withValues(alpha: 0.3),
                       ),
                     ),
                     child: Row(
@@ -180,7 +180,11 @@ class _LibraryScreenState extends State<LibraryScreen> {
                     padding: EdgeInsets.symmetric(vertical: 15, horizontal: 20),
                     width: double.infinity,
                     decoration: BoxDecoration(
-                      color: OkLab(0.71, 0.19, 0.05).toColor().withOpacity(0.1),
+                      color: OkLab(
+                        0.71,
+                        0.19,
+                        0.05,
+                      ).toColor().withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(20),
                       border: Border.all(
                         width: 1,
@@ -188,7 +192,7 @@ class _LibraryScreenState extends State<LibraryScreen> {
                           0.81,
                           0.11,
                           0.02,
-                        ).toColor().withOpacity(0.3),
+                        ).toColor().withValues(alpha: 0.3),
                       ),
                     ),
                     child: Row(

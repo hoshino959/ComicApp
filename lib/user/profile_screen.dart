@@ -311,7 +311,7 @@ class ProfileScreenState extends State<ProfileScreen> {
                             SizedBox(height: 15),
                             Container(
                               height: 2,
-                              color: Colors.grey.withOpacity(0.3),
+                              color: Colors.grey.withValues(alpha: 0.3),
                             ),
                             SizedBox(height: 15),
                             Container(
@@ -695,7 +695,7 @@ class ProfileScreenState extends State<ProfileScreen> {
           ),
           if (isLoading)
             Container(
-              color: Colors.black.withOpacity(0.3),
+              color: Colors.black.withValues(alpha: 0.3),
               child: Center(child: CircularProgressIndicator()),
             ),
         ],

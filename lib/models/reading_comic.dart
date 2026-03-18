@@ -143,4 +143,17 @@ class ReadingComic {
           'status': status,
         });
   }
+
+  static Future<void> deleteReading({required String comicId}) async {
+    final user = FirebaseAuth.instance.currentUser;
+
+    if (user == null) return;
+
+    await FirebaseFirestore.instance
+        .collection('Users')
+        .doc(user.uid)
+        .collection('Reading')
+        .doc(comicId)
+        .delete();
+  }
 }

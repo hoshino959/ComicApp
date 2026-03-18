@@ -143,7 +143,11 @@ class _ReadingCarouselState extends State<ReadingCarousel> {
                       border: Border.all(
                         width: 1,
                         color: isDark
-                            ? OkLab(0.63, 0.24, 0).toColor().withOpacity(0.4)
+                            ? OkLab(
+                                0.63,
+                                0.24,
+                                0,
+                              ).toColor().withValues(alpha: 0.4)
                             : OkLab(0.88, 0.04, 0).toColor(),
                       ),
                       borderRadius: BorderRadius.circular(20),
@@ -255,7 +259,11 @@ class _ReadingCarouselState extends State<ReadingCarousel> {
                               Row(
                                 children: [
                                   IconButton(
-                                    onPressed: () {},
+                                    onPressed: () async {
+                                      await ReadingComic.deleteReading(
+                                        comicId: comicId,
+                                      );
+                                    },
                                     icon: Icon(
                                       Icons.delete_outline,
                                       color: isDark
@@ -265,108 +273,103 @@ class _ReadingCarouselState extends State<ReadingCarousel> {
                                   ),
                                   Expanded(
                                     child: ElevatedButton(
-                                      onPressed: progress.toInt() == 1
-                                          ? () {}
-                                          : () {},
+                                      onPressed: () async {
+                                        final chapters =
+                                            await ApiService.fetchComicChapters(
+                                              comicId,
+                                            );
+                                        if (progress.toInt() != 1) {
+                                          final index = chapters.indexWhere(
+                                            (c) => c.id == chapterId,
+                                          );
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (_) => ReadingScreen(
+                                                comicId: comicId,
+                                                coverUrl: coverUrl,
+                                                chapterId: chapterId,
+                                                title: comicTitle,
+                                                chapterTitle: chapterTitle,
+                                                uploaderName: chapters[index]
+                                                    .uploaderName,
+                                                chapters: chapters,
+                                                index: index,
+                                                status: status,
+                                              ),
+                                            ),
+                                          );
+
+                                          await ReadingComic.saveProgress(
+                                            comicId: comicId,
+                                            comicTitle: comicTitle,
+                                            coverUrl: coverUrl,
+                                            chapterId: chapterId,
+                                            chapterTitle: chapterTitle,
+                                            chapterIndex: chapterIndex,
+                                            totalChapters: totalChapters,
+                                            status: status,
+                                          );
+                                        } else {
+                                          final index = chapters.length - 1;
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (_) => ReadingScreen(
+                                                comicId: comicId,
+                                                coverUrl: coverUrl,
+                                                chapterId: chapters[index].id,
+                                                title: comicTitle,
+                                                chapterTitle: chapters[index]
+                                                    .chapterTitle,
+                                                uploaderName: chapters[index]
+                                                    .uploaderName,
+                                                chapters: chapters,
+                                                index: index,
+                                                status: status,
+                                              ),
+                                            ),
+                                          );
+
+                                          await ReadingComic.pushNew(
+                                            comicId: comicId,
+                                            comicTitle: comicTitle,
+                                            coverUrl: coverUrl,
+                                            chapterId: chapters[index].id,
+                                            chapterTitle:
+                                                chapters[index].chapterTitle,
+                                            chapterIndex: 1,
+                                            totalChapters: totalChapters,
+                                            status: status,
+                                          );
+                                        }
+                                      },
                                       style: ElevatedButton.styleFrom(
                                         backgroundColor: !isDark
                                             ? OkLab(0.75, 0.17, -0.01).toColor()
                                             : OkLab(0.63, 0.24, 0).toColor(),
                                       ),
-                                      child: GestureDetector(
-                                        onTap: () async {
-                                          if (progress.toInt() != 1) {
-                                            final chapters =
-                                                await ApiService.fetchComicChapters(
-                                                  comicId,
-                                                );
-                                            final index = chapters.indexWhere(
-                                              (c) => c.id == chapterId,
-                                            );
-                                            if (index == -1) return;
-                                            await ReadingComic.saveProgress(
-                                              comicId: comicId,
-                                              comicTitle: comicTitle,
-                                              coverUrl: coverUrl,
-                                              chapterId: chapterId,
-                                              chapterTitle: chapterTitle,
-                                              chapterIndex: chapterIndex,
-                                              totalChapters: totalChapters,
-                                              status: status,
-                                            );
-                                            Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                builder: (_) => ReadingScreen(
-                                                  chapterId: chapterId,
-                                                  title: comicTitle,
-                                                  chapterTitle: chapterTitle,
-                                                  uploaderName: chapters[index]
-                                                      .uploaderName,
-                                                  chapters: chapters,
-                                                  index: index,
-                                                ),
-                                              ),
-                                            );
-                                          }
-                                          if (progress.toInt() == 1) {
-                                            final chapters =
-                                                await ApiService.fetchComicChapters(
-                                                  comicId,
-                                                );
-                                            final index = chapters.length - 1;
-
-                                            await ReadingComic.pushNew(
-                                              comicId: comicId,
-                                              comicTitle: comicTitle,
-                                              coverUrl: coverUrl,
-                                              chapterId: chapters[index].id,
-                                              chapterTitle:
-                                                  chapters[index].chapterTitle,
-                                              chapterIndex: index,
-                                              totalChapters: totalChapters,
-                                              status: status,
-                                            );
-
-                                            Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                builder: (_) => ReadingScreen(
-                                                  chapterId: chapters[index].id,
-                                                  title: comicTitle,
-                                                  chapterTitle: chapters[index]
-                                                      .chapterTitle,
-                                                  uploaderName: chapters[index]
-                                                      .uploaderName,
-                                                  chapters: chapters,
-                                                  index: index,
-                                                ),
-                                              ),
-                                            );
-                                          }
-                                        },
-                                        child: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          children: [
-                                            Icon(
-                                              progress.toInt() == 1
-                                                  ? Icons.replay
-                                                  : Icons.play_arrow_sharp,
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          Icon(
+                                            progress.toInt() == 1
+                                                ? Icons.replay
+                                                : Icons.play_arrow_sharp,
+                                            color: Colors.white,
+                                          ),
+                                          Text(
+                                            progress.toInt() == 1
+                                                ? " Đọc lại"
+                                                : " Đọc tiếp tục",
+                                            style: TextStyle(
+                                              fontSize: 12,
                                               color: Colors.white,
+                                              fontWeight: FontWeight.bold,
                                             ),
-                                            Text(
-                                              progress.toInt() == 1
-                                                  ? " Đọc lại"
-                                                  : " Đọc tiếp tục",
-                                              style: TextStyle(
-                                                fontSize: 12,
-                                                color: Colors.white,
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
+                                          ),
+                                        ],
                                       ),
                                     ),
                                   ),
