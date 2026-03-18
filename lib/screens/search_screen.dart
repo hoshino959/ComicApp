@@ -8,7 +8,6 @@ import 'package:comic_app/theme/app_colors.dart';
 import 'package:comic_app/widgets/comic_card.dart';
 import 'package:comic_app/widgets/custom_dropdown.dart';
 import 'package:comic_app/widgets/genre_tag.dart';
-import 'package:comic_app/widgets/status_chip.dart';
 import 'package:flutter/material.dart';
 
 class SearchScreen extends StatefulWidget {
