@@ -117,7 +117,9 @@ class _ReadingCarouselState extends State<ReadingCarousel> {
               decoration: BoxDecoration(
                 border: Border.all(
                   width: 1,
-                  color: OkLab(0.88, 0.04, 0).toColor(),
+                  color: isDark
+                      ? OkLab(0.97, 0, 0).toColor().withValues(alpha: 0.15)
+                      : OkLab(0.88, 0.04, 0).toColor(),
                 ),
                 borderRadius: BorderRadius.circular(20),
               ),
@@ -148,7 +150,11 @@ class _ReadingCarouselState extends State<ReadingCarousel> {
                                 0.24,
                                 0,
                               ).toColor().withValues(alpha: 0.4)
-                            : OkLab(0.88, 0.04, 0).toColor(),
+                            : OkLab(
+                                0.75,
+                                0.17,
+                                -0.01,
+                              ).toColor().withValues(alpha: 0.2),
                       ),
                       borderRadius: BorderRadius.circular(20),
                     ),

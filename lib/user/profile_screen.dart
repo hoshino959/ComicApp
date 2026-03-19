@@ -300,6 +300,8 @@ class ProfileScreenState extends State<ProfileScreen> {
                             SizedBox(height: 10),
                             Text(
                               nameFS,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
                               style: TextStyle(
                                 color: isDark
                                     ? OkLab(0.83, 0.07, -0.1).toColor()
@@ -441,6 +443,15 @@ class ProfileScreenState extends State<ProfileScreen> {
                                 ),
                                 !isEditing
                                     ? ElevatedButton(
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: isDark
+                                              ? OkLab(0.63, 0.24, 0).toColor()
+                                              : OkLab(
+                                                  0.75,
+                                                  0.17,
+                                                  -0.01,
+                                                ).toColor(),
+                                        ),
                                         onPressed: () {
                                           setState(() {
                                             isEditing = true;
@@ -450,19 +461,7 @@ class ProfileScreenState extends State<ProfileScreen> {
                                           children: [
                                             Icon(
                                               Icons.edit,
-                                              color: isDark
-                                                  ? Colors.white
-                                                  : Colors.black,
-                                            ),
-                                            SizedBox(width: 5),
-                                            Text(
-                                              'Chỉnh sửa',
-                                              style: TextStyle(
-                                                color: isDark
-                                                    ? Colors.white
-                                                    : Colors.black,
-                                                fontSize: 14,
-                                              ),
+                                              color: Colors.white,
                                             ),
                                           ],
                                         ),
@@ -470,6 +469,11 @@ class ProfileScreenState extends State<ProfileScreen> {
                                     : Row(
                                         children: [
                                           ElevatedButton(
+                                            style: ElevatedButton.styleFrom(
+                                              backgroundColor: isDark
+                                                  ? Colors.transparent
+                                                  : Colors.white,
+                                            ),
                                             onPressed: () {
                                               setState(() {
                                                 isEditing = false;
@@ -489,33 +493,79 @@ class ProfileScreenState extends State<ProfileScreen> {
                                           ElevatedButton(
                                             style: ElevatedButton.styleFrom(
                                               backgroundColor: isDark
-                                                  ? Colors.pink
-                                                  : Colors.pinkAccent,
+                                                  ? OkLab(
+                                                      0.63,
+                                                      0.24,
+                                                      0,
+                                                    ).toColor()
+                                                  : OkLab(
+                                                      0.75,
+                                                      0.17,
+                                                      -0.01,
+                                                    ).toColor(),
                                             ),
                                             onPressed: () async {
-                                              await FirebaseFirestore.instance
-                                                  .collection("Users")
-                                                  .doc(
-                                                    FirebaseAuth
+                                              if (nameController.text.isEmpty) {
+                                                ScaffoldMessenger.of(
+                                                  context,
+                                                ).showSnackBar(
+                                                  SnackBar(
+                                                    content: Text(
+                                                      'Tên không được để trống',
+                                                    ),
+                                                  ),
+                                                );
+                                              } else {
+                                                if (nameController.text.length <
+                                                    50) {
+                                                  if (nameController.text ==
+                                                      nameFS) {
+                                                    ScaffoldMessenger.of(
+                                                      context,
+                                                    ).showSnackBar(
+                                                      SnackBar(
+                                                        content: Text(
+                                                          'Tên không được trùng với tên cũ',
+                                                        ),
+                                                      ),
+                                                    );
+                                                  } else {
+                                                    await FirebaseFirestore
                                                         .instance
-                                                        .currentUser!
-                                                        .uid,
-                                                  )
-                                                  .update({
-                                                    "name": nameController.text,
-                                                    "gender": gender,
-                                                  });
-                                              setState(() {
-                                                getUserData();
-                                                isEditing = false;
-                                              });
+                                                        .collection("Users")
+                                                        .doc(
+                                                          FirebaseAuth
+                                                              .instance
+                                                              .currentUser!
+                                                              .uid,
+                                                        )
+                                                        .update({
+                                                          "name": nameController
+                                                              .text,
+                                                          "gender": gender,
+                                                        });
+                                                    setState(() {
+                                                      getUserData();
+                                                      isEditing = false;
+                                                    });
+                                                  }
+                                                } else {
+                                                  ScaffoldMessenger.of(
+                                                    context,
+                                                  ).showSnackBar(
+                                                    SnackBar(
+                                                      content: Text(
+                                                        'Tên không được quá 50 ký tự',
+                                                      ),
+                                                    ),
+                                                  );
+                                                }
+                                              }
                                             },
                                             child: Text(
                                               'Lưu',
                                               style: TextStyle(
-                                                color: isDark
-                                                    ? Colors.white
-                                                    : Colors.black,
+                                                color: Colors.white,
                                                 fontSize: 14,
                                               ),
                                             ),
@@ -546,12 +596,16 @@ class ProfileScreenState extends State<ProfileScreen> {
                                             : Colors.black,
                                       ),
                                       SizedBox(width: 10),
-                                      Text(
-                                        nameFS,
-                                        style: TextStyle(
-                                          color: isDark
-                                              ? Colors.white
-                                              : Colors.black,
+                                      Expanded(
+                                        child: Text(
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                          nameFS,
+                                          style: TextStyle(
+                                            color: isDark
+                                                ? Colors.white
+                                                : Colors.black,
+                                          ),
                                         ),
                                       ),
                                     ],

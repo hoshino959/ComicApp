@@ -86,7 +86,19 @@ class _DetailScreenState extends State<DetailScreen> {
 
     return Scaffold(
       extendBodyBehindAppBar: true,
-      appBar: AppBar(backgroundColor: Colors.transparent, elevation: 0),
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        leading: IconButton(
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          icon: Icon(
+            Icons.arrow_back,
+            color: isDark ? Colors.white : Colors.black,
+          ),
+        ),
+      ),
       body: isLoading
           ? SizedBox(
               height: 700,
@@ -392,8 +404,17 @@ class _DetailScreenState extends State<DetailScreen> {
                         const SizedBox(height: 20),
                         Container(
                           decoration: BoxDecoration(
-                            color: Color(0xFF231A2F),
+                            color: isDark
+                                ? Color(0xFF231A2F)
+                                : OkLab(0.97, 0.01, 0).toColor(),
                             borderRadius: BorderRadius.circular(30),
+                            border: Border.all(
+                              color: OkLab(
+                                0.9,
+                                0.06,
+                                -0.02,
+                              ).toColor().withValues(alpha: 0.5),
+                            ),
                           ),
                           child: Row(
                             children: [
@@ -401,7 +422,9 @@ class _DetailScreenState extends State<DetailScreen> {
                                 child: Container(
                                   padding: EdgeInsets.symmetric(vertical: 10),
                                   decoration: BoxDecoration(
-                                    color: Color(0xFFA855F7),
+                                    color: isDark
+                                        ? Color(0xFFA855F7)
+                                        : OkLab(0.56, 0.15, -0.24).toColor(),
                                     borderRadius: BorderRadius.circular(24),
                                   ),
                                   child: Row(
@@ -436,18 +459,26 @@ class _DetailScreenState extends State<DetailScreen> {
                                       Icon(
                                         Icons.chat_bubble_outline,
                                         size: 18,
-                                        color: Colors.white.withValues(
-                                          alpha: 0.6,
-                                        ),
+                                        color: isDark
+                                            ? Colors.white.withValues(
+                                                alpha: 0.6,
+                                              )
+                                            : Colors.black.withValues(
+                                                alpha: 0.6,
+                                              ),
                                       ),
                                       const SizedBox(width: 6),
                                       Text(
                                         '(5)',
                                         style: TextStyle(
                                           fontSize: 14,
-                                          color: Colors.white.withValues(
-                                            alpha: 0.6,
-                                          ),
+                                          color: isDark
+                                              ? Colors.white.withValues(
+                                                  alpha: 0.6,
+                                                )
+                                              : Colors.black.withValues(
+                                                  alpha: 0.6,
+                                                ),
                                         ),
                                       ),
                                     ],
@@ -465,18 +496,26 @@ class _DetailScreenState extends State<DetailScreen> {
                                       Icon(
                                         Icons.auto_awesome_outlined,
                                         size: 18,
-                                        color: Colors.white.withValues(
-                                          alpha: 0.6,
-                                        ),
+                                        color: isDark
+                                            ? Colors.white.withValues(
+                                                alpha: 0.6,
+                                              )
+                                            : Colors.black.withValues(
+                                                alpha: 0.6,
+                                              ),
                                       ),
                                       const SizedBox(width: 6),
                                       Text(
                                         'Liên quan',
                                         style: TextStyle(
                                           fontSize: 14,
-                                          color: Colors.white.withValues(
-                                            alpha: 0.6,
-                                          ),
+                                          color: isDark
+                                              ? Colors.white.withValues(
+                                                  alpha: 0.6,
+                                                )
+                                              : Colors.black.withValues(
+                                                  alpha: 0.6,
+                                                ),
                                         ),
                                       ),
                                     ],
@@ -492,7 +531,9 @@ class _DetailScreenState extends State<DetailScreen> {
                             color: Colors.transparent,
                             borderRadius: BorderRadius.circular(16),
                             border: Border.all(
-                              color: Colors.white.withValues(alpha: 0.1),
+                              color: isDark
+                                  ? Colors.white.withValues(alpha: 0.1)
+                                  : OkLab(0.88, 0.04, 0).toColor(),
                               width: 1,
                             ),
                           ),
@@ -511,7 +552,9 @@ class _DetailScreenState extends State<DetailScreen> {
                                     style: TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.bold,
-                                      color: Color(0xFFD69DE5),
+                                      color: isDark
+                                          ? Color(0xFFD69DE5)
+                                          : OkLab(0.5, 0.14, -0.22).toColor(),
                                     ),
                                   ),
                                   Row(
