@@ -62,6 +62,10 @@ class _SearchScreenState extends State<SearchScreen> {
     'Liên quan nhất',
   ];
 
+  String searchByVi = 'Tiêu đề';
+  String searchByEn = 'title';
+  bool isR18 = false;
+
   @override
   void initState() {
     super.initState();
@@ -112,6 +116,8 @@ class _SearchScreenState extends State<SearchScreen> {
         statuses: statuses,
         orderBy: orderBy,
         includedGenreIds: selectedGenreIds,
+        searchBy: searchByEn,
+        showR18: isR18,
       );
 
       if (!mounted) return;
@@ -951,201 +957,257 @@ class _SearchScreenState extends State<SearchScreen> {
     );
   }
 
-  void _showConfModal(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.transparent,
-      isScrollControlled: true,
-      builder: (context) {
-        return _buildConfBottomSheet();
-      },
-    );
-  }
+  void _showConfModal(BuildContext context) async {
+    String tempSearchBy = searchByVi;
+    bool tempIsR18 = isR18;
 
-  Widget _buildConfBottomSheet() {
-    return SafeArea(
-      child: Container(
-        padding: EdgeInsets.all(20),
-        decoration: BoxDecoration(
-          color: Color(0xFF1E1528),
-          borderRadius: BorderRadius.vertical(
-            top: Radius.circular(24),
-          ),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Icon(
-                  Icons.settings_outlined,
-                  color: Color(0xFFFF2E7E),
-                ),
-                const SizedBox(width: 6),
-                Text(
-                  'Cấu hình tìm kiếm',
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFFFF2E7E),
-                  ),
-                ),
-              ],
-            ),
-            Divider(
-              color: Colors.white.withValues(alpha: 0.1),
-              height: 32,
-            ),
-            Text(
-              'Tìm kiếm theo',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 16),
-            Row(
-              children: [
-                Container(
-                  width: 20,
-                  height: 20,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    border: Border.all(
-                      color: Colors.white.withValues(
-                        alpha: 0.3,
+    final result =
+        await showModalBottomSheet<Map<String, dynamic>>(
+          context: context,
+          backgroundColor: Colors.transparent,
+          isScrollControlled: true,
+          builder: (context) {
+            return StatefulBuilder(
+              builder: (context, setModalState) {
+                Widget buildRadioOption(String title) {
+                  bool isSelected = tempSearchBy == title;
+                  return InkWell(
+                    onTap: () {
+                      setModalState(() {
+                        tempSearchBy = title;
+                      });
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 8.0,
+                      ),
+                      child: Row(
+                        children: [
+                          Container(
+                            width: 20,
+                            height: 20,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              border: Border.all(
+                                color: isSelected
+                                    ? const Color(
+                                        0xFFFF2E7E,
+                                      )
+                                    : Colors.white
+                                          .withValues(
+                                            alpha: 0.3,
+                                          ),
+                                width: isSelected ? 6 : 1,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Text(
+                            title,
+                            style: TextStyle(
+                              color: isSelected
+                                  ? const Color(0xFFFF2E7E)
+                                  : Colors.white,
+                              fontWeight: isSelected
+                                  ? FontWeight.bold
+                                  : FontWeight.normal,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Text('Tiêu đề'),
-              ],
-            ),
-            const SizedBox(height: 12),
-            Row(
-              children: [
-                Container(
-                  width: 20,
-                  height: 20,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    border: Border.all(
-                      color: Colors.white.withValues(
-                        alpha: 0.3,
+                  );
+                }
+
+                return SafeArea(
+                  child: Container(
+                    padding: const EdgeInsets.all(20),
+                    decoration: const BoxDecoration(
+                      color: Color(0xFF1E1528),
+                      borderRadius: BorderRadius.vertical(
+                        top: Radius.circular(24),
                       ),
                     ),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Text('Tên khác'),
-              ],
-            ),
-            const SizedBox(height: 12),
-            Row(
-              children: [
-                Container(
-                  width: 20,
-                  height: 20,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    border: Border.all(
-                      color: Colors.white.withValues(
-                        alpha: 0.3,
-                      ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment:
+                          CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: const [
+                            Icon(
+                              Icons.settings_outlined,
+                              color: Color(0xFFFF2E7E),
+                            ),
+                            SizedBox(width: 6),
+                            Text(
+                              'Cấu hình tìm kiếm',
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                                color: Color(0xFFFF2E7E),
+                              ),
+                            ),
+                          ],
+                        ),
+                        Divider(
+                          color: Colors.white.withValues(
+                            alpha: 0.1,
+                          ),
+                          height: 32,
+                        ),
+
+                        const Text(
+                          'Tìm kiếm theo',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        buildRadioOption('Tiêu đề'),
+                        buildRadioOption('Tác giả'),
+                        buildRadioOption('Họa sĩ'),
+
+                        Divider(
+                          color: Colors.white.withValues(
+                            alpha: 0.1,
+                          ),
+                          height: 32,
+                        ),
+
+                        InkWell(
+                          onTap: () {
+                            setModalState(() {
+                              tempIsR18 = !tempIsR18;
+                            });
+                          },
+                          child: Padding(
+                            padding:
+                                const EdgeInsets.symmetric(
+                                  vertical: 8.0,
+                                ),
+                            child: Row(
+                              children: [
+                                Container(
+                                  width: 20,
+                                  height: 20,
+                                  decoration: BoxDecoration(
+                                    color: tempIsR18
+                                        ? const Color(
+                                            0xFFFF2E7E,
+                                          )
+                                        : Colors
+                                              .transparent,
+                                    borderRadius:
+                                        BorderRadius.circular(
+                                          4,
+                                        ),
+                                    border: Border.all(
+                                      color: tempIsR18
+                                          ? const Color(
+                                              0xFFFF2E7E,
+                                            )
+                                          : Colors.white
+                                                .withValues(
+                                                  alpha:
+                                                      0.3,
+                                                ),
+                                    ),
+                                  ),
+                                  child: tempIsR18
+                                      ? const Icon(
+                                          Icons.check,
+                                          size: 16,
+                                          color:
+                                              Colors.white,
+                                        )
+                                      : null,
+                                ),
+                                const SizedBox(width: 12),
+                                Text(
+                                  'Hiển thị nội dung R18',
+                                  style: TextStyle(
+                                    color: tempIsR18
+                                        ? const Color(
+                                            0xFFFF2E7E,
+                                          )
+                                        : Colors.white,
+                                    fontWeight: tempIsR18
+                                        ? FontWeight.bold
+                                        : FontWeight.normal,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+
+                        Divider(
+                          color: Colors.white.withValues(
+                            alpha: 0.1,
+                          ),
+                          height: 32,
+                        ),
+
+                        InkWell(
+                          onTap: () {
+                            Navigator.pop(context, {
+                              'searchBy': tempSearchBy,
+                              'isR18': tempIsR18,
+                            });
+                          },
+                          child: Container(
+                            width: double.infinity,
+                            decoration: BoxDecoration(
+                              color: const Color(
+                                0xFFFF2E7E,
+                              ),
+                              borderRadius:
+                                  BorderRadius.circular(24),
+                            ),
+                            padding:
+                                const EdgeInsets.symmetric(
+                                  vertical: 14,
+                                ),
+                            child: const Center(
+                              child: Text(
+                                'Áp dụng',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight:
+                                      FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                ),
-                const SizedBox(width: 12),
-                Text('Tác giả'),
-              ],
-            ),
-            const SizedBox(height: 12),
-            Row(
-              children: [
-                Container(
-                  width: 20,
-                  height: 20,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    border: Border.all(
-                      color: Colors.white.withValues(
-                        alpha: 0.3,
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Text('Họa sĩ'),
-              ],
-            ),
-            const SizedBox(height: 12),
-            Row(
-              children: [
-                Container(
-                  width: 20,
-                  height: 20,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    border: Border.all(
-                      color: Colors.white.withValues(
-                        alpha: 0.3,
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Text('Mô tả'),
-              ],
-            ),
-            Divider(
-              color: Colors.white.withValues(alpha: 0.1),
-              height: 32,
-            ),
-            Row(
-              children: [
-                Container(
-                  width: 20,
-                  height: 20,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(4),
-                    border: Border.all(
-                      color: Colors.white.withValues(
-                        alpha: 0.3,
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Text('Hiển thị nội dung R18'),
-              ],
-            ),
-            Divider(
-              color: Colors.white.withValues(alpha: 0.1),
-              height: 32,
-            ),
-            Container(
-              width: double.infinity,
-              decoration: BoxDecoration(
-                color: Color(0xFFFF2E7E),
-                borderRadius: BorderRadius.circular(24),
-              ),
-              padding: EdgeInsets.symmetric(vertical: 14),
-              child: Center(
-                child: Text(
-                  'Áp dụng',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
+                );
+              },
+            );
+          },
+        );
+
+    if (result != null) {
+      setState(() {
+        searchByVi = result['searchBy'];
+        isR18 = result['isR18'];
+
+        if (searchByVi == 'Tiêu đề') {
+          searchByEn = 'title';
+        } else if (searchByVi == 'Tác giả') {
+          searchByEn = 'author';
+        } else if (searchByVi == 'Hoạ sĩ') {
+          searchByEn = 'artist';
+        }
+
+        hasMore = true;
+        searchComics();
+      });
+    }
   }
 }

@@ -200,13 +200,16 @@ class ApiService {
     List<String>? statuses,
     String? orderBy,
     List<String>? includedGenreIds,
+    String searchBy = 'title',
+    bool showR18 = false,
   }) async {
     try {
       bool hasNoFilters =
           query.trim().isEmpty &&
           (statuses == null || statuses.isEmpty) &&
           (includedGenreIds == null ||
-              includedGenreIds.isEmpty);
+              includedGenreIds.isEmpty) &&
+          !showR18;
 
       if (hasNoFilters) {
         return await fetchRecentlyUpdatedComics(
@@ -223,8 +226,30 @@ class ApiService {
           '&hasAvailableChapters=true';
 
       if (query.trim().isNotEmpty) {
-        urlString +=
-            '&title=${Uri.encodeComponent(query.trim())}';
+        if (searchBy == 'author' || searchBy == 'artist') {
+          String? personId = await _getAuthorOrArtistId(
+            query.trim(),
+          );
+
+          if (personId == null) {
+            return [];
+          }
+
+          if (searchBy == 'author') {
+            urlString += '&authors[]=$personId';
+          } else {
+            urlString += '&artists[]=$personId';
+          }
+        } else {
+          urlString +=
+              '&title=${Uri.encodeComponent(query.trim())}';
+        }
+      }
+
+      urlString +=
+          '&contentRating[]=safe&contentRating[]=suggestive&contentRating[]=erotica';
+      if (showR18) {
+        urlString += '&contentRating[]=pornographic';
       }
 
       if (statuses != null && statuses.isNotEmpty) {
@@ -238,8 +263,6 @@ class ApiService {
         for (String tagId in includedGenreIds) {
           urlString += '&includedTags[]=$tagId';
         }
-
-        //urlString += '&includedTagsMode=OR';
       }
 
       String sortQuery = '';
@@ -263,11 +286,9 @@ class ApiService {
           sortQuery = '&order[relevance]=desc';
           break;
         default:
-          if (query.trim().isNotEmpty) {
-            sortQuery = '&order[relevance]=desc';
-          } else {
-            sortQuery = '&order[updatedAt]=desc';
-          }
+          sortQuery = query.trim().isNotEmpty
+              ? '&order[relevance]=desc'
+              : '&order[updatedAt]=desc';
       }
       urlString += sortQuery;
 
@@ -319,5 +340,30 @@ class ApiService {
     } catch (e) {
       return [];
     }
+  }
+
+  static Future<String?> _getAuthorOrArtistId(
+    String name,
+  ) async {
+    try {
+      final Uri url = Uri.parse(
+        '$_baseUrl/author?name=${Uri.encodeComponent(name)}&limit=1',
+      );
+      final response = await http.get(url);
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> data = json.decode(
+          response.body,
+        );
+        final List<dynamic> results = data['data'] ?? [];
+
+        if (results.isNotEmpty) {
+          return results[0]['id'];
+        }
+      }
+    } catch (e) {
+      return null;
+    }
+    return null;
   }
 }
