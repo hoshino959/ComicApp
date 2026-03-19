@@ -31,7 +31,8 @@ class UserScreenState extends State<UserScreen> {
   @override
   Widget build(BuildContext context) {
     final darkMode =
-        Provider.of<ThemeProvider>(context).themeMode == ThemeMode.dark;
+        Provider.of<ThemeProvider>(context).themeMode ==
+        ThemeMode.dark;
     final gradient = darkMode
         ? AppColorsDark.gradientBackground
         : AppColorsLight.gradientBackground;
@@ -66,11 +67,16 @@ class UserScreenState extends State<UserScreen> {
                       onTap: () {
                         if (user != null)
                           Navigator.of(context).push(
-                            MaterialPageRoute(builder: (_) => ProfileScreen()),
+                            MaterialPageRoute(
+                              builder: (_) =>
+                                  ProfileScreen(),
+                            ),
                           );
                         if (user == null) {
                           Navigator.of(context).push(
-                            MaterialPageRoute(builder: (_) => LoginPage()),
+                            MaterialPageRoute(
+                              builder: (_) => LoginPage(),
+                            ),
                           );
                         }
                       },
@@ -80,27 +86,46 @@ class UserScreenState extends State<UserScreen> {
                           vertical: 16,
                         ),
                         child: Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
+                          mainAxisAlignment:
+                              MainAxisAlignment.start,
                           children: [
                             Icon(
                               Icons.account_circle,
                               size: 40,
                               color: !darkMode
-                                  ? OkLab(0.5, 0.14, -0.22).toColor()
-                                  : OkLab(0.83, 0.07, -0.1).toColor(),
+                                  ? OkLab(
+                                      0.5,
+                                      0.14,
+                                      -0.22,
+                                    ).toColor()
+                                  : OkLab(
+                                      0.83,
+                                      0.07,
+                                      -0.1,
+                                    ).toColor(),
                             ),
                             SizedBox(width: 20),
                             if (user != null)
                               Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
+                                crossAxisAlignment:
+                                    CrossAxisAlignment
+                                        .start,
                                 children: [
                                   Text(
                                     'Hồ sơ',
                                     style: TextStyle(
                                       fontSize: 18,
                                       color: !darkMode
-                                          ? OkLab(0.5, 0.14, -0.22).toColor()
-                                          : OkLab(0.83, 0.07, -0.1).toColor(),
+                                          ? OkLab(
+                                              0.5,
+                                              0.14,
+                                              -0.22,
+                                            ).toColor()
+                                          : OkLab(
+                                              0.83,
+                                              0.07,
+                                              -0.1,
+                                            ).toColor(),
                                     ),
                                   ),
                                   Text(
@@ -115,15 +140,25 @@ class UserScreenState extends State<UserScreen> {
                               ),
                             if (user == null)
                               Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
+                                crossAxisAlignment:
+                                    CrossAxisAlignment
+                                        .start,
                                 children: [
                                   Text(
                                     'Đăng nhập',
                                     style: TextStyle(
                                       fontSize: 18,
                                       color: !darkMode
-                                          ? OkLab(0.5, 0.14, -0.22).toColor()
-                                          : OkLab(0.83, 0.07, -0.1).toColor(),
+                                          ? OkLab(
+                                              0.5,
+                                              0.14,
+                                              -0.22,
+                                            ).toColor()
+                                          : OkLab(
+                                              0.83,
+                                              0.07,
+                                              -0.1,
+                                            ).toColor(),
                                     ),
                                   ),
                                 ],
@@ -139,7 +174,10 @@ class UserScreenState extends State<UserScreen> {
                       InkWell(
                         onTap: () {
                           Navigator.of(context).push(
-                            MaterialPageRoute(builder: (_) => LibraryScreen()),
+                            MaterialPageRoute(
+                              builder: (_) =>
+                                  LibraryScreen(),
+                            ),
                           );
                         },
                         child: Padding(
@@ -148,26 +186,45 @@ class UserScreenState extends State<UserScreen> {
                             vertical: 16,
                           ),
                           child: Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
+                            mainAxisAlignment:
+                                MainAxisAlignment.start,
                             children: [
                               Icon(
                                 Icons.library_books,
                                 size: 40,
                                 color: !darkMode
-                                    ? OkLab(0.5, 0.14, -0.22).toColor()
-                                    : OkLab(0.83, 0.07, -0.1).toColor(),
+                                    ? OkLab(
+                                        0.5,
+                                        0.14,
+                                        -0.22,
+                                      ).toColor()
+                                    : OkLab(
+                                        0.83,
+                                        0.07,
+                                        -0.1,
+                                      ).toColor(),
                               ),
                               SizedBox(width: 20),
                               Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
+                                crossAxisAlignment:
+                                    CrossAxisAlignment
+                                        .start,
                                 children: [
                                   Text(
                                     'Thư viện',
                                     style: TextStyle(
                                       fontSize: 18,
                                       color: !darkMode
-                                          ? OkLab(0.5, 0.14, -0.22).toColor()
-                                          : OkLab(0.83, 0.07, -0.1).toColor(),
+                                          ? OkLab(
+                                              0.5,
+                                              0.14,
+                                              -0.22,
+                                            ).toColor()
+                                          : OkLab(
+                                              0.83,
+                                              0.07,
+                                              -0.1,
+                                            ).toColor(),
                                     ),
                                   ),
                                   Text(
@@ -208,26 +265,44 @@ class UserScreenState extends State<UserScreen> {
                           vertical: 16,
                         ),
                         child: Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
+                          mainAxisAlignment:
+                              MainAxisAlignment.start,
                           children: [
                             Icon(
                               Icons.settings,
                               size: 40,
                               color: !darkMode
-                                  ? OkLab(0.5, 0.14, -0.22).toColor()
-                                  : OkLab(0.83, 0.07, -0.1).toColor(),
+                                  ? OkLab(
+                                      0.5,
+                                      0.14,
+                                      -0.22,
+                                    ).toColor()
+                                  : OkLab(
+                                      0.83,
+                                      0.07,
+                                      -0.1,
+                                    ).toColor(),
                             ),
                             SizedBox(width: 20),
                             Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
+                              crossAxisAlignment:
+                                  CrossAxisAlignment.start,
                               children: [
                                 Text(
                                   'Cài đặt',
                                   style: TextStyle(
                                     fontSize: 18,
                                     color: !darkMode
-                                        ? OkLab(0.5, 0.14, -0.22).toColor()
-                                        : OkLab(0.83, 0.07, -0.1).toColor(),
+                                        ? OkLab(
+                                            0.5,
+                                            0.14,
+                                            -0.22,
+                                          ).toColor()
+                                        : OkLab(
+                                            0.83,
+                                            0.07,
+                                            -0.1,
+                                          ).toColor(),
                                   ),
                                 ),
                                 Text(
@@ -255,9 +330,14 @@ class UserScreenState extends State<UserScreen> {
                           setState(() {
                             isLoading = true;
                           });
-                          await FirebaseAuth.instance.signOut();
-                          Navigator.of(context).pushReplacement(
-                            MaterialPageRoute(builder: (_) => MainScreen()),
+                          await FirebaseAuth.instance
+                              .signOut();
+                          Navigator.of(
+                            context,
+                          ).pushReplacement(
+                            MaterialPageRoute(
+                              builder: (_) => MainScreen(),
+                            ),
                           );
                           setState(() {
                             isLoading = false;
@@ -269,14 +349,23 @@ class UserScreenState extends State<UserScreen> {
                             vertical: 16,
                           ),
                           child: Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
+                            mainAxisAlignment:
+                                MainAxisAlignment.start,
                             children: [
                               Icon(
                                 Icons.logout,
                                 size: 40,
                                 color: !darkMode
-                                    ? OkLab(0.64, 0.21, 0.1).toColor()
-                                    : OkLab(0.7, 0.18, 0.07).toColor(),
+                                    ? OkLab(
+                                        0.64,
+                                        0.21,
+                                        0.1,
+                                      ).toColor()
+                                    : OkLab(
+                                        0.7,
+                                        0.18,
+                                        0.07,
+                                      ).toColor(),
                               ),
                               SizedBox(width: 20),
                               Text(
@@ -284,8 +373,16 @@ class UserScreenState extends State<UserScreen> {
                                 style: TextStyle(
                                   fontSize: 18,
                                   color: !darkMode
-                                      ? OkLab(0.64, 0.21, 0.1).toColor()
-                                      : OkLab(0.7, 0.18, 0.07).toColor(),
+                                      ? OkLab(
+                                          0.64,
+                                          0.21,
+                                          0.1,
+                                        ).toColor()
+                                      : OkLab(
+                                          0.7,
+                                          0.18,
+                                          0.07,
+                                        ).toColor(),
                                 ),
                               ),
                             ],
@@ -301,7 +398,9 @@ class UserScreenState extends State<UserScreen> {
         if (isLoading)
           Container(
             color: Colors.black.withValues(alpha: 0.3),
-            child: Center(child: CircularProgressIndicator()),
+            child: Center(
+              child: CircularProgressIndicator(),
+            ),
           ),
       ],
     );
