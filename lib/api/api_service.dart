@@ -124,42 +124,62 @@ class ApiService {
     }
   }
 
-  static Future<List<ChapterModel>> fetchComicChapters(
+  static Future<List<ChapterModel>> fetchAllComicChapters(
     String mangaId, {
-    int limit = 100,
-    int offset = 0,
     String language = 'en',
   }) async {
+    List<ChapterModel> allChapters = [];
+    int limit = 500;
+    int offset = 0;
+    int total = 1;
+
     try {
-      final Uri url = Uri.parse(
-        '$_baseUrl/manga/$mangaId/feed'
-        '?limit=$limit'
-        '&offset=$offset'
-        '&translatedLanguage[]=$language'
-        '&includes[]=scanlation_group'
-        '&includes[]=user'
-        '&order[chapter]=desc',
-      );
-
-      final response = await http.get(url);
-
-      if (response.statusCode == 200) {
-        final Map<String, dynamic> data = json.decode(
-          response.body,
+      while (offset < total) {
+        final Uri url = Uri.parse(
+          '$_baseUrl/manga/$mangaId/feed'
+          '?limit=$limit'
+          '&offset=$offset'
+          '&translatedLanguage[]=$language'
+          '&includes[]=scanlation_group'
+          '&includes[]=user'
+          '&order[chapter]=desc',
         );
-        final List<dynamic> chapterList =
-            data['data'] ?? [];
 
-        return chapterList
-            .map((json) => ChapterModel.fromJson(json))
-            .toList();
-      } else {
-        throw Exception(
-          'Failed to load chapters. Status Code: ${response.statusCode}',
-        );
+        final response = await http.get(url);
+
+        if (response.statusCode == 200) {
+          final Map<String, dynamic> data = json.decode(
+            response.body,
+          );
+
+          total = data['total'] ?? 0;
+
+          final List<dynamic> chapterList =
+              data['data'] ?? [];
+
+          allChapters.addAll(
+            chapterList
+                .map((json) => ChapterModel.fromJson(json))
+                .toList(),
+          );
+
+          offset += limit;
+
+          if (offset < total) {
+            await Future.delayed(
+              const Duration(milliseconds: 300),
+            );
+          }
+        } else {
+          throw Exception(
+            'Failed to load chapters. Status Code: ${response.statusCode}',
+          );
+        }
       }
+
+      return allChapters;
     } catch (e) {
-      return [];
+      return allChapters;
     }
   }
 
