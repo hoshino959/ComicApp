@@ -2,6 +2,7 @@ import 'package:comic_app/theme/app_dark_colors.dart';
 import 'package:comic_app/theme/app_light_colors.dart';
 import 'package:comic_app/theme/theme_provider.dart';
 import 'package:comic_app/user/library_all.dart';
+import 'package:comic_app/user/library_fav_saved.dart';
 import 'package:comic_app/widgets/reading_carousel.dart';
 import 'package:flutter/material.dart';
 import 'package:okcolor/models/oklab.dart';
@@ -125,7 +126,13 @@ class _LibraryScreenState extends State<LibraryScreen> {
                 SizedBox(height: 20),
                 //Đã lưu
                 GestureDetector(
-                  onTap: () {},
+                  onTap: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (_) => LibraryFavSaved(status: 'Saved'),
+                      ),
+                    );
+                  },
                   child: Container(
                     padding: EdgeInsets.symmetric(vertical: 15, horizontal: 20),
                     width: double.infinity,
@@ -175,7 +182,13 @@ class _LibraryScreenState extends State<LibraryScreen> {
                 //Yêu thích
                 SizedBox(height: 15),
                 GestureDetector(
-                  onTap: () {},
+                  onTap: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (_) => LibraryFavSaved(status: 'Favorite'),
+                      ),
+                    );
+                  },
                   child: Container(
                     padding: EdgeInsets.symmetric(vertical: 15, horizontal: 20),
                     width: double.infinity,

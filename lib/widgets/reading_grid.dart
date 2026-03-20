@@ -10,7 +10,9 @@ import 'package:okcolor/models/oklab.dart';
 import 'package:provider/provider.dart';
 
 class ReadingGrid extends StatefulWidget {
-  const ReadingGrid({super.key});
+  final String status;
+
+  const ReadingGrid({super.key, required this.status});
 
   @override
   State<StatefulWidget> createState() {
@@ -45,7 +47,7 @@ class _ReadingGridState extends State<ReadingGrid> {
     readingStream = FirebaseFirestore.instance
         .collection('Users')
         .doc(user!.uid)
-        .collection('Reading')
+        .collection(widget.status)
         .orderBy('updatedAt', descending: true)
         .snapshots();
   }
@@ -77,7 +79,7 @@ class _ReadingGridState extends State<ReadingGrid> {
             children: [
               Container(
                 width: double.infinity,
-                height: 210,
+                height: MediaQuery.of(context).size.height * 0.75,
                 decoration: BoxDecoration(
                   border: Border.all(width: 1, color: Colors.grey),
                   borderRadius: BorderRadius.circular(50),
@@ -101,7 +103,7 @@ class _ReadingGridState extends State<ReadingGrid> {
             children: [
               Container(
                 width: double.infinity,
-                height: 210,
+                height: MediaQuery.of(context).size.height * 0.75,
                 decoration: BoxDecoration(
                   border: Border.all(width: 1, color: Colors.grey),
                   borderRadius: BorderRadius.circular(50),
@@ -163,12 +165,20 @@ class _ReadingGridState extends State<ReadingGrid> {
                     padding: EdgeInsets.all(10),
                     child: Container(
                       decoration: BoxDecoration(
-                        color: OkLab(
-                          0.28,
-                          -0.01,
-                          -0.03,
-                        ).toColor().withValues(alpha: 0.8),
+                        color: isDark
+                            ? OkLab(
+                                0.28,
+                                -0.01,
+                                -0.03,
+                              ).toColor().withValues(alpha: 0.8)
+                            : Colors.white,
                         borderRadius: BorderRadius.circular(15),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.3),
+                            blurRadius: 10,
+                          ),
+                        ],
                       ),
                       child: Column(
                         children: [
@@ -208,7 +218,9 @@ class _ReadingGridState extends State<ReadingGrid> {
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
                                   style: TextStyle(
-                                    color: OkLab(0.83, 0.07, -0.1).toColor(),
+                                    color: isDark
+                                        ? OkLab(0.83, 0.07, -0.1).toColor()
+                                        : OkLab(0.5, 0.14, -0.22).toColor(),
                                     fontWeight: FontWeight.bold,
                                     fontSize: 16,
                                   ),
@@ -219,7 +231,9 @@ class _ReadingGridState extends State<ReadingGrid> {
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
                                   style: TextStyle(
-                                    color: OkLab(0.71, 0.12, -0.17).toColor(),
+                                    color: isDark
+                                        ? OkLab(0.71, 0.12, -0.17).toColor()
+                                        : OkLab(0.56, 0.15, -0.24).toColor(),
                                     fontSize: 14,
                                   ),
                                 ),
@@ -235,7 +249,9 @@ class _ReadingGridState extends State<ReadingGrid> {
                                     Text(
                                       totalChapters.toString(),
                                       style: TextStyle(
-                                        color: Colors.white,
+                                        color: isDark
+                                            ? Colors.white
+                                            : Colors.black,
                                         fontSize: 14,
                                       ),
                                     ),
@@ -256,7 +272,9 @@ class _ReadingGridState extends State<ReadingGrid> {
                                             Random().nextInt(9999),
                                       ),
                                       style: TextStyle(
-                                        color: Colors.white,
+                                        color: isDark
+                                            ? Colors.white
+                                            : Colors.black,
                                         fontSize: 14,
                                       ),
                                     ),
