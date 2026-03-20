@@ -45,9 +45,7 @@ class _DetailScreenState extends State<DetailScreen> {
 
   void _fetchData() async {
     try {
-      final result = await ApiService.fetchComicDetail(
-        widget.id,
-      );
+      final result = await ApiService.fetchComicDetail(widget.id);
       if (!mounted) return;
       setState(() {
         comicDetail = result;
@@ -64,9 +62,7 @@ class _DetailScreenState extends State<DetailScreen> {
 
   void _fetchChapters() async {
     try {
-      final result = await ApiService.fetchAllComicChapters(
-        widget.id,
-      );
+      final result = await ApiService.fetchAllComicChapters(widget.id);
 
       if (!mounted) return;
       setState(() {
@@ -85,8 +81,7 @@ class _DetailScreenState extends State<DetailScreen> {
   @override
   Widget build(BuildContext context) {
     final isDark =
-        Provider.of<ThemeProvider>(context).themeMode ==
-        ThemeMode.dark;
+        Provider.of<ThemeProvider>(context).themeMode == ThemeMode.dark;
 
     final gradient = isDark
         ? AppColorsDark.gradientBackground
@@ -153,69 +148,46 @@ class _DetailScreenState extends State<DetailScreen> {
       body: isLoading
           ? SizedBox(
               height: 700,
-              child: Center(
-                child: CircularProgressIndicator(),
-              ),
+              child: Center(child: CircularProgressIndicator()),
             )
           : (errorMessage != null)
-          ? SizedBox(
-              height: 700,
-              child: Center(child: Text(errorMessage!)),
-            )
+          ? SizedBox(height: 700, child: Center(child: Text(errorMessage!)))
           : Container(
               decoration: BoxDecoration(gradient: gradient),
               child: SafeArea(
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 10,
-                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: 10),
                   child: SingleChildScrollView(
                     child: Column(
-                      crossAxisAlignment:
-                          CrossAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         Center(
                           child: ClipRRect(
-                            borderRadius:
-                                BorderRadius.circular(15),
+                            borderRadius: BorderRadius.circular(15),
                             child: CachedNetworkImage(
-                              imageUrl:
-                                  comicDetail!.coverUrl,
+                              imageUrl: comicDetail!.coverUrl,
                               width: 200,
                               height: 300,
                               fit: BoxFit.cover,
                               memCacheHeight: 300,
-                              placeholder: (context, url) =>
-                                  Container(
-                                    height: 300,
-                                    color: Colors.grey
-                                        .withValues(
-                                          alpha: 0.1,
-                                        ),
-                                    child: Center(
-                                      child: CircularProgressIndicator(
-                                        color: AppColors
-                                            .secondaryPink,
-                                      ),
-                                    ),
+                              placeholder: (context, url) => Container(
+                                height: 300,
+                                color: Colors.grey.withValues(alpha: 0.1),
+                                child: Center(
+                                  child: CircularProgressIndicator(
+                                    color: AppColors.secondaryPink,
                                   ),
-                              errorWidget:
-                                  (
-                                    context,
-                                    url,
-                                    error,
-                                  ) => Container(
-                                    height: 300,
-                                    color: Colors.grey
-                                        .withValues(
-                                          alpha: 0.1,
-                                        ),
-                                    child: const Icon(
-                                      Icons.broken_image,
-                                      color: Colors.grey,
-                                      size: 40,
-                                    ),
-                                  ),
+                                ),
+                              ),
+                              errorWidget: (context, url, error) => Container(
+                                height: 300,
+                                color: Colors.grey.withValues(alpha: 0.1),
+                                child: const Icon(
+                                  Icons.broken_image,
+                                  color: Colors.grey,
+                                  size: 40,
+                                ),
+                              ),
                             ),
                           ),
                         ),
@@ -225,16 +197,8 @@ class _DetailScreenState extends State<DetailScreen> {
                           style: TextStyle(
                             fontSize: 24,
                             color: isDark
-                                ? OkLab(
-                                    0.83,
-                                    0.07,
-                                    -0.1,
-                                  ).toColor()
-                                : OkLab(
-                                    0.5,
-                                    0.14,
-                                    -0.22,
-                                  ).toColor(),
+                                ? OkLab(0.83, 0.07, -0.1).toColor()
+                                : OkLab(0.5, 0.14, -0.22).toColor(),
                             fontWeight: FontWeight.bold,
                           ),
                           textAlign: TextAlign.center,
@@ -244,9 +208,7 @@ class _DetailScreenState extends State<DetailScreen> {
                           comicDetail!.altTitle,
                           style: TextStyle(
                             fontSize: 14,
-                            color: isDark
-                                ? Colors.white
-                                : Colors.black,
+                            color: isDark ? Colors.white : Colors.black,
                           ),
                           textAlign: TextAlign.center,
                         ),
@@ -256,45 +218,30 @@ class _DetailScreenState extends State<DetailScreen> {
                           spacing: 8,
                           runSpacing: 12,
                           children: [
-                            for (var genre
-                                in comicDetail!.genres)
+                            for (var genre in comicDetail!.genres)
                               GenreTag(title: genre),
                           ],
                         ),
                         const SizedBox(height: 16),
                         Row(
-                          mainAxisAlignment:
-                              MainAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.start,
                           children: [
-                            StatusChip(
-                              status: comicDetail!.status,
-                            ),
+                            StatusChip(status: comicDetail!.status),
                             const SizedBox(width: 12),
                             StatItem(
                               icon: Icon(
-                                Icons
-                                    .calendar_today_outlined,
+                                Icons.calendar_today_outlined,
                                 size: 16,
-                                color: OkLab(
-                                  0.79,
-                                  -0.18,
-                                  0.1,
-                                ).toColor(),
+                                color: OkLab(0.79, -0.18, 0.1).toColor(),
                               ),
-                              title:
-                                  comicDetail!.publishYear,
+                              title: comicDetail!.publishYear,
                             ),
                             const SizedBox(width: 12),
                             StatItem(
                               icon: Icon(
-                                Icons
-                                    .remove_red_eye_outlined,
+                                Icons.remove_red_eye_outlined,
                                 size: 16,
-                                color: OkLab(
-                                  0.71,
-                                  -0.04,
-                                  -0.16,
-                                ).toColor(),
+                                color: OkLab(0.71, -0.04, -0.16).toColor(),
                               ),
                               title: '0',
                             ),
@@ -303,23 +250,16 @@ class _DetailScreenState extends State<DetailScreen> {
                               icon: Icon(
                                 Icons.bookmark_border,
                                 size: 16,
-                                color: OkLab(
-                                  0.72,
-                                  0.2,
-                                  -0.04,
-                                ).toColor(),
+                                color: OkLab(0.72, 0.2, -0.04).toColor(),
                               ),
-                              title: comicDetail!.follows
-                                  .toString(),
+                              title: comicDetail!.follows.toString(),
                             ),
                           ],
                         ),
                         const SizedBox(height: 20),
                         Row(
-                          mainAxisAlignment:
-                              MainAxisAlignment.start,
-                          crossAxisAlignment:
-                              CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             const SizedBox(width: 10),
                             Icon(
@@ -333,9 +273,7 @@ class _DetailScreenState extends State<DetailScreen> {
                               style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w500,
-                                color: isDark
-                                    ? Colors.white
-                                    : Colors.black,
+                                color: isDark ? Colors.white : Colors.black,
                               ),
                             ),
                             const SizedBox(width: 6),
@@ -344,19 +282,10 @@ class _DetailScreenState extends State<DetailScreen> {
                                 comicDetail!.authorName,
                                 style: TextStyle(
                                   fontSize: 16,
-                                  fontWeight:
-                                      FontWeight.w400,
+                                  fontWeight: FontWeight.w400,
                                   color: isDark
-                                      ? OkLab(
-                                          0.83,
-                                          -0.07,
-                                          -0.09,
-                                        ).toColor()
-                                      : OkLab(
-                                          0.59,
-                                          -0.07,
-                                          -0.14,
-                                        ).toColor(),
+                                      ? OkLab(0.83, -0.07, -0.09).toColor()
+                                      : OkLab(0.59, -0.07, -0.14).toColor(),
                                 ),
                               ),
                             ),
@@ -369,15 +298,10 @@ class _DetailScreenState extends State<DetailScreen> {
                           decoration: BoxDecoration(
                             color: isDark
                                 ? AppColorsDark.background3
-                                : AppColorsLight
-                                      .background3,
-                            borderRadius:
-                                BorderRadius.circular(12),
+                                : AppColorsLight.background3,
+                            borderRadius: BorderRadius.circular(12),
                             boxShadow: [
-                              BoxShadow(
-                                blurRadius: 10,
-                                color: Colors.black26,
-                              ),
+                              BoxShadow(blurRadius: 10, color: Colors.black26),
                             ],
                           ),
                           child: Text(
@@ -385,113 +309,69 @@ class _DetailScreenState extends State<DetailScreen> {
                             style: TextStyle(
                               fontSize: 14,
                               height: 1.5,
-                              color: isDark
-                                  ? Colors.white
-                                  : Colors.black,
+                              color: isDark ? Colors.white : Colors.black,
                             ),
                           ),
                         ),
                         const SizedBox(height: 20),
                         Row(
-                          mainAxisAlignment:
-                              MainAxisAlignment.center,
+                          mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             InkWell(
                               onTap: () {
                                 ChapterModel firstChapter =
-                                    chapters![chapters!
-                                            .length -
-                                        1];
+                                    chapters![chapters!.length - 1];
                                 ReadingComic.saveProgress(
                                   comicId: widget.id,
-                                  comicTitle:
-                                      comicDetail!.title,
-                                  coverUrl:
-                                      comicDetail!.coverUrl,
-                                  chapterId:
-                                      firstChapter.id,
-                                  chapterTitle: firstChapter
-                                      .chapterTitle,
+                                  comicTitle: comicDetail!.title,
+                                  coverUrl: comicDetail!.coverUrl,
+                                  chapterId: firstChapter.id,
+                                  chapterTitle: firstChapter.chapterTitle,
                                   chapterIndex: 1,
-                                  totalChapters:
-                                      chapters!.length,
-                                  status:
-                                      comicDetail!.status,
+                                  totalChapters: chapters!.length,
+                                  status: comicDetail!.status,
                                 );
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) =>
-                                        ReadingScreen(
-                                          comicId:
-                                              widget.id,
-                                          coverUrl:
-                                              comicDetail!
-                                                  .coverUrl,
-                                          chapterId:
-                                              firstChapter
-                                                  .id,
-                                          title:
-                                              comicDetail!
-                                                  .title,
-                                          chapterTitle:
-                                              firstChapter
-                                                  .chapterTitle,
-                                          uploaderName:
-                                              firstChapter
-                                                  .uploaderName,
-                                          chapters:
-                                              chapters!,
-                                          index:
-                                              chapters!
-                                                  .length -
-                                              1,
-                                          status:
-                                              comicDetail!
-                                                  .status,
-                                        ),
+                                    builder: (context) => ReadingScreen(
+                                      comicId: widget.id,
+                                      coverUrl: comicDetail!.coverUrl,
+                                      chapterId: firstChapter.id,
+                                      title: comicDetail!.title,
+                                      chapterTitle: firstChapter.chapterTitle,
+                                      uploaderName: firstChapter.uploaderName,
+                                      chapters: chapters!,
+                                      index: chapters!.length - 1,
+                                      status: comicDetail!.status,
+                                    ),
                                   ),
                                 );
                               },
                               child: Container(
                                 decoration: BoxDecoration(
-                                  color: OkLab(
-                                    0.63,
-                                    0.24,
-                                    0,
-                                  ).toColor(),
-                                  borderRadius:
-                                      BorderRadius.circular(
-                                        10,
-                                      ),
+                                  color: OkLab(0.63, 0.24, 0).toColor(),
+                                  borderRadius: BorderRadius.circular(10),
                                 ),
-                                padding:
-                                    EdgeInsets.symmetric(
-                                      horizontal: 12,
-                                      vertical: 12,
-                                    ),
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: 12,
+                                  vertical: 12,
+                                ),
                                 child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment
-                                          .center,
-                                  mainAxisSize:
-                                      MainAxisSize.min,
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  mainAxisSize: MainAxisSize.min,
                                   children: [
                                     Icon(
-                                      Icons
-                                          .visibility_outlined,
+                                      Icons.visibility_outlined,
                                       size: 18,
                                       color: Colors.white,
                                     ),
-                                    const SizedBox(
-                                      width: 8,
-                                    ),
+                                    const SizedBox(width: 8),
                                     Text(
                                       'Bắt đầu đọc',
                                       style: TextStyle(
                                         fontSize: 14,
-                                        fontWeight:
-                                            FontWeight.bold,
+                                        fontWeight: FontWeight.bold,
                                         color: Colors.white,
                                       ),
                                     ),
@@ -502,91 +382,55 @@ class _DetailScreenState extends State<DetailScreen> {
                             const SizedBox(width: 12),
                             InkWell(
                               onTap: () {
-                                ChapterModel lastChapter =
-                                    chapters![0];
+                                ChapterModel lastChapter = chapters![0];
                                 ReadingComic.saveProgress(
                                   comicId: widget.id,
-                                  comicTitle:
-                                      comicDetail!.title,
-                                  coverUrl:
-                                      comicDetail!.coverUrl,
+                                  comicTitle: comicDetail!.title,
+                                  coverUrl: comicDetail!.coverUrl,
                                   chapterId: lastChapter.id,
-                                  chapterTitle: lastChapter
-                                      .chapterTitle,
-                                  chapterIndex:
-                                      chapters!.length,
-                                  totalChapters:
-                                      chapters!.length,
-                                  status:
-                                      comicDetail!.status,
+                                  chapterTitle: lastChapter.chapterTitle,
+                                  chapterIndex: chapters!.length,
+                                  totalChapters: chapters!.length,
+                                  status: comicDetail!.status,
                                 );
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) =>
-                                        ReadingScreen(
-                                          comicId:
-                                              widget.id,
-                                          coverUrl:
-                                              comicDetail!
-                                                  .coverUrl,
-                                          chapterId:
-                                              lastChapter
-                                                  .id,
-                                          title:
-                                              comicDetail!
-                                                  .title,
-                                          chapterTitle:
-                                              lastChapter
-                                                  .chapterTitle,
-                                          uploaderName:
-                                              lastChapter
-                                                  .uploaderName,
-                                          chapters:
-                                              chapters!,
-                                          index: 0,
-                                          status:
-                                              comicDetail!
-                                                  .status,
-                                        ),
+                                    builder: (context) => ReadingScreen(
+                                      comicId: widget.id,
+                                      coverUrl: comicDetail!.coverUrl,
+                                      chapterId: lastChapter.id,
+                                      title: comicDetail!.title,
+                                      chapterTitle: lastChapter.chapterTitle,
+                                      uploaderName: lastChapter.uploaderName,
+                                      chapters: chapters!,
+                                      index: 0,
+                                      status: comicDetail!.status,
+                                    ),
                                   ),
                                 );
                               },
                               child: Container(
                                 decoration: BoxDecoration(
-                                  color: OkLab(
-                                    0.55,
-                                    0.06,
-                                    -0.24,
-                                  ).toColor(),
-                                  borderRadius:
-                                      BorderRadius.circular(
-                                        10,
-                                      ),
+                                  color: OkLab(0.55, 0.06, -0.24).toColor(),
+                                  borderRadius: BorderRadius.circular(10),
                                 ),
-                                padding:
-                                    EdgeInsets.symmetric(
-                                      horizontal: 12,
-                                      vertical: 12,
-                                    ),
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: 12,
+                                  vertical: 12,
+                                ),
                                 child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment
-                                          .center,
-                                  mainAxisSize:
-                                      MainAxisSize.min,
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  mainAxisSize: MainAxisSize.min,
                                   children: [
                                     Icon(
-                                      Icons
-                                          .auto_awesome_outlined,
+                                      Icons.auto_awesome_outlined,
                                       size: 18,
                                       color: !isDark
                                           ? Colors.white
                                           : Colors.black,
                                     ),
-                                    const SizedBox(
-                                      width: 8,
-                                    ),
+                                    const SizedBox(width: 8),
                                     Text(
                                       'Đọc mới nhất',
                                       style: TextStyle(
@@ -594,8 +438,7 @@ class _DetailScreenState extends State<DetailScreen> {
                                             ? Colors.white
                                             : Colors.black,
                                         fontSize: 14,
-                                        fontWeight:
-                                            FontWeight.bold,
+                                        fontWeight: FontWeight.bold,
                                       ),
                                     ),
                                   ],
@@ -609,63 +452,42 @@ class _DetailScreenState extends State<DetailScreen> {
                           decoration: BoxDecoration(
                             color: isDark
                                 ? Color(0xFF231A2F)
-                                : OkLab(
-                                    0.97,
-                                    0.01,
-                                    0,
-                                  ).toColor(),
-                            borderRadius:
-                                BorderRadius.circular(30),
+                                : OkLab(0.97, 0.01, 0).toColor(),
+                            borderRadius: BorderRadius.circular(30),
                             border: Border.all(
-                              color: OkLab(0.9, 0.06, -0.02)
-                                  .toColor()
-                                  .withValues(alpha: 0.5),
+                              color: OkLab(
+                                0.9,
+                                0.06,
+                                -0.02,
+                              ).toColor().withValues(alpha: 0.5),
                             ),
                           ),
                           child: Row(
                             children: [
                               Expanded(
                                 child: Container(
-                                  padding:
-                                      EdgeInsets.symmetric(
-                                        vertical: 10,
-                                      ),
+                                  padding: EdgeInsets.symmetric(vertical: 10),
                                   decoration: BoxDecoration(
                                     color: isDark
                                         ? Color(0xFFA855F7)
-                                        : OkLab(
-                                            0.56,
-                                            0.15,
-                                            -0.24,
-                                          ).toColor(),
-                                    borderRadius:
-                                        BorderRadius.circular(
-                                          24,
-                                        ),
+                                        : OkLab(0.56, 0.15, -0.24).toColor(),
+                                    borderRadius: BorderRadius.circular(24),
                                   ),
                                   child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment
-                                            .center,
+                                    mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
                                       Icon(
-                                        Icons
-                                            .format_list_bulleted,
+                                        Icons.format_list_bulleted,
                                         size: 18,
                                         color: Colors.white,
                                       ),
-                                      const SizedBox(
-                                        width: 6,
-                                      ),
+                                      const SizedBox(width: 6),
                                       Text(
                                         'Chapters',
                                         style: TextStyle(
                                           fontSize: 14,
-                                          fontWeight:
-                                              FontWeight
-                                                  .bold,
-                                          color:
-                                              Colors.white,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.white,
                                         ),
                                       ),
                                     ],
@@ -674,49 +496,35 @@ class _DetailScreenState extends State<DetailScreen> {
                               ),
                               Expanded(
                                 child: Padding(
-                                  padding:
-                                      const EdgeInsets.symmetric(
-                                        vertical: 10,
-                                      ),
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 10,
+                                  ),
                                   child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment
-                                            .center,
+                                    mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
                                       Icon(
-                                        Icons
-                                            .chat_bubble_outline,
+                                        Icons.chat_bubble_outline,
                                         size: 18,
                                         color: isDark
-                                            ? Colors.white
-                                                  .withValues(
-                                                    alpha:
-                                                        0.6,
-                                                  )
-                                            : Colors.black
-                                                  .withValues(
-                                                    alpha:
-                                                        0.6,
-                                                  ),
+                                            ? Colors.white.withValues(
+                                                alpha: 0.6,
+                                              )
+                                            : Colors.black.withValues(
+                                                alpha: 0.6,
+                                              ),
                                       ),
-                                      const SizedBox(
-                                        width: 6,
-                                      ),
+                                      const SizedBox(width: 6),
                                       Text(
                                         '(5)',
                                         style: TextStyle(
                                           fontSize: 14,
                                           color: isDark
-                                              ? Colors.white
-                                                    .withValues(
-                                                      alpha:
-                                                          0.6,
-                                                    )
-                                              : Colors.black
-                                                    .withValues(
-                                                      alpha:
-                                                          0.6,
-                                                    ),
+                                              ? Colors.white.withValues(
+                                                  alpha: 0.6,
+                                                )
+                                              : Colors.black.withValues(
+                                                  alpha: 0.6,
+                                                ),
                                         ),
                                       ),
                                     ],
@@ -725,49 +533,35 @@ class _DetailScreenState extends State<DetailScreen> {
                               ),
                               Expanded(
                                 child: Padding(
-                                  padding:
-                                      const EdgeInsets.symmetric(
-                                        vertical: 10,
-                                      ),
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 10,
+                                  ),
                                   child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment
-                                            .center,
+                                    mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
                                       Icon(
-                                        Icons
-                                            .auto_awesome_outlined,
+                                        Icons.auto_awesome_outlined,
                                         size: 18,
                                         color: isDark
-                                            ? Colors.white
-                                                  .withValues(
-                                                    alpha:
-                                                        0.6,
-                                                  )
-                                            : Colors.black
-                                                  .withValues(
-                                                    alpha:
-                                                        0.6,
-                                                  ),
+                                            ? Colors.white.withValues(
+                                                alpha: 0.6,
+                                              )
+                                            : Colors.black.withValues(
+                                                alpha: 0.6,
+                                              ),
                                       ),
-                                      const SizedBox(
-                                        width: 6,
-                                      ),
+                                      const SizedBox(width: 6),
                                       Text(
                                         'Liên quan',
                                         style: TextStyle(
                                           fontSize: 14,
                                           color: isDark
-                                              ? Colors.white
-                                                    .withValues(
-                                                      alpha:
-                                                          0.6,
-                                                    )
-                                              : Colors.black
-                                                    .withValues(
-                                                      alpha:
-                                                          0.6,
-                                                    ),
+                                              ? Colors.white.withValues(
+                                                  alpha: 0.6,
+                                                )
+                                              : Colors.black.withValues(
+                                                  alpha: 0.6,
+                                                ),
                                         ),
                                       ),
                                     ],
@@ -781,18 +575,11 @@ class _DetailScreenState extends State<DetailScreen> {
                         Container(
                           decoration: BoxDecoration(
                             color: Colors.transparent,
-                            borderRadius:
-                                BorderRadius.circular(16),
+                            borderRadius: BorderRadius.circular(16),
                             border: Border.all(
                               color: isDark
-                                  ? Colors.white.withValues(
-                                      alpha: 0.1,
-                                    )
-                                  : OkLab(
-                                      0.88,
-                                      0.04,
-                                      0,
-                                    ).toColor(),
+                                  ? Colors.white.withValues(alpha: 0.1)
+                                  : OkLab(0.88, 0.04, 0).toColor(),
                               width: 1,
                             ),
                           ),
@@ -804,24 +591,16 @@ class _DetailScreenState extends State<DetailScreen> {
                             children: [
                               Row(
                                 mainAxisAlignment:
-                                    MainAxisAlignment
-                                        .spaceBetween,
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text(
                                     'Tất cả chapters',
                                     style: TextStyle(
                                       fontSize: 16,
-                                      fontWeight:
-                                          FontWeight.bold,
+                                      fontWeight: FontWeight.bold,
                                       color: isDark
-                                          ? Color(
-                                              0xFFD69DE5,
-                                            )
-                                          : OkLab(
-                                              0.5,
-                                              0.14,
-                                              -0.22,
-                                            ).toColor(),
+                                          ? Color(0xFFD69DE5)
+                                          : OkLab(0.5, 0.14, -0.22).toColor(),
                                     ),
                                   ),
                                   Row(
@@ -829,16 +608,13 @@ class _DetailScreenState extends State<DetailScreen> {
                                       IconButton(
                                         onPressed: () {
                                           setState(() {
-                                            isLoadingChapter =
-                                                true;
+                                            isLoadingChapter = true;
                                             _fetchChapters();
                                           });
                                         },
                                         icon: Icon(
                                           Icons.sync,
-                                          color: Color(
-                                            0xFFFF2E7E,
-                                          ),
+                                          color: Color(0xFFFF2E7E),
                                           size: 18,
                                         ),
                                       ),
@@ -850,15 +626,12 @@ class _DetailScreenState extends State<DetailScreen> {
                                           });
                                         },
                                         icon: RotatedBox(
-                                          quarterTurns:
-                                              isReversedChapter
+                                          quarterTurns: isReversedChapter
                                               ? 2
                                               : 0,
                                           child: Icon(
                                             Icons.sort,
-                                            color: Color(
-                                              0xFFFF2E7E,
-                                            ),
+                                            color: Color(0xFFFF2E7E),
                                             size: 18,
                                           ),
                                         ),
@@ -872,18 +645,14 @@ class _DetailScreenState extends State<DetailScreen> {
                                   ? const SizedBox(
                                       height: 300,
                                       child: Center(
-                                        child:
-                                            CircularProgressIndicator(),
+                                        child: CircularProgressIndicator(),
                                       ),
                                     )
-                                  : (errorMessageChapter !=
-                                        null)
+                                  : (errorMessageChapter != null)
                                   ? SizedBox(
                                       height: 300,
                                       child: Center(
-                                        child: Text(
-                                          errorMessageChapter!,
-                                        ),
+                                        child: Text(errorMessageChapter!),
                                       ),
                                     )
                                   : chapters!.isEmpty
@@ -893,92 +662,65 @@ class _DetailScreenState extends State<DetailScreen> {
                                         child: Text(
                                           'Bộ truyện này chưa có chapter nào.',
                                           style: TextStyle(
-                                            color: Colors
-                                                .white70,
+                                            color: Colors.white70,
                                           ),
                                         ),
                                       ),
                                     )
                                   : ListView.builder(
                                       shrinkWrap: true,
-                                      reverse:
-                                          isReversedChapter,
+                                      reverse: isReversedChapter,
                                       physics:
                                           const NeverScrollableScrollPhysics(),
-                                      itemCount:
-                                          chapters!.length,
+                                      itemCount: chapters!.length,
                                       itemBuilder: (context, index) {
                                         return InkWell(
                                           onTap: () async {
                                             await ReadingComic.saveProgress(
-                                              comicId:
-                                                  widget.id,
-                                              comicTitle:
-                                                  comicDetail!
-                                                      .title,
-                                              coverUrl:
-                                                  comicDetail!
-                                                      .coverUrl,
-                                              chapterId:
-                                                  chapters![index]
-                                                      .id,
+                                              comicId: widget.id,
+                                              comicTitle: comicDetail!.title,
+                                              coverUrl: comicDetail!.coverUrl,
+                                              chapterId: chapters![index].id,
                                               chapterTitle:
-                                                  chapters![index]
-                                                      .chapterTitle,
+                                                  chapters![index].chapterTitle,
                                               chapterIndex:
-                                                  chapters!
-                                                      .length -
-                                                  index,
-                                              totalChapters:
-                                                  chapters!
-                                                      .length,
-                                              status:
-                                                  comicDetail!
-                                                      .status,
+                                                  chapters!.length - index,
+                                              totalChapters: chapters!.length,
+                                              status: comicDetail!.status,
                                             );
                                             Navigator.push(
                                               context,
                                               MaterialPageRoute(
-                                                builder: (context) => ReadingScreen(
-                                                  comicId:
-                                                      widget
-                                                          .id,
-                                                  coverUrl:
-                                                      comicDetail!
-                                                          .coverUrl,
-                                                  chapterId:
-                                                      chapters![index]
-                                                          .id,
-                                                  title: comicDetail!
-                                                      .title,
-                                                  chapterTitle:
-                                                      chapters![index]
-                                                          .chapterTitle,
-                                                  uploaderName:
-                                                      chapters![index]
-                                                          .uploaderName,
-                                                  chapters:
-                                                      chapters!,
-                                                  index:
-                                                      index,
-                                                  status: comicDetail!
-                                                      .status,
-                                                ),
+                                                builder: (context) =>
+                                                    ReadingScreen(
+                                                      comicId: widget.id,
+                                                      coverUrl:
+                                                          comicDetail!.coverUrl,
+                                                      chapterId:
+                                                          chapters![index].id,
+                                                      title: comicDetail!.title,
+                                                      chapterTitle:
+                                                          chapters![index]
+                                                              .chapterTitle,
+                                                      uploaderName:
+                                                          chapters![index]
+                                                              .uploaderName,
+                                                      chapters: chapters!,
+                                                      index: index,
+                                                      status:
+                                                          comicDetail!.status,
+                                                    ),
                                               ),
                                             );
                                           },
                                           child: ChapterItem(
                                             chapterTitle:
-                                                chapters![index]
-                                                    .chapterTitle,
+                                                chapters![index].chapterTitle,
                                             uploaderName:
-                                                chapters![index]
-                                                    .uploaderName,
+                                                chapters![index].uploaderName,
                                             publishDate:
-                                                chapters![index]
-                                                    .publishDate,
-                                            isNewest:
-                                                index == 0,
+                                                chapters![index].publishDate,
+                                            isNewest: index == 0,
                                           ),
                                         );
                                       },
