@@ -93,7 +93,7 @@ class _ReadingCarouselState extends State<ReadingCarousel> {
       final newTitle = comicDetail.title;
       final newStatus = comicDetail.status;
 
-      double progress = (chapterIndex / newTotalChapters) * 100;
+      double progress = (chapterIndex / newTotalChapters);
 
       if (oldTotalChapters != newTotalChapters) {
         await FirebaseFirestore.instance
@@ -351,6 +351,7 @@ class _ReadingCarouselState extends State<ReadingCarousel> {
                                     onPressed: () async {
                                       await ReadingComic.deleteReading(
                                         comicId: comicId,
+                                        collection: 'Reading',
                                       );
                                     },
                                     icon: Icon(

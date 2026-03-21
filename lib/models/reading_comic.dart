@@ -144,7 +144,10 @@ class ReadingComic {
         });
   }
 
-  static Future<void> deleteReading({required String comicId}) async {
+  static Future<void> deleteReading({
+    required String comicId,
+    required String collection,
+  }) async {
     final user = FirebaseAuth.instance.currentUser;
 
     if (user == null) return;
@@ -152,8 +155,37 @@ class ReadingComic {
     await FirebaseFirestore.instance
         .collection('Users')
         .doc(user.uid)
-        .collection('Reading')
+        .collection(collection)
         .doc(comicId)
         .delete();
+  }
+
+  static Future<void> addLibrary({
+    required String comicId,
+    required String comicTitle,
+    required String coverUrl,
+    required String chapterTitle,
+    required int totalChapters,
+    required String status,
+    required String collection,
+  }) async {
+    final user = FirebaseAuth.instance.currentUser;
+
+    if (user == null) return;
+
+    await FirebaseFirestore.instance
+        .collection('Users')
+        .doc(user.uid)
+        .collection(collection)
+        .doc(comicId)
+        .set({
+          'comicId': comicId,
+          'comicTitle': comicTitle,
+          'coverUrl': coverUrl,
+          'chapterTitle': chapterTitle,
+          'totalChapters': totalChapters,
+          'updatedAt': FieldValue.serverTimestamp(),
+          'status': status,
+        });
   }
 }

@@ -19,8 +19,7 @@ class _LibraryAllState extends State<LibraryAll> {
   @override
   Widget build(BuildContext context) {
     final isDark =
-        Provider.of<ThemeProvider>(context).themeMode ==
-        ThemeMode.dark;
+        Provider.of<ThemeProvider>(context).themeMode == ThemeMode.dark;
     final gradient = isDark
         ? AppColorsDark.gradientBackground
         : AppColorsLight.gradientBackground;
@@ -31,6 +30,13 @@ class _LibraryAllState extends State<LibraryAll> {
               ? AppColorsDark.background1
               : AppColorsLight.background1,
           elevation: 0,
+          leading: IconButton(
+            icon: Icon(Icons.arrow_back),
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            color: isDark ? Colors.white : Colors.black,
+          ),
         ),
         body: SizedBox.expand(
           child: Container(
@@ -38,15 +44,12 @@ class _LibraryAllState extends State<LibraryAll> {
             padding: EdgeInsets.all(20),
             child: SingleChildScrollView(
               child: Column(
-                crossAxisAlignment:
-                    CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     'Lịch sử đọc',
                     style: TextStyle(
-                      color: isDark
-                          ? Colors.white
-                          : Colors.black,
+                      color: isDark ? Colors.white : Colors.black,
                       fontSize: 35,
                       fontWeight: FontWeight.w900,
                     ),
@@ -57,11 +60,7 @@ class _LibraryAllState extends State<LibraryAll> {
                     style: TextStyle(
                       color: isDark
                           ? OkLab(0.71, 0, -0.02).toColor()
-                          : OkLab(
-                              0.55,
-                              0.06,
-                              -0.24,
-                            ).toColor(),
+                          : OkLab(0.55, 0.06, -0.24).toColor(),
                       fontSize: 16,
                       fontWeight: FontWeight.w500,
                     ),
