@@ -313,15 +313,13 @@ class _SearchScreenState extends State<SearchScreen> {
               ),
               const SizedBox(height: 16),
               if (isLoading)
-                const SizedBox(
-                  height: 320,
+                Expanded(
                   child: Center(
                     child: CircularProgressIndicator(),
                   ),
                 )
               else if (comics == null || comics!.isEmpty)
-                const SizedBox(
-                  height: 320,
+                Expanded(
                   child: Center(
                     child: Text('Không tìm thấy truyện'),
                   ),

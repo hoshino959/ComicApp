@@ -4,12 +4,18 @@ import 'package:comic_app/theme/app_colors.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter/services.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
   final themeProvider = ThemeProvider();
   await themeProvider.loadTheme();
+
+  await SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+  ]);
+
   runApp(
     ChangeNotifierProvider(
       create: (_) => themeProvider,
