@@ -21,9 +21,6 @@ class ReadingList extends StatefulWidget {
 }
 
 class _ReadingListState extends State<ReadingList> {
-  int currentPage = 1;
-  final int pageSize = 10;
-
   bool isLoading = false;
 
   late Stream<QuerySnapshot> readingStream;
@@ -147,35 +144,17 @@ class _ReadingListState extends State<ReadingList> {
           return Center(child: CircularProgressIndicator());
         }
         if (snapshot.hasError) {
-          return Column(
-            children: [
-              Container(
-                width: double.infinity,
-                height: 210,
-                decoration: BoxDecoration(
-                  border: Border.all(width: 1, color: Colors.grey),
-                  borderRadius: BorderRadius.circular(50),
-                ),
-                child: Center(
-                  child: Text(
-                    'Lỗi tải dữ liệu',
-                    style: TextStyle(
-                      color: isDark ? Colors.white : Colors.black,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 20,
-                    ),
-                  ),
-                ),
+          return Expanded(
+            child: Container(
+              width: double.infinity,
+              height: 210,
+              decoration: BoxDecoration(
+                border: Border.all(width: 1, color: Colors.grey),
+                borderRadius: BorderRadius.circular(50),
               ),
-            ],
-          );
-        }
-        if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-          return Column(
-            children: [
-              Center(
+              child: Center(
                 child: Text(
-                  'Bạn chưa có truyện từng đọc',
+                  'Lỗi tải dữ liệu',
                   style: TextStyle(
                     color: isDark ? Colors.white : Colors.black,
                     fontWeight: FontWeight.bold,
@@ -183,20 +162,24 @@ class _ReadingListState extends State<ReadingList> {
                   ),
                 ),
               ),
-            ],
+            ),
+          );
+        }
+        if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+          return Expanded(
+            child: Center(
+              child: Text(
+                'Bạn chưa có truyện từng đọc',
+                style: TextStyle(
+                  color: isDark ? Colors.white : Colors.black,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 20,
+                ),
+              ),
+            ),
           );
         }
         final docs = snapshot.data!.docs;
-
-        final totalPages = (docs.length / pageSize).ceil();
-
-        int start = (currentPage - 1) * pageSize;
-
-        int end = start + pageSize;
-
-        if (end > docs.length) end = docs.length;
-
-        final pageDocs = docs.sublist(start, end);
 
         return Column(
           children: [
@@ -226,9 +209,9 @@ class _ReadingListState extends State<ReadingList> {
               child: ListView.builder(
                 shrinkWrap: true,
                 physics: NeverScrollableScrollPhysics(),
-                itemCount: pageDocs.length,
+                itemCount: docs.length,
                 itemBuilder: (context, index) {
-                  final data = pageDocs[index].data() as Map<String, dynamic>;
+                  final data = docs[index].data() as Map<String, dynamic>;
                   final comicId = data['comicId'];
                   final comicTitle = data['comicTitle'];
                   final coverUrl = data['coverUrl'];
@@ -372,7 +355,7 @@ class _ReadingListState extends State<ReadingList> {
                                                 await ApiService.fetchAllComicChapters(
                                                   comicId,
                                                 );
-                                            if (progress.toInt() != 1) {
+                                            if (progress < 1) {
                                               final index = chapters.indexWhere(
                                                 (c) => c.id == chapterId,
                                               );
@@ -487,7 +470,7 @@ class _ReadingListState extends State<ReadingList> {
                           ],
                         ),
                         SizedBox(height: 30),
-                        if (index != pageDocs.length - 1)
+                        if (index != docs.length - 1)
                           Container(
                             color: Colors.grey.withValues(alpha: 0.3),
                             height: 1,
@@ -497,52 +480,6 @@ class _ReadingListState extends State<ReadingList> {
                   );
                 },
               ),
-            ),
-            SizedBox(height: 10),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                IconButton(
-                  onPressed: currentPage > 1
-                      ? () {
-                          setState(() {
-                            currentPage--;
-                          });
-                        }
-                      : null,
-                  icon: Icon(Icons.arrow_back_ios),
-                ),
-                for (int i = 1; i <= totalPages; i++)
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 6),
-                    child: GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          currentPage = i;
-                        });
-                      },
-                      child: Text(
-                        '$i',
-                        style: TextStyle(
-                          fontWeight: currentPage == i
-                              ? FontWeight.bold
-                              : FontWeight.normal,
-                          fontSize: 16,
-                        ),
-                      ),
-                    ),
-                  ),
-                IconButton(
-                  onPressed: currentPage < totalPages
-                      ? () {
-                          setState(() {
-                            currentPage++;
-                          });
-                        }
-                      : null,
-                  icon: Icon(Icons.arrow_forward_ios),
-                ),
-              ],
             ),
           ],
         );

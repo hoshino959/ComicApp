@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:comic_app/api/api_service.dart';
 import 'package:comic_app/screens/detail_screen.dart';
 import 'package:comic_app/theme/theme_provider.dart';
 import 'package:comic_app/widgets/status_chip.dart';
@@ -21,8 +22,7 @@ class ReadingGrid extends StatefulWidget {
 }
 
 class _ReadingGridState extends State<ReadingGrid> {
-  int currentPage = 1;
-  final int pageSize = 10;
+  bool isLoading = false;
 
   late Stream<QuerySnapshot> readingStream;
 
@@ -50,6 +50,82 @@ class _ReadingGridState extends State<ReadingGrid> {
         .collection(widget.status)
         .orderBy('updatedAt', descending: true)
         .snapshots();
+    _initData();
+  }
+
+  Future<void> _initData() async {
+    setState(() {
+      isLoading = true;
+    });
+    await updateComic();
+    setState(() {
+      isLoading = false;
+    });
+  }
+
+  Future<void> updateComic() async {
+    final user = FirebaseAuth.instance.currentUser;
+    final snapshot = await FirebaseFirestore.instance
+        .collection('Users')
+        .doc(user!.uid)
+        .collection('Reading')
+        .get();
+    for (var doc in snapshot.docs) {
+      final data = doc.data();
+
+      final comicId = data['comicId'];
+
+      final oldTotalChapters = data['totalChapters'];
+      final oldCoverUrl = data['coverUrl'];
+      final oldTitle = data['comicTitle'];
+      final oldStatus = data['status'];
+
+      final chapterIndex = data['chapterIndex'];
+
+      final chapters = await ApiService.fetchAllComicChapters(comicId);
+      final comicDetail = await ApiService.fetchComicDetail(comicId);
+
+      if (chapters.isEmpty || comicDetail == null) continue;
+
+      final newTotalChapters = chapters.length;
+      final newCoverUrl = comicDetail.coverUrl;
+      final newTitle = comicDetail.title;
+      final newStatus = comicDetail.status;
+
+      double progress = (chapterIndex / newTotalChapters);
+
+      if (oldTotalChapters != newTotalChapters) {
+        await FirebaseFirestore.instance
+            .collection('Users')
+            .doc(user.uid)
+            .collection('Reading')
+            .doc(comicId)
+            .update({'totalChapters': newTotalChapters, 'progress': progress});
+      }
+      if (oldCoverUrl != newCoverUrl) {
+        updateFireStore(comicId, 'coverUrl', newCoverUrl);
+      }
+      if (oldTitle != newTitle) {
+        updateFireStore(comicId, 'comicTitle', newTitle);
+      }
+      if (oldStatus != newStatus) {
+        updateFireStore(comicId, 'status', newStatus);
+      }
+    }
+  }
+
+  Future<void> updateFireStore(
+    String comicId,
+    String string,
+    dynamic dynamic,
+  ) async {
+    final user = FirebaseAuth.instance.currentUser;
+    await FirebaseFirestore.instance
+        .collection('Users')
+        .doc(user!.uid)
+        .collection('Reading')
+        .doc(comicId)
+        .update({string: dynamic});
   }
 
   String formatViews(int views) {
@@ -75,77 +151,69 @@ class _ReadingGridState extends State<ReadingGrid> {
           return Center(child: CircularProgressIndicator());
         }
         if (snapshot.hasError) {
-          return Column(
-            children: [
-              Container(
-                width: double.infinity,
-                height: MediaQuery.of(context).size.height * 0.75,
-                decoration: BoxDecoration(
-                  border: Border.all(width: 1, color: Colors.grey),
-                  borderRadius: BorderRadius.circular(50),
-                ),
-                child: Center(
-                  child: Text(
-                    'Lỗi tải dữ liệu',
-                    style: TextStyle(
-                      color: isDark ? Colors.white : Colors.black,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 20,
-                    ),
+          return Expanded(
+            child: Container(
+              width: double.infinity,
+              height: MediaQuery.of(context).size.height * 0.75,
+              decoration: BoxDecoration(
+                border: Border.all(width: 1, color: Colors.grey),
+                borderRadius: BorderRadius.circular(50),
+              ),
+              child: Center(
+                child: Text(
+                  'Lỗi tải dữ liệu',
+                  style: TextStyle(
+                    color: isDark ? Colors.white : Colors.black,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 20,
                   ),
                 ),
               ),
-            ],
+            ),
           );
         }
         if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-          return Column(
-            children: [
-              Container(
-                width: double.infinity,
-                height: MediaQuery.of(context).size.height * 0.75,
-                decoration: BoxDecoration(
-                  border: Border.all(width: 1, color: Colors.grey),
-                  borderRadius: BorderRadius.circular(50),
-                ),
-                child: Center(
-                  child: Text(
-                    'Bạn chưa có truyện từng đọc',
-                    style: TextStyle(
-                      color: isDark ? Colors.white : Colors.black,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 20,
-                    ),
+          return Expanded(
+            child: Container(
+              width: double.infinity,
+              height: MediaQuery.of(context).size.height * 0.75,
+              decoration: BoxDecoration(
+                border: Border.all(width: 1, color: Colors.grey),
+                borderRadius: BorderRadius.circular(50),
+              ),
+              child: Center(
+                child: Text(
+                  'Bạn chưa có truyện từng đọc',
+                  style: TextStyle(
+                    color: isDark ? Colors.white : Colors.black,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 20,
                   ),
                 ),
               ),
-            ],
+            ),
           );
         }
         final docs = snapshot.data!.docs;
 
-        final totalPages = (docs.length / pageSize).ceil();
+        final screenWidth = MediaQuery.of(context).size.width;
+        final itemWidth = (screenWidth - 20) / 2;
+        final itemHeight = 335;
 
-        int start = (currentPage - 1) * pageSize;
-
-        int end = start + pageSize;
-
-        if (end > docs.length) end = docs.length;
-
-        final pageDocs = docs.sublist(start, end);
+        final ratio = itemWidth / itemHeight;
 
         return Column(
           children: [
             GridView.builder(
               shrinkWrap: true,
               physics: NeverScrollableScrollPhysics(),
-              itemCount: pageDocs.length,
+              itemCount: docs.length,
               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 2,
-                childAspectRatio: 0.54,
+                childAspectRatio: ratio,
               ),
               itemBuilder: (context, index) {
-                final data = pageDocs[index].data() as Map<String, dynamic>;
+                final data = docs[index].data() as Map<String, dynamic>;
                 final comicId = data['comicId'];
                 final comicTitle = data['comicTitle'];
                 final coverUrl = data['coverUrl'];
@@ -289,52 +357,6 @@ class _ReadingGridState extends State<ReadingGrid> {
                   ),
                 );
               },
-            ),
-            SizedBox(height: 10),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                IconButton(
-                  onPressed: currentPage > 1
-                      ? () {
-                          setState(() {
-                            currentPage--;
-                          });
-                        }
-                      : null,
-                  icon: Icon(Icons.arrow_back_ios),
-                ),
-                for (int i = 1; i <= totalPages; i++)
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 6),
-                    child: GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          currentPage = i;
-                        });
-                      },
-                      child: Text(
-                        '$i',
-                        style: TextStyle(
-                          fontWeight: currentPage == i
-                              ? FontWeight.bold
-                              : FontWeight.normal,
-                          fontSize: 16,
-                        ),
-                      ),
-                    ),
-                  ),
-                IconButton(
-                  onPressed: currentPage < totalPages
-                      ? () {
-                          setState(() {
-                            currentPage++;
-                          });
-                        }
-                      : null,
-                  icon: Icon(Icons.arrow_forward_ios),
-                ),
-              ],
             ),
           ],
         );
