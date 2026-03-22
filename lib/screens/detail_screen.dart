@@ -46,6 +46,9 @@ class _DetailScreenState extends State<DetailScreen> {
   int chunkSize = 100;
   int currentChunkIndex = 0;
 
+  final ScrollController _chunkScrollController =
+      ScrollController();
+
   @override
   void initState() {
     super.initState();
@@ -118,6 +121,12 @@ class _DetailScreenState extends State<DetailScreen> {
   }
 
   @override
+  void dispose() {
+    super.dispose();
+    _chunkScrollController.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final isDark =
         Provider.of<ThemeProvider>(context).themeMode ==
@@ -127,11 +136,13 @@ class _DetailScreenState extends State<DetailScreen> {
         : AppColorsLight.gradientBackground;
 
     List<ChapterModel> currentChapters = [];
+    int totalChunks = 0;
 
     if (chapters != null && chapters!.isNotEmpty) {
-      List<ChapterModel> baseList = isReversedChapter
-          ? chapters!.reversed.toList()
-          : chapters!;
+      List<ChapterModel> baseList = chapters!.reversed
+          .toList();
+
+      totalChunks = (baseList.length / chunkSize).ceil();
 
       int startIndex = currentChunkIndex * chunkSize;
       int endIndex =
@@ -143,12 +154,11 @@ class _DetailScreenState extends State<DetailScreen> {
         startIndex,
         endIndex,
       );
-    }
 
-    int totalChunks =
-        (chapters != null && chapters!.isNotEmpty)
-        ? (chapters!.length / chunkSize).ceil()
-        : 0;
+      if (isReversedChapter) {
+        currentChapters = currentChapters.reversed.toList();
+      }
+    }
 
     return Scaffold(
       extendBodyBehindAppBar: true,
@@ -1003,13 +1013,35 @@ class _DetailScreenState extends State<DetailScreen> {
                                               setState(() {
                                                 isReversedChapter =
                                                     !isReversedChapter;
+
+                                                if (isReversedChapter) {
+                                                  currentChunkIndex =
+                                                      totalChunks -
+                                                      1;
+                                                } else {
+                                                  currentChunkIndex =
+                                                      0;
+                                                }
+
+                                                if (_chunkScrollController
+                                                    .hasClients) {
+                                                  _chunkScrollController.animateTo(
+                                                    0.0,
+                                                    duration: const Duration(
+                                                      milliseconds:
+                                                          300,
+                                                    ),
+                                                    curve: Curves
+                                                        .easeInOut,
+                                                  );
+                                                }
                                               });
                                             },
                                             icon: RotatedBox(
                                               quarterTurns:
                                                   isReversedChapter
-                                                  ? 2
-                                                  : 0,
+                                                  ? 0
+                                                  : 2,
                                               child: Icon(
                                                 Icons.sort,
                                                 color: Color(
@@ -1028,17 +1060,27 @@ class _DetailScreenState extends State<DetailScreen> {
                                     SizedBox(
                                       height: 40,
                                       child: ListView.builder(
+                                        controller:
+                                            _chunkScrollController,
                                         scrollDirection:
                                             Axis.horizontal,
                                         itemCount:
                                             totalChunks,
                                         itemBuilder: (context, index) {
+                                          int actualIndex =
+                                              isReversedChapter
+                                              ? (totalChunks -
+                                                    1 -
+                                                    index)
+                                              : index;
+
                                           int startChap =
-                                              index *
+                                              actualIndex *
                                                   chunkSize +
                                               1;
                                           int endChap =
-                                              (index + 1) *
+                                              (actualIndex +
+                                                  1) *
                                               chunkSize;
                                           if (endChap >
                                               chapters!
@@ -1050,13 +1092,13 @@ class _DetailScreenState extends State<DetailScreen> {
 
                                           bool isSelected =
                                               currentChunkIndex ==
-                                              index;
+                                              actualIndex;
 
                                           return InkWell(
                                             onTap: () {
                                               setState(() {
                                                 currentChunkIndex =
-                                                    index;
+                                                    actualIndex;
                                               });
                                             },
                                             child: Container(
