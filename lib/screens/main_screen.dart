@@ -1,3 +1,4 @@
+import 'package:comic_app/screens/notify_screen.dart';
 import 'package:comic_app/screens/search_screen.dart';
 import 'package:comic_app/theme/app_colors.dart';
 import 'package:comic_app/screens/home_screen.dart';
@@ -17,7 +18,7 @@ class _MainScreenState extends State<MainScreen> {
   static final List<Widget> _widgetOptions = <Widget>[
     const HomeScreen(),
     const SearchScreen(),
-    const Text('Màn hình Thông báo'),
+    const NotifyScreen(),
     const UserScreen(),
   ];
 
@@ -30,14 +31,10 @@ class _MainScreenState extends State<MainScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
-        child: _widgetOptions.elementAt(_selectedIndex),
-      ),
+      body: Center(child: _widgetOptions.elementAt(_selectedIndex)),
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
-        backgroundColor: Theme.of(
-          context,
-        ).scaffoldBackgroundColor,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         selectedItemColor: AppColors.primaryPink,
         unselectedItemColor: Colors.grey,
         selectedFontSize: 12,
