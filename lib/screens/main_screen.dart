@@ -3,6 +3,7 @@ import 'package:comic_app/screens/search_screen.dart';
 import 'package:comic_app/theme/app_colors.dart';
 import 'package:comic_app/screens/home_screen.dart';
 import 'package:comic_app/user/user_screen.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class MainScreen extends StatefulWidget {
@@ -14,11 +15,12 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen> {
   int _selectedIndex = 0;
+  final user = FirebaseAuth.instance.currentUser;
 
-  static final List<Widget> _widgetOptions = <Widget>[
+  List<Widget> get _widgetOptions => [
     const HomeScreen(),
     const SearchScreen(),
-    const NotifyScreen(),
+    if (user != null) const NotifyScreen(),
     const UserScreen(),
   ];
 
@@ -42,7 +44,7 @@ class _MainScreenState extends State<MainScreen> {
         elevation: 8,
         currentIndex: _selectedIndex,
         onTap: _onItemTapped,
-        items: const <BottomNavigationBarItem>[
+        items: <BottomNavigationBarItem>[
           BottomNavigationBarItem(
             icon: Icon(Icons.home_outlined),
             activeIcon: Icon(Icons.home),
@@ -53,11 +55,12 @@ class _MainScreenState extends State<MainScreen> {
             activeIcon: Icon(Icons.search),
             label: 'Tìm kiếm',
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.notifications_none),
-            activeIcon: Icon(Icons.notifications),
-            label: 'Thông báo',
-          ),
+          if (user != null)
+            BottomNavigationBarItem(
+              icon: Icon(Icons.notifications_none),
+              activeIcon: Icon(Icons.notifications),
+              label: 'Thông báo',
+            ),
           BottomNavigationBarItem(
             icon: Icon(Icons.person_outline),
             activeIcon: Icon(Icons.person),

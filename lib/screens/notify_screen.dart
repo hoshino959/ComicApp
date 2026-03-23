@@ -16,6 +16,9 @@ class NotifyScreen extends StatefulWidget {
 }
 
 class _NotifyScreenState extends State<NotifyScreen> {
+  final isDisabled = false;
+  bool showUnreadOnly = false;
+
   @override
   Widget build(BuildContext context) {
     final isDark =
@@ -29,52 +32,136 @@ class _NotifyScreenState extends State<NotifyScreen> {
         decoration: BoxDecoration(gradient: gradient),
         child: Scaffold(
           backgroundColor: Colors.transparent,
-          body: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              SizedBox(height: 20),
-              Text(
-                'Thông báo',
-                style: TextStyle(
-                  color: OkLab(0.5, 0.14, -0.22).toColor(),
-                  fontSize: 24,
-                  fontWeight: FontWeight.w700,
+          body: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                SizedBox(height: 20),
+                Text(
+                  'Thông báo',
+                  style: TextStyle(
+                    color: OkLab(0.5, 0.14, -0.22).toColor(),
+                    fontSize: 24,
+                    fontWeight: FontWeight.w700,
+                  ),
                 ),
-              ),
-              SizedBox(height: 5),
-              Text(
-                'Quản lý và xem lại tất cả các thông báo của bạn từ hệ thống.',
-                style: TextStyle(
-                  fontSize: 16,
-                  color: OkLab(0.55, -0.01, -0.04).toColor(),
-                  fontWeight: FontWeight.w400,
+                SizedBox(height: 5),
+                Text(
+                  'Quản lý và xem lại tất cả các thông báo của bạn từ hệ thống.',
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: OkLab(0.55, -0.01, -0.04).toColor(),
+                    fontWeight: FontWeight.w400,
+                  ),
                 ),
-              ),
-              SizedBox(height: 20),
-              Material(
-                color: OkLab(0.75, 0.17, -0.01).toColor(),
-                borderRadius: BorderRadius.circular(20),
-                child: InkWell(
-                  onTap: null,
+                SizedBox(height: 20),
+                Material(
+                  color: !isDisabled
+                      ? OkLab(0.75, 0.17, -0.01).toColor()
+                      : OkLab(
+                          0.75,
+                          0.17,
+                          -0.01,
+                        ).toColor().withValues(alpha: 0.7),
                   borderRadius: BorderRadius.circular(20),
-                  child: Padding(
-                    padding: EdgeInsets.all(10),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(Icons.check_circle_outline, color: Colors.white),
-                        SizedBox(width: 10),
-                        Text(
-                          'Đánh dấu tất cả là đã đọc',
-                          style: TextStyle(color: Colors.white),
-                        ),
-                      ],
+                  child: InkWell(
+                    onTap: isDisabled ? null : () {},
+                    borderRadius: BorderRadius.circular(20),
+                    child: Padding(
+                      padding: EdgeInsets.all(10),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.check_circle_outline, color: Colors.white),
+                          SizedBox(width: 10),
+                          Text(
+                            'Đánh dấu tất cả là đã đọc',
+                            style: TextStyle(color: Colors.white),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
-              ),
-            ],
+                SizedBox(height: 20),
+                Row(
+                  children: [
+                    GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          showUnreadOnly = false;
+                        });
+                      },
+                      child: Container(
+                        padding: EdgeInsets.symmetric(
+                          vertical: 10,
+                          horizontal: 20,
+                        ),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(20),
+                          color: !showUnreadOnly
+                              ? OkLab(0.75, 0.17, -0.01).toColor()
+                              : Colors.white,
+                          border: Border.all(
+                            width: 1,
+                            color: OkLab(
+                              0.75,
+                              0.17,
+                              -0.01,
+                            ).toColor().withValues(alpha: 0.5),
+                          ),
+                        ),
+                        child: Text(
+                          'Tất cả',
+                          style: TextStyle(
+                            color: !showUnreadOnly
+                                ? Colors.white
+                                : Colors.black,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                    ),
+                    SizedBox(width: 10),
+                    GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          showUnreadOnly = true;
+                        });
+                      },
+                      child: Container(
+                        padding: EdgeInsets.symmetric(
+                          vertical: 10,
+                          horizontal: 20,
+                        ),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(20),
+                          color: showUnreadOnly
+                              ? OkLab(0.75, 0.17, -0.01).toColor()
+                              : Colors.white,
+                          border: Border.all(
+                            width: 1,
+                            color: OkLab(
+                              0.75,
+                              0.17,
+                              -0.01,
+                            ).toColor().withValues(alpha: 0.5),
+                          ),
+                        ),
+                        child: Text(
+                          'Chưa đọc',
+                          style: TextStyle(
+                            color: showUnreadOnly ? Colors.white : Colors.black,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
       ),
