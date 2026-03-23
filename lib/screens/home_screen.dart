@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:comic_app/api/api_service.dart';
+import 'package:comic_app/models/chapter_model.dart';
 import 'package:comic_app/models/comic_model.dart';
 import 'package:comic_app/screens/detail_screen.dart';
 import 'package:comic_app/theme/app_colors.dart';
@@ -98,7 +99,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
     for (var doc in snapshot.docs) {
       final comicId = doc.id;
-      final totalChaptersFS = doc['totalChapters'];
+      final totalChaptersFS = doc['totalChapters'] ?? 0;
 
       final chapters = await ApiService.fetchAllComicChapters(comicId);
       final comicDetail = await ApiService.fetchComicDetail(comicId);
@@ -108,19 +109,35 @@ class _HomeScreenState extends State<HomeScreen> {
       final totalChaptersAPI = chapters.length;
 
       if (totalChaptersFS < totalChaptersAPI) {
-        // await FirebaseFirestore.instance
-        //     .collection('Notification')
-        //     .doc(user!.uid)
-        //     .collection(comicId)
-        //     .add({
-        //       'comicId': comicId,
-        //       'coverUrl': comicDetail!.coverUrl,
-        //       'comicTitle': comicDetail.title,
-        //       'totalChapters': totalChaptersAPI,
-        //       'chapterTitle': chapters[0].chapterTitle,
-        //       'updatedAt': FieldValue.serverTimestamp(),
-        //       'status': false,
-        //     });
+        final sortedChapters = List<ChapterModel>.from(chapters);
+        sortedChapters.sort((a, b) => b.publishDate.compareTo(a.publishDate));
+        final diff = (totalChaptersAPI - totalChaptersFS).toInt();
+        final newChapters = sortedChapters.take(diff).toList();
+        for (var chap in newChapters) {
+          final docRef = FirebaseFirestore.instance
+              .collection('Notification')
+              .doc(user!.uid)
+              .collection(comicId)
+              .doc(chap.id);
+          final exists = await docRef.get();
+          if (exists.exists) continue;
+          await docRef.set({
+            'comicId': comicId,
+            'comicTitle': comicDetail?.title,
+            'coverUrl': comicDetail?.coverUrl,
+            'chapter': chap.chapterTitle,
+            'chapterId': chap.id,
+            'publishDate': chap.publishDate,
+            'updatedAt': FieldValue.serverTimestamp(),
+            'status': false,
+          });
+        }
+        await FirebaseFirestore.instance
+            .collection('Users')
+            .doc(user!.uid)
+            .collection('Notification')
+            .doc(comicId)
+            .update({'totalChapters': chapters.length});
       }
     }
   }
