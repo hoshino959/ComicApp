@@ -11,9 +11,7 @@ import 'package:okcolor/models/oklab.dart';
 import 'package:provider/provider.dart';
 
 class NotifyScreen extends StatefulWidget {
-  final VoidCallback? onRefresh;
-
-  const NotifyScreen({super.key, this.onRefresh});
+  const NotifyScreen({super.key});
 
   @override
   State<StatefulWidget> createState() {
@@ -151,7 +149,6 @@ class _NotifyScreenState extends State<NotifyScreen> {
                                   }
                                 }
                                 await loadNotifications();
-                                widget.onRefresh?.call();
                                 setState(() {
                                   isLoading = false;
                                 });
@@ -310,7 +307,6 @@ class _NotifyScreenState extends State<NotifyScreen> {
                                 .update({'status': true});
 
                             await loadNotifications();
-                            widget.onRefresh?.call();
 
                             final chapters =
                                 await ApiService.fetchAllComicChapters(

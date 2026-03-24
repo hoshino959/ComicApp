@@ -22,7 +22,7 @@ class _MainScreenState extends State<MainScreen> {
   List<Widget> get _widgetOptions => [
     const HomeScreen(),
     const SearchScreen(),
-    if (user != null) NotifyScreen(onRefresh: () => setState(() {})),
+    if (user != null) const NotifyScreen(),
     const UserScreen(),
   ];
 
@@ -50,9 +50,11 @@ class _MainScreenState extends State<MainScreen> {
                 .limit(1)
                 .get();
             if (chapterSnapshot.docs.isNotEmpty) {
+              setState(() {});
               return true;
             }
           }
+          setState(() {});
           return false;
         });
   }
