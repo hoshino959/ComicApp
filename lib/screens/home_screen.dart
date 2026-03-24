@@ -81,9 +81,9 @@ class _HomeScreenState extends State<HomeScreen> {
     setState(() {
       isLoading = true;
     });
+    await checkChapterNews();
     await fetchRandomComics();
     await fetchNewestComics();
-    await checkChapterNews();
     setState(() {
       isLoading = false;
     });
@@ -447,11 +447,6 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
         ),
-        if (isLoading)
-          Container(
-            color: Colors.black.withValues(alpha: 0.3),
-            child: Center(child: CircularProgressIndicator()),
-          ),
       ],
     );
   }

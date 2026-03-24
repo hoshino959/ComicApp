@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:comic_app/screens/notify_screen.dart';
 import 'package:comic_app/screens/search_screen.dart';
 import 'package:comic_app/theme/app_colors.dart';
@@ -15,12 +16,13 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen> {
   int _selectedIndex = 0;
+  bool hasUnread = false;
   final user = FirebaseAuth.instance.currentUser;
 
   List<Widget> get _widgetOptions => [
     const HomeScreen(),
     const SearchScreen(),
-    if (user != null) const NotifyScreen(),
+    if (user != null) NotifyScreen(onRefresh: () => setState(() {})),
     const UserScreen(),
   ];
 
@@ -28,6 +30,31 @@ class _MainScreenState extends State<MainScreen> {
     setState(() {
       _selectedIndex = index;
     });
+  }
+
+  Stream<bool> hasUnReadNotifications() {
+    return FirebaseFirestore.instance
+        .collection('Users')
+        .doc(user!.uid)
+        .collection('Notification')
+        .snapshots()
+        .asyncMap((comicSnapshot) async {
+          for (var comicDoc in comicSnapshot.docs) {
+            final comicId = comicDoc.id;
+
+            final chapterSnapshot = await FirebaseFirestore.instance
+                .collection('Notification')
+                .doc(user!.uid)
+                .collection(comicId)
+                .where('status', isEqualTo: false)
+                .limit(1)
+                .get();
+            if (chapterSnapshot.docs.isNotEmpty) {
+              return true;
+            }
+          }
+          return false;
+        });
   }
 
   @override
@@ -57,8 +84,54 @@ class _MainScreenState extends State<MainScreen> {
           ),
           if (user != null)
             BottomNavigationBarItem(
-              icon: Icon(Icons.notifications_none),
-              activeIcon: Icon(Icons.notifications),
+              icon: StreamBuilder<bool>(
+                stream: hasUnReadNotifications(),
+                builder: (context, snapshot) {
+                  bool hasUnread = snapshot.data ?? false;
+                  return Stack(
+                    children: [
+                      Icon(Icons.notifications_none),
+                      if (hasUnread)
+                        Positioned(
+                          right: 0,
+                          top: 0,
+                          child: Container(
+                            width: 10,
+                            height: 10,
+                            decoration: BoxDecoration(
+                              color: Colors.red,
+                              shape: BoxShape.circle,
+                            ),
+                          ),
+                        ),
+                    ],
+                  );
+                },
+              ),
+              activeIcon: StreamBuilder<bool>(
+                stream: hasUnReadNotifications(),
+                builder: (context, snapshot) {
+                  bool hasUnread = snapshot.data ?? false;
+                  return Stack(
+                    children: [
+                      Icon(Icons.notifications),
+                      if (hasUnread)
+                        Positioned(
+                          right: 0,
+                          top: 0,
+                          child: Container(
+                            width: 10,
+                            height: 10,
+                            decoration: BoxDecoration(
+                              color: Colors.red,
+                              shape: BoxShape.circle,
+                            ),
+                          ),
+                        ),
+                    ],
+                  );
+                },
+              ),
               label: 'Thông báo',
             ),
           BottomNavigationBarItem(

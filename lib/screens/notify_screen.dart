@@ -11,7 +11,9 @@ import 'package:okcolor/models/oklab.dart';
 import 'package:provider/provider.dart';
 
 class NotifyScreen extends StatefulWidget {
-  const NotifyScreen({super.key});
+  final VoidCallback? onRefresh;
+
+  const NotifyScreen({super.key, this.onRefresh});
 
   @override
   State<StatefulWidget> createState() {
@@ -23,7 +25,7 @@ class _NotifyScreenState extends State<NotifyScreen> {
   final user = FirebaseAuth.instance.currentUser;
 
   bool isLoading = true;
-  final isDisabled = false;
+  bool isDisabled = true;
   bool showUnreadOnly = false;
 
   List<Map<String, dynamic>> allNotifications = [];
@@ -64,6 +66,7 @@ class _NotifyScreenState extends State<NotifyScreen> {
     setState(() {
       allNotifications = tempList;
       isLoading = false;
+      isDisabled = !allNotifications.any((e) => e['status'] == false);
     });
   }
 
@@ -94,7 +97,9 @@ class _NotifyScreenState extends State<NotifyScreen> {
                     Text(
                       'Thông báo',
                       style: TextStyle(
-                        color: OkLab(0.5, 0.14, -0.22).toColor(),
+                        color: isDark
+                            ? OkLab(0.83, 0.07, -0.1).toColor()
+                            : OkLab(0.5, 0.14, -0.22).toColor(),
                         fontSize: 24,
                         fontWeight: FontWeight.w700,
                       ),
@@ -104,24 +109,37 @@ class _NotifyScreenState extends State<NotifyScreen> {
                       'Quản lý và xem lại tất cả các thông báo của bạn từ hệ thống.',
                       style: TextStyle(
                         fontSize: 16,
-                        color: OkLab(0.55, -0.01, -0.04).toColor(),
+                        color: isDark
+                            ? OkLab(0.7, -0.01, -0.04).toColor()
+                            : OkLab(0.55, -0.01, -0.04).toColor(),
                         fontWeight: FontWeight.w400,
                       ),
                     ),
                     SizedBox(height: 20),
                     Material(
-                      color: !isDisabled
-                          ? OkLab(0.75, 0.17, -0.01).toColor()
-                          : OkLab(
-                              0.75,
-                              0.17,
-                              -0.01,
-                            ).toColor().withValues(alpha: 0.7),
+                      color: isDark
+                          ? (!isDisabled
+                                ? OkLab(0.63, 0.24, 0).toColor()
+                                : OkLab(
+                                    0.63,
+                                    0.24,
+                                    0,
+                                  ).toColor().withValues(alpha: 0.5))
+                          : (!isDisabled
+                                ? OkLab(0.75, 0.17, -0.01).toColor()
+                                : OkLab(
+                                    0.75,
+                                    0.17,
+                                    -0.01,
+                                  ).toColor().withValues(alpha: 0.5)),
                       borderRadius: BorderRadius.circular(20),
                       child: InkWell(
                         onTap: isDisabled
                             ? null
                             : () async {
+                                setState(() {
+                                  isLoading = true;
+                                });
                                 for (var item in allNotifications) {
                                   if (item['status'] == false) {
                                     await FirebaseFirestore.instance
@@ -132,7 +150,11 @@ class _NotifyScreenState extends State<NotifyScreen> {
                                         .update({'status': true});
                                   }
                                 }
-                                loadNotifications();
+                                await loadNotifications();
+                                widget.onRefresh?.call();
+                                setState(() {
+                                  isLoading = false;
+                                });
                               },
                         borderRadius: BorderRadius.circular(20),
                         child: Padding(
@@ -170,9 +192,13 @@ class _NotifyScreenState extends State<NotifyScreen> {
                             ),
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(20),
-                              color: !showUnreadOnly
-                                  ? OkLab(0.75, 0.17, -0.01).toColor()
-                                  : Colors.white,
+                              color: isDark
+                                  ? (!showUnreadOnly
+                                        ? OkLab(0.63, 0.24, 0).toColor()
+                                        : Colors.transparent)
+                                  : (!showUnreadOnly
+                                        ? OkLab(0.75, 0.17, -0.01).toColor()
+                                        : Colors.white),
                               border: Border.all(
                                 width: 1,
                                 color: OkLab(
@@ -185,9 +211,11 @@ class _NotifyScreenState extends State<NotifyScreen> {
                             child: Text(
                               'Tất cả',
                               style: TextStyle(
-                                color: !showUnreadOnly
+                                color: isDark
                                     ? Colors.white
-                                    : Colors.black,
+                                    : (!showUnreadOnly
+                                          ? Colors.white
+                                          : Colors.black),
                                 fontWeight: FontWeight.w500,
                               ),
                             ),
@@ -207,9 +235,13 @@ class _NotifyScreenState extends State<NotifyScreen> {
                             ),
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(20),
-                              color: showUnreadOnly
-                                  ? OkLab(0.75, 0.17, -0.01).toColor()
-                                  : Colors.white,
+                              color: isDark
+                                  ? (showUnreadOnly
+                                        ? OkLab(0.63, 0.24, 0).toColor()
+                                        : Colors.transparent)
+                                  : (showUnreadOnly
+                                        ? OkLab(0.75, 0.17, -0.01).toColor()
+                                        : Colors.white),
                               border: Border.all(
                                 width: 1,
                                 color: OkLab(
@@ -222,9 +254,11 @@ class _NotifyScreenState extends State<NotifyScreen> {
                             child: Text(
                               'Chưa đọc',
                               style: TextStyle(
-                                color: showUnreadOnly
+                                color: isDark
                                     ? Colors.white
-                                    : Colors.black,
+                                    : (showUnreadOnly
+                                          ? Colors.white
+                                          : Colors.black),
                                 fontWeight: FontWeight.w500,
                               ),
                             ),
@@ -275,7 +309,8 @@ class _NotifyScreenState extends State<NotifyScreen> {
                                 .doc(item['chapterId'])
                                 .update({'status': true});
 
-                            loadNotifications();
+                            await loadNotifications();
+                            widget.onRefresh?.call();
 
                             final chapters =
                                 await ApiService.fetchAllComicChapters(
@@ -314,9 +349,20 @@ class _NotifyScreenState extends State<NotifyScreen> {
                             padding: EdgeInsets.all(10),
                             margin: EdgeInsets.only(bottom: 10),
                             decoration: BoxDecoration(
-                              color: Colors.white,
+                              color: isDark
+                                  ? OkLab(0.23, 0, -0.01).toColor()
+                                  : Colors.white,
                               borderRadius: BorderRadius.circular(20),
-                              border: Border.all(width: 1, color: Colors.pink),
+                              border: Border.all(
+                                width: 1,
+                                color: isDark
+                                    ? OkLab(
+                                        0.97,
+                                        0,
+                                        0,
+                                      ).toColor().withValues(alpha: 0.15)
+                                    : OkLab(0.88, 0.04, 0).toColor(),
+                              ),
                             ),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -354,11 +400,13 @@ class _NotifyScreenState extends State<NotifyScreen> {
                                             overflow: TextOverflow.ellipsis,
                                             maxLines: 1,
                                             style: TextStyle(
-                                              color: OkLab(
-                                                0.21,
-                                                0,
-                                                -0.04,
-                                              ).toColor(),
+                                              color: isDark
+                                                  ? Colors.white
+                                                  : OkLab(
+                                                      0.21,
+                                                      0,
+                                                      -0.04,
+                                                    ).toColor(),
                                               fontWeight: FontWeight.w700,
                                               fontSize: 16,
                                             ),
@@ -372,11 +420,17 @@ class _NotifyScreenState extends State<NotifyScreen> {
                                             overflow: TextOverflow.ellipsis,
                                             maxLines: 1,
                                             style: TextStyle(
-                                              color: OkLab(
-                                                0.55,
-                                                -0.01,
-                                                -0.04,
-                                              ).toColor(),
+                                              color: isDark
+                                                  ? OkLab(
+                                                      0.7,
+                                                      -0.01,
+                                                      -0.04,
+                                                    ).toColor()
+                                                  : OkLab(
+                                                      0.55,
+                                                      -0.01,
+                                                      -0.04,
+                                                    ).toColor(),
                                               fontWeight: FontWeight.w500,
                                               fontSize: 12,
                                             ),
@@ -384,6 +438,16 @@ class _NotifyScreenState extends State<NotifyScreen> {
                                         ],
                                       ),
                                     ),
+                                    if (item['status'] == false)
+                                      Container(
+                                        width: 10,
+                                        height: 10,
+                                        margin: EdgeInsets.only(right: 10),
+                                        decoration: BoxDecoration(
+                                          color: Colors.red,
+                                          shape: BoxShape.circle,
+                                        ),
+                                      ),
                                   ],
                                 ),
                                 SizedBox(height: 5),
@@ -392,7 +456,9 @@ class _NotifyScreenState extends State<NotifyScreen> {
                                   overflow: TextOverflow.ellipsis,
                                   maxLines: 1,
                                   style: TextStyle(
-                                    color: OkLab(0.45, -0.01, -0.04).toColor(),
+                                    color: isDark
+                                        ? OkLab(0.87, -0.01, -0.02).toColor()
+                                        : OkLab(0.45, -0.01, -0.04).toColor(),
                                     fontWeight: FontWeight.w400,
                                     fontSize: 14,
                                   ),
@@ -411,7 +477,7 @@ class _NotifyScreenState extends State<NotifyScreen> {
           if (isLoading)
             Container(
               decoration: BoxDecoration(
-                color: Colors.black.withValues(alpha: 0.3),
+                color: Colors.black.withValues(alpha: 0.1),
               ),
               child: Center(child: CircularProgressIndicator()),
             ),
