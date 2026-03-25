@@ -81,9 +81,11 @@ class _HomeScreenState extends State<HomeScreen> {
     setState(() {
       isLoading = true;
     });
-    await checkChapterNews();
-    await fetchRandomComics();
-    await fetchNewestComics();
+    await Future.wait([
+      checkChapterNews(),
+      fetchRandomComics(),
+      fetchNewestComics(),
+    ]);
     setState(() {
       isLoading = false;
     });

@@ -1,3 +1,6 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:comic_app/api/api_service.dart';
+import 'package:comic_app/models/chapter_model.dart';
 import 'package:comic_app/screens/main_screen.dart';
 import 'package:comic_app/theme/app_dark_colors.dart';
 import 'package:comic_app/theme/app_light_colors.dart';
@@ -26,13 +29,66 @@ class UserScreenState extends State<UserScreen> {
   @override
   void initState() {
     super.initState();
+    checkChapterNews();
+  }
+
+  Future<void> checkChapterNews() async {
+    if (user == null) return;
+    final snapshot = await FirebaseFirestore.instance
+        .collection('Users')
+        .doc(user!.uid)
+        .collection('Notification')
+        .get();
+
+    for (var doc in snapshot.docs) {
+      final comicId = doc.id;
+      final totalChaptersFS = doc['totalChapters'] ?? 0;
+
+      final chapters = await ApiService.fetchAllComicChapters(comicId);
+      final comicDetail = await ApiService.fetchComicDetail(comicId);
+
+      if (chapters.isEmpty) continue;
+
+      final totalChaptersAPI = chapters.length;
+
+      if (totalChaptersFS < totalChaptersAPI) {
+        final sortedChapters = List<ChapterModel>.from(chapters);
+        sortedChapters.sort((a, b) => b.publishDate.compareTo(a.publishDate));
+        final diff = (totalChaptersAPI - totalChaptersFS).toInt();
+        final newChapters = sortedChapters.take(diff).toList();
+        for (var chap in newChapters) {
+          final docRef = FirebaseFirestore.instance
+              .collection('Notification')
+              .doc(user!.uid)
+              .collection(comicId)
+              .doc(chap.id);
+          final exists = await docRef.get();
+          if (exists.exists) continue;
+          await docRef.set({
+            'comicId': comicId,
+            'comicTitle': comicDetail?.title,
+            'coverUrl': comicDetail?.coverUrl,
+            'chapter': chap.chapterTitle,
+            'chapterId': chap.id,
+            'publishDate': chap.publishDate,
+            'updatedAt': FieldValue.serverTimestamp(),
+            'status': false,
+          });
+        }
+        await FirebaseFirestore.instance
+            .collection('Users')
+            .doc(user!.uid)
+            .collection('Notification')
+            .doc(comicId)
+            .update({'totalChapters': chapters.length});
+      }
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     final darkMode =
-        Provider.of<ThemeProvider>(context).themeMode ==
-        ThemeMode.dark;
+        Provider.of<ThemeProvider>(context).themeMode == ThemeMode.dark;
     final gradient = darkMode
         ? AppColorsDark.gradientBackground
         : AppColorsLight.gradientBackground;
@@ -67,16 +123,11 @@ class UserScreenState extends State<UserScreen> {
                       onTap: () {
                         if (user != null)
                           Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (_) =>
-                                  ProfileScreen(),
-                            ),
+                            MaterialPageRoute(builder: (_) => ProfileScreen()),
                           );
                         if (user == null) {
                           Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (_) => LoginPage(),
-                            ),
+                            MaterialPageRoute(builder: (_) => LoginPage()),
                           );
                         }
                       },
@@ -86,46 +137,27 @@ class UserScreenState extends State<UserScreen> {
                           vertical: 16,
                         ),
                         child: Row(
-                          mainAxisAlignment:
-                              MainAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.start,
                           children: [
                             Icon(
                               Icons.account_circle,
                               size: 40,
                               color: !darkMode
-                                  ? OkLab(
-                                      0.5,
-                                      0.14,
-                                      -0.22,
-                                    ).toColor()
-                                  : OkLab(
-                                      0.83,
-                                      0.07,
-                                      -0.1,
-                                    ).toColor(),
+                                  ? OkLab(0.5, 0.14, -0.22).toColor()
+                                  : OkLab(0.83, 0.07, -0.1).toColor(),
                             ),
                             SizedBox(width: 20),
                             if (user != null)
                               Column(
-                                crossAxisAlignment:
-                                    CrossAxisAlignment
-                                        .start,
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
                                     'Hồ sơ',
                                     style: TextStyle(
                                       fontSize: 18,
                                       color: !darkMode
-                                          ? OkLab(
-                                              0.5,
-                                              0.14,
-                                              -0.22,
-                                            ).toColor()
-                                          : OkLab(
-                                              0.83,
-                                              0.07,
-                                              -0.1,
-                                            ).toColor(),
+                                          ? OkLab(0.5, 0.14, -0.22).toColor()
+                                          : OkLab(0.83, 0.07, -0.1).toColor(),
                                     ),
                                   ),
                                   Text(
@@ -140,25 +172,15 @@ class UserScreenState extends State<UserScreen> {
                               ),
                             if (user == null)
                               Column(
-                                crossAxisAlignment:
-                                    CrossAxisAlignment
-                                        .start,
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
                                     'Đăng nhập',
                                     style: TextStyle(
                                       fontSize: 18,
                                       color: !darkMode
-                                          ? OkLab(
-                                              0.5,
-                                              0.14,
-                                              -0.22,
-                                            ).toColor()
-                                          : OkLab(
-                                              0.83,
-                                              0.07,
-                                              -0.1,
-                                            ).toColor(),
+                                          ? OkLab(0.5, 0.14, -0.22).toColor()
+                                          : OkLab(0.83, 0.07, -0.1).toColor(),
                                     ),
                                   ),
                                 ],
@@ -174,10 +196,7 @@ class UserScreenState extends State<UserScreen> {
                       InkWell(
                         onTap: () {
                           Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (_) =>
-                                  LibraryScreen(),
-                            ),
+                            MaterialPageRoute(builder: (_) => LibraryScreen()),
                           );
                         },
                         child: Padding(
@@ -186,45 +205,26 @@ class UserScreenState extends State<UserScreen> {
                             vertical: 16,
                           ),
                           child: Row(
-                            mainAxisAlignment:
-                                MainAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.start,
                             children: [
                               Icon(
                                 Icons.library_books,
                                 size: 40,
                                 color: !darkMode
-                                    ? OkLab(
-                                        0.5,
-                                        0.14,
-                                        -0.22,
-                                      ).toColor()
-                                    : OkLab(
-                                        0.83,
-                                        0.07,
-                                        -0.1,
-                                      ).toColor(),
+                                    ? OkLab(0.5, 0.14, -0.22).toColor()
+                                    : OkLab(0.83, 0.07, -0.1).toColor(),
                               ),
                               SizedBox(width: 20),
                               Column(
-                                crossAxisAlignment:
-                                    CrossAxisAlignment
-                                        .start,
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
                                     'Thư viện',
                                     style: TextStyle(
                                       fontSize: 18,
                                       color: !darkMode
-                                          ? OkLab(
-                                              0.5,
-                                              0.14,
-                                              -0.22,
-                                            ).toColor()
-                                          : OkLab(
-                                              0.83,
-                                              0.07,
-                                              -0.1,
-                                            ).toColor(),
+                                          ? OkLab(0.5, 0.14, -0.22).toColor()
+                                          : OkLab(0.83, 0.07, -0.1).toColor(),
                                     ),
                                   ),
                                   Text(
@@ -265,44 +265,26 @@ class UserScreenState extends State<UserScreen> {
                           vertical: 16,
                         ),
                         child: Row(
-                          mainAxisAlignment:
-                              MainAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.start,
                           children: [
                             Icon(
                               Icons.settings,
                               size: 40,
                               color: !darkMode
-                                  ? OkLab(
-                                      0.5,
-                                      0.14,
-                                      -0.22,
-                                    ).toColor()
-                                  : OkLab(
-                                      0.83,
-                                      0.07,
-                                      -0.1,
-                                    ).toColor(),
+                                  ? OkLab(0.5, 0.14, -0.22).toColor()
+                                  : OkLab(0.83, 0.07, -0.1).toColor(),
                             ),
                             SizedBox(width: 20),
                             Column(
-                              crossAxisAlignment:
-                                  CrossAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
                                   'Cài đặt',
                                   style: TextStyle(
                                     fontSize: 18,
                                     color: !darkMode
-                                        ? OkLab(
-                                            0.5,
-                                            0.14,
-                                            -0.22,
-                                          ).toColor()
-                                        : OkLab(
-                                            0.83,
-                                            0.07,
-                                            -0.1,
-                                          ).toColor(),
+                                        ? OkLab(0.5, 0.14, -0.22).toColor()
+                                        : OkLab(0.83, 0.07, -0.1).toColor(),
                                   ),
                                 ),
                                 Text(
@@ -330,14 +312,9 @@ class UserScreenState extends State<UserScreen> {
                           setState(() {
                             isLoading = true;
                           });
-                          await FirebaseAuth.instance
-                              .signOut();
-                          Navigator.of(
-                            context,
-                          ).pushReplacement(
-                            MaterialPageRoute(
-                              builder: (_) => MainScreen(),
-                            ),
+                          await FirebaseAuth.instance.signOut();
+                          Navigator.of(context).pushReplacement(
+                            MaterialPageRoute(builder: (_) => MainScreen()),
                           );
                           setState(() {
                             isLoading = false;
@@ -349,23 +326,14 @@ class UserScreenState extends State<UserScreen> {
                             vertical: 16,
                           ),
                           child: Row(
-                            mainAxisAlignment:
-                                MainAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.start,
                             children: [
                               Icon(
                                 Icons.logout,
                                 size: 40,
                                 color: !darkMode
-                                    ? OkLab(
-                                        0.64,
-                                        0.21,
-                                        0.1,
-                                      ).toColor()
-                                    : OkLab(
-                                        0.7,
-                                        0.18,
-                                        0.07,
-                                      ).toColor(),
+                                    ? OkLab(0.64, 0.21, 0.1).toColor()
+                                    : OkLab(0.7, 0.18, 0.07).toColor(),
                               ),
                               SizedBox(width: 20),
                               Text(
@@ -373,16 +341,8 @@ class UserScreenState extends State<UserScreen> {
                                 style: TextStyle(
                                   fontSize: 18,
                                   color: !darkMode
-                                      ? OkLab(
-                                          0.64,
-                                          0.21,
-                                          0.1,
-                                        ).toColor()
-                                      : OkLab(
-                                          0.7,
-                                          0.18,
-                                          0.07,
-                                        ).toColor(),
+                                      ? OkLab(0.64, 0.21, 0.1).toColor()
+                                      : OkLab(0.7, 0.18, 0.07).toColor(),
                                 ),
                               ),
                             ],
@@ -398,9 +358,7 @@ class UserScreenState extends State<UserScreen> {
         if (isLoading)
           Container(
             color: Colors.black.withValues(alpha: 0.3),
-            child: Center(
-              child: CircularProgressIndicator(),
-            ),
+            child: Center(child: CircularProgressIndicator()),
           ),
       ],
     );

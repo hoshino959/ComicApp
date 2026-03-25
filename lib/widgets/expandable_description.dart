@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:okcolor/models/oklab.dart';
 
 class ExpandableDescription extends StatefulWidget {
   final String text;
@@ -11,12 +12,10 @@ class ExpandableDescription extends StatefulWidget {
   });
 
   @override
-  State<ExpandableDescription> createState() =>
-      _ExpandableDescriptionState();
+  State<ExpandableDescription> createState() => _ExpandableDescriptionState();
 }
 
-class _ExpandableDescriptionState
-    extends State<ExpandableDescription> {
+class _ExpandableDescriptionState extends State<ExpandableDescription> {
   bool isExpanded = false;
 
   @override
@@ -24,7 +23,9 @@ class _ExpandableDescriptionState
     final textStyle = TextStyle(
       fontSize: 14,
       height: 1.5,
-      color: widget.isDark ? Colors.white : Colors.black,
+      color: widget.isDark
+          ? OkLab(0.71, 0, -0.02).toColor()
+          : OkLab(0.45, -0.01, -0.03).toColor(),
     );
 
     return Container(
@@ -32,19 +33,14 @@ class _ExpandableDescriptionState
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: widget.isDark
-            ? const Color(0xFF231A2F)
-            : Colors.white,
+            ? OkLab(0.28, 0.09, -0.13).toColor().withValues(alpha: 0.2)
+            : OkLab(0.98, 0.01, -0.01).toColor().withValues(alpha: 0.8),
         borderRadius: BorderRadius.circular(12),
-        boxShadow: const [
-          BoxShadow(blurRadius: 10, color: Colors.black26),
-        ],
+        boxShadow: const [BoxShadow(blurRadius: 10, color: Colors.black26)],
       ),
       child: LayoutBuilder(
         builder: (context, constraints) {
-          final span = TextSpan(
-            text: widget.text,
-            style: textStyle,
-          );
+          final span = TextSpan(text: widget.text, style: textStyle);
           final tp = TextPainter(
             text: span,
             maxLines: 3,
@@ -81,13 +77,10 @@ class _ExpandableDescriptionState
                     });
                   },
                   child: Row(
-                    mainAxisAlignment:
-                        MainAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        isExpanded
-                            ? 'Thu gọn'
-                            : 'Xem đầy đủ',
+                        isExpanded ? 'Thu gọn' : 'Xem đầy đủ',
                         style: const TextStyle(
                           color: Color(0xFFFF2E7E),
                           fontSize: 14,
