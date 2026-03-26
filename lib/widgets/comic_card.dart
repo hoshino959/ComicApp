@@ -21,8 +21,7 @@ class ComicCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final darkMode =
-        Provider.of<ThemeProvider>(context).themeMode == ThemeMode.dark;
+    final darkMode = Provider.of<ThemeProvider>(context).themeMode == ThemeMode.dark;
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
@@ -33,10 +32,7 @@ class ComicCard extends StatelessWidget {
       child: Column(
         children: [
           ClipRRect(
-            borderRadius: const BorderRadius.only(
-              topLeft: Radius.circular(9),
-              topRight: Radius.circular(9),
-            ),
+            borderRadius: const BorderRadius.only(topLeft: Radius.circular(9), topRight: Radius.circular(9)),
             child: CachedNetworkImage(
               imageUrl: thumbnailUrl,
               width: double.infinity,
@@ -46,20 +42,12 @@ class ComicCard extends StatelessWidget {
               placeholder: (context, url) => Container(
                 height: 219,
                 color: Colors.grey.withValues(alpha: 0.1),
-                child: Center(
-                  child: CircularProgressIndicator(
-                    color: AppColors.secondaryPink,
-                  ),
-                ),
+                child: Center(child: CircularProgressIndicator(color: AppColors.secondaryPink)),
               ),
               errorWidget: (context, url, error) => Container(
                 height: 219,
                 color: Colors.grey.withValues(alpha: 0.1),
-                child: const Icon(
-                  Icons.broken_image,
-                  color: Colors.grey,
-                  size: 40,
-                ),
+                child: const Icon(Icons.broken_image, color: Colors.grey, size: 40),
               ),
             ),
           ),
@@ -71,18 +59,9 @@ class ComicCard extends StatelessWidget {
               children: [
                 Row(
                   children: [
-                    Icon(
-                      Icons.history,
-                      color: !darkMode ? Colors.black : Colors.white,
-                      size: 16,
-                    ),
+                    Icon(Icons.history, color: !darkMode ? Colors.black : Colors.white, size: 16),
                     const SizedBox(width: 5),
-                    Text(
-                      timeAgo,
-                      style: TextStyle(
-                        color: !darkMode ? Colors.black : Colors.white,
-                      ),
-                    ),
+                    Text(timeAgo, style: TextStyle(color: !darkMode ? Colors.black : Colors.white)),
                   ],
                 ),
                 SizedBox(height: 6),
@@ -91,9 +70,7 @@ class ComicCard extends StatelessWidget {
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 18,
-                    color: darkMode
-                        ? OkLab(0.83, 0.07, -0.1).toColor()
-                        : OkLab(0.5, 0.14, -0.22).toColor(),
+                    color: darkMode ? OkLab(0.83, 0.07, -0.1).toColor() : OkLab(0.5, 0.14, -0.22).toColor(),
                   ),
                   overflow: TextOverflow.ellipsis,
                   maxLines: 1,
@@ -101,20 +78,14 @@ class ComicCard extends StatelessWidget {
                 const SizedBox(height: 6),
                 Row(
                   children: [
-                    const Icon(
-                      Icons.book,
-                      color: Colors.orangeAccent,
-                      size: 16,
-                    ),
+                    const Icon(Icons.book, color: Colors.orangeAccent, size: 16),
                     const SizedBox(width: 5),
                     Expanded(
                       child: Text(
                         newestChapter,
                         overflow: TextOverflow.ellipsis,
                         maxLines: 1,
-                        style: TextStyle(
-                          color: !darkMode ? Colors.black : Colors.white,
-                        ),
+                        style: TextStyle(color: !darkMode ? Colors.black : Colors.white),
                       ),
                     ),
                   ],

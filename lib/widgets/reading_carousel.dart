@@ -66,11 +66,7 @@ class _ReadingCarouselState extends State<ReadingCarousel> {
 
   Future<void> updateComic() async {
     final user = FirebaseAuth.instance.currentUser;
-    final snapshot = await FirebaseFirestore.instance
-        .collection('Users')
-        .doc(user!.uid)
-        .collection('Reading')
-        .get();
+    final snapshot = await FirebaseFirestore.instance.collection('Users').doc(user!.uid).collection('Reading').get();
     for (var doc in snapshot.docs) {
       final data = doc.data();
 
@@ -96,12 +92,10 @@ class _ReadingCarouselState extends State<ReadingCarousel> {
       double progress = (chapterIndex / newTotalChapters);
 
       if (oldTotalChapters != newTotalChapters) {
-        await FirebaseFirestore.instance
-            .collection('Users')
-            .doc(user.uid)
-            .collection('Reading')
-            .doc(comicId)
-            .update({'totalChapters': newTotalChapters, 'progress': progress});
+        await FirebaseFirestore.instance.collection('Users').doc(user.uid).collection('Reading').doc(comicId).update({
+          'totalChapters': newTotalChapters,
+          'progress': progress,
+        });
       }
       if (oldCoverUrl != newCoverUrl) {
         updateFireStore(comicId, 'coverUrl', newCoverUrl);
@@ -115,29 +109,18 @@ class _ReadingCarouselState extends State<ReadingCarousel> {
     }
   }
 
-  Future<void> updateFireStore(
-    String comicId,
-    String string,
-    dynamic dynamic,
-  ) async {
+  Future<void> updateFireStore(String comicId, String string, dynamic dynamic) async {
     final user = FirebaseAuth.instance.currentUser;
-    await FirebaseFirestore.instance
-        .collection('Users')
-        .doc(user!.uid)
-        .collection('Reading')
-        .doc(comicId)
-        .update({string: dynamic});
+    await FirebaseFirestore.instance.collection('Users').doc(user!.uid).collection('Reading').doc(comicId).update({
+      string: dynamic,
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    final isDark =
-        Provider.of<ThemeProvider>(context).themeMode == ThemeMode.dark;
+    final isDark = Provider.of<ThemeProvider>(context).themeMode == ThemeMode.dark;
     if (isLoading) {
-      return SizedBox(
-        height: 200,
-        child: Center(child: CircularProgressIndicator()),
-      );
+      return SizedBox(height: 200, child: Center(child: CircularProgressIndicator()));
     }
     return StreamBuilder<QuerySnapshot>(
       stream: readingStream,
@@ -200,9 +183,7 @@ class _ReadingCarouselState extends State<ReadingCarousel> {
               decoration: BoxDecoration(
                 border: Border.all(
                   width: 1,
-                  color: isDark
-                      ? OkLab(0.97, 0, 0).toColor().withValues(alpha: 0.15)
-                      : OkLab(0.88, 0.04, 0).toColor(),
+                  color: isDark ? OkLab(0.97, 0, 0).toColor().withValues(alpha: 0.15) : OkLab(0.88, 0.04, 0).toColor(),
                 ),
                 borderRadius: BorderRadius.circular(20),
               ),
@@ -228,16 +209,8 @@ class _ReadingCarouselState extends State<ReadingCarousel> {
                       border: Border.all(
                         width: 1,
                         color: isDark
-                            ? OkLab(
-                                0.63,
-                                0.24,
-                                0,
-                              ).toColor().withValues(alpha: 0.4)
-                            : OkLab(
-                                0.75,
-                                0.17,
-                                -0.01,
-                              ).toColor().withValues(alpha: 0.2),
+                            ? OkLab(0.63, 0.24, 0).toColor().withValues(alpha: 0.4)
+                            : OkLab(0.75, 0.17, -0.01).toColor().withValues(alpha: 0.2),
                       ),
                       borderRadius: BorderRadius.circular(20),
                     ),
@@ -273,9 +246,7 @@ class _ReadingCarouselState extends State<ReadingCarousel> {
                                 style: TextStyle(
                                   fontWeight: FontWeight.bold,
                                   fontSize: 14,
-                                  color: isDark
-                                      ? OkLab(0.83, 0.07, -0.1).toColor()
-                                      : OkLab(0.5, 0.14, -0.22).toColor(),
+                                  color: isDark ? OkLab(0.83, 0.07, -0.1).toColor() : OkLab(0.5, 0.14, -0.22).toColor(),
                                 ),
                               ),
                               SizedBox(height: 6),
@@ -291,16 +262,8 @@ class _ReadingCarouselState extends State<ReadingCarousel> {
                                       style: TextStyle(
                                         fontSize: 12,
                                         color: isDark
-                                            ? OkLab(
-                                                0.55,
-                                                -0.01,
-                                                -0.04,
-                                              ).toColor()
-                                            : OkLab(
-                                                0.7,
-                                                -0.01,
-                                                -0.04,
-                                              ).toColor(),
+                                            ? OkLab(0.55, -0.01, -0.04).toColor()
+                                            : OkLab(0.7, -0.01, -0.04).toColor(),
                                         fontWeight: FontWeight.bold,
                                       ),
                                     ),
@@ -315,23 +278,13 @@ class _ReadingCarouselState extends State<ReadingCarousel> {
                                       overflow: TextOverflow.ellipsis,
                                       maxLines: 1,
                                       "$chapterTitle",
-                                      style: TextStyle(
-                                        fontSize: 12,
-                                        color: isDark
-                                            ? Colors.white
-                                            : Colors.black,
-                                      ),
+                                      style: TextStyle(fontSize: 12, color: isDark ? Colors.white : Colors.black),
                                     ),
                                   ),
                                   Spacer(),
                                   Text(
                                     "${(progress * 100).toInt()}%",
-                                    style: TextStyle(
-                                      fontSize: 12,
-                                      color: isDark
-                                          ? Colors.white
-                                          : Colors.black,
-                                    ),
+                                    style: TextStyle(fontSize: 12, color: isDark ? Colors.white : Colors.black),
                                   ),
                                 ],
                               ),
@@ -340,38 +293,23 @@ class _ReadingCarouselState extends State<ReadingCarousel> {
                                 value: progress,
                                 minHeight: 6,
                                 borderRadius: BorderRadius.circular(10),
-                                color: isDark
-                                    ? OkLab(0.55, 0.06, -0.24).toColor()
-                                    : OkLab(0.75, 0.17, -0.01).toColor(),
+                                color: isDark ? OkLab(0.55, 0.06, -0.24).toColor() : OkLab(0.75, 0.17, -0.01).toColor(),
                               ),
                               SizedBox(height: 10),
                               Row(
                                 children: [
                                   IconButton(
                                     onPressed: () async {
-                                      await ReadingComic.deleteReading(
-                                        comicId: comicId,
-                                        collection: 'Reading',
-                                      );
+                                      await ReadingComic.deleteReading(comicId: comicId, collection: 'Reading');
                                     },
-                                    icon: Icon(
-                                      Icons.delete_outline,
-                                      color: isDark
-                                          ? Colors.white
-                                          : Colors.black,
-                                    ),
+                                    icon: Icon(Icons.delete_outline, color: isDark ? Colors.white : Colors.black),
                                   ),
                                   Expanded(
                                     child: ElevatedButton(
                                       onPressed: () async {
-                                        final chapters =
-                                            await ApiService.fetchAllComicChapters(
-                                              comicId,
-                                            );
+                                        final chapters = await ApiService.fetchAllComicChapters(comicId);
                                         if (progress.toInt() != 1) {
-                                          final index = chapters.indexWhere(
-                                            (c) => c.id == chapterId,
-                                          );
+                                          final index = chapters.indexWhere((c) => c.id == chapterId);
                                           Navigator.push(
                                             context,
                                             MaterialPageRoute(
@@ -381,8 +319,7 @@ class _ReadingCarouselState extends State<ReadingCarousel> {
                                                 chapterId: chapterId,
                                                 title: comicTitle,
                                                 chapterTitle: chapterTitle,
-                                                uploaderName: chapters[index]
-                                                    .uploaderName,
+                                                uploaderName: chapters[index].uploaderName,
                                                 chapters: chapters,
                                                 index: index,
                                                 status: status,
@@ -410,10 +347,8 @@ class _ReadingCarouselState extends State<ReadingCarousel> {
                                                 coverUrl: coverUrl,
                                                 chapterId: chapters[index].id,
                                                 title: comicTitle,
-                                                chapterTitle: chapters[index]
-                                                    .chapterTitle,
-                                                uploaderName: chapters[index]
-                                                    .uploaderName,
+                                                chapterTitle: chapters[index].chapterTitle,
+                                                uploaderName: chapters[index].uploaderName,
                                                 chapters: chapters,
                                                 index: index,
                                                 status: status,
@@ -426,8 +361,7 @@ class _ReadingCarouselState extends State<ReadingCarousel> {
                                             comicTitle: comicTitle,
                                             coverUrl: coverUrl,
                                             chapterId: chapters[index].id,
-                                            chapterTitle:
-                                                chapters[index].chapterTitle,
+                                            chapterTitle: chapters[index].chapterTitle,
                                             chapterIndex: 1,
                                             totalChapters: totalChapters,
                                             status: status,
@@ -440,19 +374,14 @@ class _ReadingCarouselState extends State<ReadingCarousel> {
                                             : OkLab(0.63, 0.24, 0).toColor(),
                                       ),
                                       child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
+                                        mainAxisAlignment: MainAxisAlignment.center,
                                         children: [
                                           Icon(
-                                            progress.toInt() == 1
-                                                ? Icons.replay
-                                                : Icons.play_arrow_sharp,
+                                            progress.toInt() == 1 ? Icons.replay : Icons.play_arrow_sharp,
                                             color: Colors.white,
                                           ),
                                           Text(
-                                            progress.toInt() == 1
-                                                ? " Đọc lại"
-                                                : " Đọc tiếp tục",
+                                            progress.toInt() == 1 ? " Đọc lại" : " Đọc tiếp tục",
                                             style: TextStyle(
                                               fontSize: 12,
                                               color: Colors.white,
@@ -478,9 +407,7 @@ class _ReadingCarouselState extends State<ReadingCarousel> {
                   autoPlayInterval: Duration(seconds: 5),
                   autoPlayAnimationDuration: Duration(seconds: 1),
                   viewportFraction: 1,
-                  scrollPhysics: docs.length == 1
-                      ? NeverScrollableScrollPhysics()
-                      : BouncingScrollPhysics(),
+                  scrollPhysics: docs.length == 1 ? NeverScrollableScrollPhysics() : BouncingScrollPhysics(),
                   onPageChanged: (index, reason) {
                     setState(() {
                       currentIndex = index;

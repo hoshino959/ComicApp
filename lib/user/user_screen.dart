@@ -87,11 +87,8 @@ class UserScreenState extends State<UserScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final darkMode =
-        Provider.of<ThemeProvider>(context).themeMode == ThemeMode.dark;
-    final gradient = darkMode
-        ? AppColorsDark.gradientBackground
-        : AppColorsLight.gradientBackground;
+    final darkMode = Provider.of<ThemeProvider>(context).themeMode == ThemeMode.dark;
+    final gradient = darkMode ? AppColorsDark.gradientBackground : AppColorsLight.gradientBackground;
 
     return Stack(
       children: [
@@ -105,14 +102,7 @@ class UserScreenState extends State<UserScreen> {
                   children: [
                     SizedBox(height: 60),
                     //logoApp
-                    ClipOval(
-                      child: Image.asset(
-                        'assets/images/logo.png',
-                        height: 100,
-                        width: 100,
-                        fit: BoxFit.cover,
-                      ),
-                    ),
+                    ClipOval(child: Image.asset('assets/images/logo.png', height: 100, width: 100, fit: BoxFit.cover)),
 
                     SizedBox(height: 50),
                     dashLine(),
@@ -122,29 +112,20 @@ class UserScreenState extends State<UserScreen> {
                     InkWell(
                       onTap: () {
                         if (user != null)
-                          Navigator.of(context).push(
-                            MaterialPageRoute(builder: (_) => ProfileScreen()),
-                          );
+                          Navigator.of(context).push(MaterialPageRoute(builder: (_) => ProfileScreen()));
                         if (user == null) {
-                          Navigator.of(context).push(
-                            MaterialPageRoute(builder: (_) => LoginPage()),
-                          );
+                          Navigator.of(context).push(MaterialPageRoute(builder: (_) => LoginPage()));
                         }
                       },
                       child: Padding(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: 30,
-                          vertical: 16,
-                        ),
+                        padding: EdgeInsets.symmetric(horizontal: 30, vertical: 16),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.start,
                           children: [
                             Icon(
                               Icons.account_circle,
                               size: 40,
-                              color: !darkMode
-                                  ? OkLab(0.5, 0.14, -0.22).toColor()
-                                  : OkLab(0.83, 0.07, -0.1).toColor(),
+                              color: !darkMode ? OkLab(0.5, 0.14, -0.22).toColor() : OkLab(0.83, 0.07, -0.1).toColor(),
                             ),
                             SizedBox(width: 20),
                             if (user != null)
@@ -162,11 +143,7 @@ class UserScreenState extends State<UserScreen> {
                                   ),
                                   Text(
                                     'Chỉnh sửa hồ sơ của bạn',
-                                    style: TextStyle(
-                                      color: darkMode
-                                          ? Colors.white
-                                          : Colors.black,
-                                    ),
+                                    style: TextStyle(color: darkMode ? Colors.white : Colors.black),
                                   ),
                                 ],
                               ),
@@ -195,15 +172,10 @@ class UserScreenState extends State<UserScreen> {
                     if (user != null)
                       InkWell(
                         onTap: () {
-                          Navigator.of(context).push(
-                            MaterialPageRoute(builder: (_) => LibraryScreen()),
-                          );
+                          Navigator.of(context).push(MaterialPageRoute(builder: (_) => LibraryScreen()));
                         },
                         child: Padding(
-                          padding: EdgeInsets.symmetric(
-                            horizontal: 30,
-                            vertical: 16,
-                          ),
+                          padding: EdgeInsets.symmetric(horizontal: 30, vertical: 16),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.start,
                             children: [
@@ -229,11 +201,7 @@ class UserScreenState extends State<UserScreen> {
                                   ),
                                   Text(
                                     'Xem lại những bộ truyện của bạn',
-                                    style: TextStyle(
-                                      color: darkMode
-                                          ? Colors.white
-                                          : Colors.black,
-                                    ),
+                                    style: TextStyle(color: darkMode ? Colors.white : Colors.black),
                                   ),
                                 ],
                               ),
@@ -250,29 +218,21 @@ class UserScreenState extends State<UserScreen> {
                           isLoading = true;
                         });
 
-                        await Provider.of<ThemeProvider>(
-                          context,
-                          listen: false,
-                        ).toggleTheme();
+                        await Provider.of<ThemeProvider>(context, listen: false).toggleTheme();
 
                         setState(() {
                           isLoading = false;
                         });
                       },
                       child: Padding(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: 30,
-                          vertical: 16,
-                        ),
+                        padding: EdgeInsets.symmetric(horizontal: 30, vertical: 16),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.start,
                           children: [
                             Icon(
                               Icons.settings,
                               size: 40,
-                              color: !darkMode
-                                  ? OkLab(0.5, 0.14, -0.22).toColor()
-                                  : OkLab(0.83, 0.07, -0.1).toColor(),
+                              color: !darkMode ? OkLab(0.5, 0.14, -0.22).toColor() : OkLab(0.83, 0.07, -0.1).toColor(),
                             ),
                             SizedBox(width: 20),
                             Column(
@@ -289,11 +249,7 @@ class UserScreenState extends State<UserScreen> {
                                 ),
                                 Text(
                                   'Chỉnh nền sáng tối tại đây',
-                                  style: TextStyle(
-                                    color: darkMode
-                                        ? Colors.white
-                                        : Colors.black,
-                                  ),
+                                  style: TextStyle(color: darkMode ? Colors.white : Colors.black),
                                 ),
                               ],
                             ),
@@ -313,27 +269,20 @@ class UserScreenState extends State<UserScreen> {
                             isLoading = true;
                           });
                           await FirebaseAuth.instance.signOut();
-                          Navigator.of(context).pushReplacement(
-                            MaterialPageRoute(builder: (_) => MainScreen()),
-                          );
+                          Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (_) => MainScreen()));
                           setState(() {
                             isLoading = false;
                           });
                         },
                         child: Padding(
-                          padding: EdgeInsets.symmetric(
-                            horizontal: 30,
-                            vertical: 16,
-                          ),
+                          padding: EdgeInsets.symmetric(horizontal: 30, vertical: 16),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.start,
                             children: [
                               Icon(
                                 Icons.logout,
                                 size: 40,
-                                color: !darkMode
-                                    ? OkLab(0.64, 0.21, 0.1).toColor()
-                                    : OkLab(0.7, 0.18, 0.07).toColor(),
+                                color: !darkMode ? OkLab(0.64, 0.21, 0.1).toColor() : OkLab(0.7, 0.18, 0.07).toColor(),
                               ),
                               SizedBox(width: 20),
                               Text(
@@ -370,10 +319,6 @@ class dashLine extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: 2,
-      color: Colors.grey,
-      margin: EdgeInsets.symmetric(horizontal: 30),
-    );
+    return Container(height: 2, color: Colors.grey, margin: EdgeInsets.symmetric(horizontal: 30));
   }
 }

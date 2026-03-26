@@ -18,17 +18,12 @@ class LibraryAll extends StatefulWidget {
 class _LibraryAllState extends State<LibraryAll> {
   @override
   Widget build(BuildContext context) {
-    final isDark =
-        Provider.of<ThemeProvider>(context).themeMode == ThemeMode.dark;
-    final gradient = isDark
-        ? AppColorsDark.gradientBackground
-        : AppColorsLight.gradientBackground;
+    final isDark = Provider.of<ThemeProvider>(context).themeMode == ThemeMode.dark;
+    final gradient = isDark ? AppColorsDark.gradientBackground : AppColorsLight.gradientBackground;
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
-          backgroundColor: isDark
-              ? AppColorsDark.background1
-              : AppColorsLight.background1,
+          backgroundColor: isDark ? AppColorsDark.background1 : AppColorsLight.background1,
           elevation: 0,
           leading: IconButton(
             icon: Icon(Icons.arrow_back),
@@ -58,9 +53,7 @@ class _LibraryAllState extends State<LibraryAll> {
                   Text(
                     'Tất cả truyện bạn đã đọc',
                     style: TextStyle(
-                      color: isDark
-                          ? OkLab(0.71, 0, -0.02).toColor()
-                          : OkLab(0.55, 0.06, -0.24).toColor(),
+                      color: isDark ? OkLab(0.71, 0, -0.02).toColor() : OkLab(0.55, 0.06, -0.24).toColor(),
                       fontSize: 16,
                       fontWeight: FontWeight.w500,
                     ),

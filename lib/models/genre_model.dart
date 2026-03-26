@@ -8,12 +8,8 @@ class GenreModel {
     final attributes = json['attributes'] ?? {};
     final nameMap = attributes['name'] ?? {};
 
-    String parsedName =
-        nameMap['vi'] ?? nameMap['en'] ?? 'Unknown';
+    String parsedName = nameMap['vi'] ?? nameMap['en'] ?? 'Unknown';
 
-    return GenreModel(
-      id: json['id'] ?? '',
-      name: parsedName,
-    );
+    return GenreModel(id: json['id'] ?? '', name: parsedName);
   }
 }

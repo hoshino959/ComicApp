@@ -10,6 +10,9 @@ class ComicDetailModel {
   final String description;
   final int follows;
   final String views;
+  final String authorId;
+  final List<String> tagIds;
+  final List<String> relatedMangaIds;
 
   ComicDetailModel({
     required this.id,
@@ -23,50 +26,42 @@ class ComicDetailModel {
     required this.description,
     required this.follows,
     required this.views,
+    required this.authorId,
+    required this.tagIds,
+    required this.relatedMangaIds,
   });
 
-  factory ComicDetailModel.fromJson(
-    Map<String, dynamic> json,
-    Map<String, dynamic>? statsJson,
-  ) {
+  factory ComicDetailModel.fromJson(Map<String, dynamic> json, Map<String, dynamic>? statsJson) {
     final attributes = json['attributes'] ?? {};
     final id = json['id'] ?? '';
 
     String parsedTitle = 'Đang cập nhật';
-    if (attributes['title'] != null &&
-        attributes['title'].isNotEmpty) {
+    if (attributes['title'] != null && attributes['title'].isNotEmpty) {
       parsedTitle =
-          attributes['title']['vi'] ??
-          attributes['title']['en'] ??
-          attributes['title'].values.first.toString();
+          attributes['title']['vi'] ?? attributes['title']['en'] ?? attributes['title'].values.first.toString();
     }
 
     String parsedAltTitle = 'Không có tên thay thế';
-    final altTitles =
-        attributes['altTitles'] as List<dynamic>? ?? [];
+    final altTitles = attributes['altTitles'] as List<dynamic>? ?? [];
     if (altTitles.isNotEmpty) {
       for (var alt in altTitles) {
         if (alt['vi'] != null) {
           parsedAltTitle = alt['vi'];
           break;
-        } else if (alt['en'] != null &&
-            parsedAltTitle.isEmpty) {
+        } else if (alt['en'] != null && parsedAltTitle.isEmpty) {
           parsedAltTitle = alt['en'];
-        } else if (alt['ja-ro'] != null &&
-            parsedAltTitle.isEmpty) {
+        } else if (alt['ja-ro'] != null && parsedAltTitle.isEmpty) {
           parsedAltTitle = alt['ja-ro'];
         }
       }
 
       if (parsedAltTitle.isEmpty) {
-        parsedAltTitle = altTitles.first.values.first
-            .toString();
+        parsedAltTitle = altTitles.first.values.first.toString();
       }
     }
 
     String parsedDescription = 'Không có nội dung mô tả.';
-    if (attributes['description'] != null &&
-        attributes['description'].isNotEmpty) {
+    if (attributes['description'] != null && attributes['description'].isNotEmpty) {
       parsedDescription =
           attributes['description']['vi'] ??
           attributes['description']['en'] ??
@@ -74,45 +69,51 @@ class ComicDetailModel {
     }
 
     List<String> parsedGenres = [];
+    List<String> parsedTagIds = [];
+
     final tags = attributes['tags'] as List<dynamic>? ?? [];
     for (var tag in tags) {
+      if (tag['id'] != null) {
+        parsedTagIds.add(tag['id']);
+      }
+
       final tagAttributes = tag['attributes'];
-      if (tagAttributes != null &&
-          tagAttributes['name'] != null) {
-        parsedGenres.add(
-          tagAttributes['name']['vi'] ??
-              tagAttributes['name']['en'] ??
-              '',
-        );
+      if (tagAttributes != null && tagAttributes['name'] != null) {
+        parsedGenres.add(tagAttributes['name']['vi'] ?? tagAttributes['name']['en'] ?? '');
       }
     }
 
     String parsedStatus = attributes['status'] ?? 'unknown';
-    String parsedYear =
-        attributes['year']?.toString() ?? 'N/A';
-    if (parsedYear == 'N/A' &&
-        attributes['createdAt'] != null) {
-      DateTime createdAt = DateTime.parse(
-        attributes['createdAt'],
-      ).toLocal();
-      parsedYear =
-          '${createdAt.day}/${createdAt.month}/${createdAt.year}';
+    String parsedYear = attributes['year']?.toString() ?? 'N/A';
+    if (parsedYear == 'N/A' && attributes['createdAt'] != null) {
+      DateTime createdAt = DateTime.parse(attributes['createdAt']).toLocal();
+      parsedYear = '${createdAt.day}/${createdAt.month}/${createdAt.year}';
     }
 
     String parsedAuthor = 'Đang cập nhật';
     String coverFileName = '';
-    final relationships =
-        json['relationships'] as List<dynamic>? ?? [];
+
+    String parsedAuthorId = '';
+    List<String> parsedRelatedMangaIds = [];
+
+    final relationships = json['relationships'] as List<dynamic>? ?? [];
 
     for (var rel in relationships) {
-      if (rel['type'] == 'author' &&
-          rel['attributes'] != null) {
-        parsedAuthor =
-            rel['attributes']['name'] ?? parsedAuthor;
+      if (rel['type'] == 'author') {
+        parsedAuthorId = rel['id'] ?? '';
+        if (rel['attributes'] != null) {
+          parsedAuthor = rel['attributes']['name'] ?? parsedAuthor;
+        }
       }
-      if (rel['type'] == 'cover_art' &&
-          rel['attributes'] != null) {
+
+      if (rel['type'] == 'cover_art' && rel['attributes'] != null) {
         coverFileName = rel['attributes']['fileName'] ?? '';
+      }
+
+      if (rel['type'] == 'manga') {
+        if (rel['id'] != null) {
+          parsedRelatedMangaIds.add(rel['id']);
+        }
       }
     }
 
@@ -137,6 +138,9 @@ class ComicDetailModel {
       description: parsedDescription,
       follows: parsedFollows,
       views: '0',
+      authorId: parsedAuthorId,
+      tagIds: parsedTagIds,
+      relatedMangaIds: parsedRelatedMangaIds,
     );
   }
 }

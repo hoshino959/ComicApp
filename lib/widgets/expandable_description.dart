@@ -5,11 +5,7 @@ class ExpandableDescription extends StatefulWidget {
   final String text;
   final bool isDark;
 
-  const ExpandableDescription({
-    super.key,
-    required this.text,
-    required this.isDark,
-  });
+  const ExpandableDescription({super.key, required this.text, required this.isDark});
 
   @override
   State<ExpandableDescription> createState() => _ExpandableDescriptionState();
@@ -23,9 +19,7 @@ class _ExpandableDescriptionState extends State<ExpandableDescription> {
     final textStyle = TextStyle(
       fontSize: 14,
       height: 1.5,
-      color: widget.isDark
-          ? OkLab(0.71, 0, -0.02).toColor()
-          : OkLab(0.45, -0.01, -0.03).toColor(),
+      color: widget.isDark ? OkLab(0.71, 0, -0.02).toColor() : OkLab(0.45, -0.01, -0.03).toColor(),
     );
 
     return Container(
@@ -41,11 +35,7 @@ class _ExpandableDescriptionState extends State<ExpandableDescription> {
       child: LayoutBuilder(
         builder: (context, constraints) {
           final span = TextSpan(text: widget.text, style: textStyle);
-          final tp = TextPainter(
-            text: span,
-            maxLines: 3,
-            textDirection: TextDirection.ltr,
-          );
+          final tp = TextPainter(text: span, maxLines: 3, textDirection: TextDirection.ltr);
 
           tp.layout(maxWidth: constraints.maxWidth);
 
@@ -62,9 +52,7 @@ class _ExpandableDescriptionState extends State<ExpandableDescription> {
                   widget.text,
                   style: textStyle,
                   maxLines: isExpanded ? null : 3,
-                  overflow: isExpanded
-                      ? TextOverflow.visible
-                      : TextOverflow.ellipsis,
+                  overflow: isExpanded ? TextOverflow.visible : TextOverflow.ellipsis,
                 ),
               ),
 
@@ -81,16 +69,10 @@ class _ExpandableDescriptionState extends State<ExpandableDescription> {
                     children: [
                       Text(
                         isExpanded ? 'Thu gọn' : 'Xem đầy đủ',
-                        style: const TextStyle(
-                          color: Color(0xFFFF2E7E),
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
-                        ),
+                        style: const TextStyle(color: Color(0xFFFF2E7E), fontSize: 14, fontWeight: FontWeight.bold),
                       ),
                       Icon(
-                        isExpanded
-                            ? Icons.keyboard_arrow_up
-                            : Icons.keyboard_arrow_down,
+                        isExpanded ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
                         color: const Color(0xFFFF2E7E),
                         size: 20,
                       ),

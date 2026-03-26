@@ -84,27 +84,18 @@ class _ReadingScreenState extends State<ReadingScreen> {
               onPressed: () {
                 Navigator.pop(context);
               },
-              icon: Icon(
-                Icons.arrow_back,
-                color: Colors.white.withValues(alpha: 0.8),
-              ),
+              icon: Icon(Icons.arrow_back, color: Colors.white.withValues(alpha: 0.8)),
             ),
             IconButton(
               onPressed: () {},
-              icon: Icon(
-                Icons.home_outlined,
-                color: Colors.white.withValues(alpha: 0.8),
-              ),
+              icon: Icon(Icons.home_outlined, color: Colors.white.withValues(alpha: 0.8)),
             ),
           ],
         ),
         actions: [
           IconButton(
             onPressed: () {},
-            icon: Icon(
-              Icons.settings_outlined,
-              color: Colors.white.withValues(alpha: 0.8),
-            ),
+            icon: Icon(Icons.settings_outlined, color: Colors.white.withValues(alpha: 0.8)),
           ),
           IconButton(
             onPressed: () {},
@@ -131,10 +122,8 @@ class _ReadingScreenState extends State<ReadingScreen> {
                           currentChapterId = widget.chapters[currentIndex!].id;
                           isLoading = true;
                           _fetchData();
-                          currentChapterTitle =
-                              widget.chapters[currentIndex!].chapterTitle;
-                          currentUploaderName =
-                              widget.chapters[currentIndex!].uploaderName;
+                          currentChapterTitle = widget.chapters[currentIndex!].chapterTitle;
+                          currentUploaderName = widget.chapters[currentIndex!].uploaderName;
                         });
                       }
                     : null,
@@ -178,18 +167,15 @@ class _ReadingScreenState extends State<ReadingScreen> {
                           currentChapterId = widget.chapters[currentIndex!].id;
                           isLoading = true;
                           _fetchData();
-                          currentChapterTitle =
-                              widget.chapters[currentIndex!].chapterTitle;
-                          currentUploaderName =
-                              widget.chapters[currentIndex!].uploaderName;
+                          currentChapterTitle = widget.chapters[currentIndex!].chapterTitle;
+                          currentUploaderName = widget.chapters[currentIndex!].uploaderName;
                         });
                         await ReadingComic.saveProgress(
                           comicId: widget.comicId,
                           comicTitle: widget.title,
                           coverUrl: widget.coverUrl,
                           chapterId: widget.chapters[currentIndex!].id,
-                          chapterTitle:
-                              widget.chapters[currentIndex!].chapterTitle,
+                          chapterTitle: widget.chapters[currentIndex!].chapterTitle,
                           chapterIndex: widget.chapters.length - currentIndex!,
                           totalChapters: widget.chapters.length,
                           status: widget.status,
@@ -198,9 +184,7 @@ class _ReadingScreenState extends State<ReadingScreen> {
                     : null,
                 icon: Icon(
                   Icons.keyboard_arrow_right,
-                  color: currentIndex! > 0
-                      ? Colors.white
-                      : Colors.white.withValues(alpha: 0.3),
+                  color: currentIndex! > 0 ? Colors.white : Colors.white.withValues(alpha: 0.3),
                 ),
               ),
             ],
@@ -208,10 +192,7 @@ class _ReadingScreenState extends State<ReadingScreen> {
         ),
       ),
       body: isLoading
-          ? SizedBox(
-              height: 700,
-              child: Center(child: CircularProgressIndicator()),
-            )
+          ? SizedBox(height: 700, child: Center(child: CircularProgressIndicator()))
           : (errorMessage != null)
           ? SizedBox(height: 700, child: Center(child: Text(errorMessage!)))
           : ListView.builder(
@@ -220,10 +201,7 @@ class _ReadingScreenState extends State<ReadingScreen> {
                 return index == 0
                     ? Container(
                         margin: EdgeInsets.symmetric(vertical: 20),
-                        decoration: BoxDecoration(
-                          color: Color(0xFF231A2F),
-                          borderRadius: BorderRadius.circular(20),
-                        ),
+                        decoration: BoxDecoration(color: Color(0xFF231A2F), borderRadius: BorderRadius.circular(20)),
                         padding: EdgeInsets.fromLTRB(16, 5, 16, 16),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -245,11 +223,7 @@ class _ReadingScreenState extends State<ReadingScreen> {
                                       _fetchData();
                                     });
                                   },
-                                  icon: Icon(
-                                    Icons.sync,
-                                    size: 20,
-                                    color: Color(0xFFFF2E7E),
-                                  ),
+                                  icon: Icon(Icons.sync, size: 20, color: Color(0xFFFF2E7E)),
                                 ),
                               ],
                             ),
@@ -269,10 +243,7 @@ class _ReadingScreenState extends State<ReadingScreen> {
                                 Expanded(
                                   child: Text(
                                     currentUploaderName!,
-                                    style: TextStyle(
-                                      fontSize: 13,
-                                      color: Color.fromARGB(255, 235, 177, 212),
-                                    ),
+                                    style: TextStyle(fontSize: 13, color: Color.fromARGB(255, 235, 177, 212)),
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
                                   ),
@@ -280,10 +251,7 @@ class _ReadingScreenState extends State<ReadingScreen> {
                                 const SizedBox(width: 8),
                                 Text(
                                   '${chapterPages!.totalPages} trang',
-                                  style: TextStyle(
-                                    fontSize: 13,
-                                    color: Colors.white,
-                                  ),
+                                  style: TextStyle(fontSize: 13, color: Colors.white),
                                 ),
                               ],
                             ),
@@ -295,11 +263,7 @@ class _ReadingScreenState extends State<ReadingScreen> {
                         fit: BoxFit.fitWidth,
                         placeholder: (context, url) => SizedBox(
                           height: 400,
-                          child: Center(
-                            child: CircularProgressIndicator(
-                              color: Color(0xFFFF2E7E),
-                            ),
-                          ),
+                          child: Center(child: CircularProgressIndicator(color: Color(0xFFFF2E7E))),
                         ),
                         errorWidget: (context, url, error) => Container(
                           height: 400,
@@ -308,16 +272,9 @@ class _ReadingScreenState extends State<ReadingScreen> {
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Icon(
-                                  Icons.broken_image,
-                                  color: Colors.white54,
-                                  size: 40,
-                                ),
+                                Icon(Icons.broken_image, color: Colors.white54, size: 40),
                                 const SizedBox(height: 8),
-                                Text(
-                                  'Lỗi hoặc link ảnh đã hết hạn',
-                                  style: TextStyle(color: Colors.white54),
-                                ),
+                                Text('Lỗi hoặc link ảnh đã hết hạn', style: TextStyle(color: Colors.white54)),
                               ],
                             ),
                           ),

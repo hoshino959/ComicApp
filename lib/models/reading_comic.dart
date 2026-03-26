@@ -25,41 +25,31 @@ class ReadingComic {
         .doc(comicId)
         .get();
     if (!doc.exists) {
-      await FirebaseFirestore.instance
-          .collection('Users')
-          .doc(user.uid)
-          .collection('Reading')
-          .doc(comicId)
-          .set({
-            'comicId': comicId,
-            'comicTitle': comicTitle,
-            'coverUrl': coverUrl,
-            'chapterId': chapterId,
-            'chapterTitle': chapterTitle,
-            'chapterIndex': chapterIndex,
-            'totalChapters': totalChapters,
-            'progress': progress,
-            'updatedAt': FieldValue.serverTimestamp(),
-            'status': status,
-          });
+      await FirebaseFirestore.instance.collection('Users').doc(user.uid).collection('Reading').doc(comicId).set({
+        'comicId': comicId,
+        'comicTitle': comicTitle,
+        'coverUrl': coverUrl,
+        'chapterId': chapterId,
+        'chapterTitle': chapterTitle,
+        'chapterIndex': chapterIndex,
+        'totalChapters': totalChapters,
+        'progress': progress,
+        'updatedAt': FieldValue.serverTimestamp(),
+        'status': status,
+      });
     } else {
       final data = doc.data()!;
 
       if (chapterIndex < data['chapterIndex']) return;
 
-      await FirebaseFirestore.instance
-          .collection('Users')
-          .doc(user.uid)
-          .collection('Reading')
-          .doc(comicId)
-          .update({
-            'chapterId': chapterId,
-            'chapterTitle': chapterTitle,
-            'chapterIndex': chapterIndex,
-            'progress': progress,
-            'updatedAt': FieldValue.serverTimestamp(),
-            'status': status,
-          });
+      await FirebaseFirestore.instance.collection('Users').doc(user.uid).collection('Reading').doc(comicId).update({
+        'chapterId': chapterId,
+        'chapterTitle': chapterTitle,
+        'chapterIndex': chapterIndex,
+        'progress': progress,
+        'updatedAt': FieldValue.serverTimestamp(),
+        'status': status,
+      });
     }
   }
 
@@ -125,39 +115,26 @@ class ReadingComic {
 
     if (user == null) return;
 
-    await FirebaseFirestore.instance
-        .collection('Users')
-        .doc(user.uid)
-        .collection('Reading')
-        .doc(comicId)
-        .set({
-          'comicId': comicId,
-          'comicTitle': comicTitle,
-          'coverUrl': coverUrl,
-          'chapterId': chapterId,
-          'chapterTitle': chapterTitle,
-          'chapterIndex': chapterIndex,
-          'totalChapters': totalChapters,
-          'progress': progress,
-          'updatedAt': FieldValue.serverTimestamp(),
-          'status': status,
-        });
+    await FirebaseFirestore.instance.collection('Users').doc(user.uid).collection('Reading').doc(comicId).set({
+      'comicId': comicId,
+      'comicTitle': comicTitle,
+      'coverUrl': coverUrl,
+      'chapterId': chapterId,
+      'chapterTitle': chapterTitle,
+      'chapterIndex': chapterIndex,
+      'totalChapters': totalChapters,
+      'progress': progress,
+      'updatedAt': FieldValue.serverTimestamp(),
+      'status': status,
+    });
   }
 
-  static Future<void> deleteReading({
-    required String comicId,
-    required String collection,
-  }) async {
+  static Future<void> deleteReading({required String comicId, required String collection}) async {
     final user = FirebaseAuth.instance.currentUser;
 
     if (user == null) return;
 
-    await FirebaseFirestore.instance
-        .collection('Users')
-        .doc(user.uid)
-        .collection(collection)
-        .doc(comicId)
-        .delete();
+    await FirebaseFirestore.instance.collection('Users').doc(user.uid).collection(collection).doc(comicId).delete();
   }
 
   static Future<void> addLibrary({
@@ -173,19 +150,14 @@ class ReadingComic {
 
     if (user == null) return;
 
-    await FirebaseFirestore.instance
-        .collection('Users')
-        .doc(user.uid)
-        .collection(collection)
-        .doc(comicId)
-        .set({
-          'comicId': comicId,
-          'comicTitle': comicTitle,
-          'coverUrl': coverUrl,
-          'chapterTitle': chapterTitle,
-          'totalChapters': totalChapters,
-          'updatedAt': FieldValue.serverTimestamp(),
-          'status': status,
-        });
+    await FirebaseFirestore.instance.collection('Users').doc(user.uid).collection(collection).doc(comicId).set({
+      'comicId': comicId,
+      'comicTitle': comicTitle,
+      'coverUrl': coverUrl,
+      'chapterTitle': chapterTitle,
+      'totalChapters': totalChapters,
+      'updatedAt': FieldValue.serverTimestamp(),
+      'status': status,
+    });
   }
 }

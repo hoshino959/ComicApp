@@ -47,10 +47,7 @@ class StatusChip extends StatelessWidget {
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-      decoration: BoxDecoration(
-        color: backgroundColor,
-        borderRadius: BorderRadius.circular(16),
-      ),
+      decoration: BoxDecoration(color: backgroundColor, borderRadius: BorderRadius.circular(16)),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -61,8 +58,7 @@ class StatusChip extends StatelessWidget {
             style: TextStyle(
               fontSize: 12,
               color: OkLab(0.55, 0.05, 0.12).toColor(),
-              fontWeight: FontWeight
-                  .w500, // Thêm chút đậm cho chữ dễ đọc hơn trên nền màu
+              fontWeight: FontWeight.w500, // Thêm chút đậm cho chữ dễ đọc hơn trên nền màu
             ),
           ),
         ],

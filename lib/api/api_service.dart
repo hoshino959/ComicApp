@@ -9,11 +9,7 @@ import 'package:http/http.dart' as http;
 class ApiService {
   static const String _baseUrl = 'https://api.mangadex.org';
 
-  static Future<List<ComicModel>>
-  fetchRecentlyUpdatedComics({
-    int limit = 20,
-    int offset = 0,
-  }) async {
+  static Future<List<ComicModel>> fetchRecentlyUpdatedComics({int limit = 20, int offset = 0}) async {
     try {
       final Uri url = Uri.parse(
         '$_baseUrl/manga'
@@ -27,26 +23,19 @@ class ApiService {
       final response = await http.get(url);
 
       if (response.statusCode == 200) {
-        final Map<String, dynamic> data = json.decode(
-          response.body,
-        );
+        final Map<String, dynamic> data = json.decode(response.body);
         final List<dynamic> mangaList = data['data'] ?? [];
 
-        return mangaList
-            .map((json) => ComicModel.fromJson(json))
-            .toList();
+        return mangaList.map((json) => ComicModel.fromJson(json)).toList();
       } else {
-        throw Exception(
-          'Failed to load comics. Status Code: ${response.statusCode}',
-        );
+        throw Exception('Failed to load comics. Status Code: ${response.statusCode}');
       }
     } catch (e) {
       return [];
     }
   }
 
-  static Future<List<ComicModel>>
-  fetchRandomComicsFromList() async {
+  static Future<List<ComicModel>> fetchRandomComicsFromList() async {
     try {
       final Uri url = Uri.parse(
         '$_baseUrl/manga'
@@ -59,14 +48,10 @@ class ApiService {
       final response = await http.get(url);
 
       if (response.statusCode == 200) {
-        final Map<String, dynamic> data = json.decode(
-          response.body,
-        );
+        final Map<String, dynamic> data = json.decode(response.body);
         final List<dynamic> mangaList = data['data'] ?? [];
 
-        List<ComicModel> comics = mangaList
-            .map((json) => ComicModel.fromJson(json))
-            .toList();
+        List<ComicModel> comics = mangaList.map((json) => ComicModel.fromJson(json)).toList();
 
         comics.shuffle();
 
@@ -79,9 +64,7 @@ class ApiService {
     }
   }
 
-  static Future<ComicDetailModel?> fetchComicDetail(
-    String id,
-  ) async {
+  static Future<ComicDetailModel?> fetchComicDetail(String id) async {
     try {
       final Uri mangaUrl = Uri.parse(
         '$_baseUrl/manga/$id'
@@ -93,41 +76,28 @@ class ApiService {
       final mangaResponse = await http.get(mangaUrl);
 
       if (mangaResponse.statusCode == 200) {
-        final Map<String, dynamic> mangaData = json.decode(
-          mangaResponse.body,
-        );
+        final Map<String, dynamic> mangaData = json.decode(mangaResponse.body);
         final mangaJson = mangaData['data'];
 
-        final Uri statsUrl = Uri.parse(
-          '$_baseUrl/statistics/manga/$id',
-        );
+        final Uri statsUrl = Uri.parse('$_baseUrl/statistics/manga/$id');
         final statsResponse = await http.get(statsUrl);
 
         Map<String, dynamic>? statsJson;
         if (statsResponse.statusCode == 200) {
-          final Map<String, dynamic> statsData = json
-              .decode(statsResponse.body);
+          final Map<String, dynamic> statsData = json.decode(statsResponse.body);
           statsJson = statsData['statistics'];
         }
 
-        return ComicDetailModel.fromJson(
-          mangaJson,
-          statsJson,
-        );
+        return ComicDetailModel.fromJson(mangaJson, statsJson);
       } else {
-        throw Exception(
-          'Failed to load comic details. Status Code: ${mangaResponse.statusCode}',
-        );
+        throw Exception('Failed to load comic details. Status Code: ${mangaResponse.statusCode}');
       }
     } catch (e) {
       return null;
     }
   }
 
-  static Future<List<ChapterModel>> fetchAllComicChapters(
-    String mangaId, {
-    String language = 'en',
-  }) async {
+  static Future<List<ChapterModel>> fetchAllComicChapters(String mangaId, {String language = 'en'}) async {
     List<ChapterModel> allChapters = [];
     int limit = 500;
     int offset = 0;
@@ -148,32 +118,21 @@ class ApiService {
         final response = await http.get(url);
 
         if (response.statusCode == 200) {
-          final Map<String, dynamic> data = json.decode(
-            response.body,
-          );
+          final Map<String, dynamic> data = json.decode(response.body);
 
           total = data['total'] ?? 0;
 
-          final List<dynamic> chapterList =
-              data['data'] ?? [];
+          final List<dynamic> chapterList = data['data'] ?? [];
 
-          allChapters.addAll(
-            chapterList
-                .map((json) => ChapterModel.fromJson(json))
-                .toList(),
-          );
+          allChapters.addAll(chapterList.map((json) => ChapterModel.fromJson(json)).toList());
 
           offset += limit;
 
           if (offset < total) {
-            await Future.delayed(
-              const Duration(milliseconds: 300),
-            );
+            await Future.delayed(const Duration(milliseconds: 300));
           }
         } else {
-          throw Exception(
-            'Failed to load chapters. Status Code: ${response.statusCode}',
-          );
+          throw Exception('Failed to load chapters. Status Code: ${response.statusCode}');
         }
       }
 
@@ -183,30 +142,18 @@ class ApiService {
     }
   }
 
-  static Future<ChapterPagesModel?> fetchChapterPages(
-    String chapterId, {
-    bool useDataSaver = false,
-  }) async {
+  static Future<ChapterPagesModel?> fetchChapterPages(String chapterId, {bool useDataSaver = false}) async {
     try {
-      final Uri url = Uri.parse(
-        '$_baseUrl/at-home/server/$chapterId',
-      );
+      final Uri url = Uri.parse('$_baseUrl/at-home/server/$chapterId');
 
       final response = await http.get(url);
 
       if (response.statusCode == 200) {
-        final Map<String, dynamic> data = json.decode(
-          response.body,
-        );
+        final Map<String, dynamic> data = json.decode(response.body);
 
-        return ChapterPagesModel.fromJson(
-          data,
-          useDataSaver: useDataSaver,
-        );
+        return ChapterPagesModel.fromJson(data, useDataSaver: useDataSaver);
       } else {
-        throw Exception(
-          'Failed to load chapter images. Status Code: ${response.statusCode}',
-        );
+        throw Exception('Failed to load chapter images. Status Code: ${response.statusCode}');
       }
     } catch (e) {
       return null;
@@ -227,15 +174,11 @@ class ApiService {
       bool hasNoFilters =
           query.trim().isEmpty &&
           (statuses == null || statuses.isEmpty) &&
-          (includedGenreIds == null ||
-              includedGenreIds.isEmpty) &&
+          (includedGenreIds == null || includedGenreIds.isEmpty) &&
           !showR18;
 
       if (hasNoFilters) {
-        return await fetchRecentlyUpdatedComics(
-          limit: limit,
-          offset: offset,
-        );
+        return await fetchRecentlyUpdatedComics(limit: limit, offset: offset);
       }
 
       String urlString =
@@ -247,9 +190,7 @@ class ApiService {
 
       if (query.trim().isNotEmpty) {
         if (searchBy == 'author' || searchBy == 'artist') {
-          String? personId = await _getAuthorOrArtistId(
-            query.trim(),
-          );
+          String? personId = await _getAuthorOrArtistId(query.trim());
 
           if (personId == null) {
             return [];
@@ -261,13 +202,11 @@ class ApiService {
             urlString += '&artists[]=$personId';
           }
         } else {
-          urlString +=
-              '&title=${Uri.encodeComponent(query.trim())}';
+          urlString += '&title=${Uri.encodeComponent(query.trim())}';
         }
       }
 
-      urlString +=
-          '&contentRating[]=safe&contentRating[]=suggestive&contentRating[]=erotica';
+      urlString += '&contentRating[]=safe&contentRating[]=suggestive&contentRating[]=erotica';
       if (showR18) {
         urlString += '&contentRating[]=pornographic';
       }
@@ -278,8 +217,7 @@ class ApiService {
         }
       }
 
-      if (includedGenreIds != null &&
-          includedGenreIds.isNotEmpty) {
+      if (includedGenreIds != null && includedGenreIds.isNotEmpty) {
         for (String tagId in includedGenreIds) {
           urlString += '&includedTags[]=$tagId';
         }
@@ -306,9 +244,7 @@ class ApiService {
           sortQuery = '&order[relevance]=desc';
           break;
         default:
-          sortQuery = query.trim().isNotEmpty
-              ? '&order[relevance]=desc'
-              : '&order[updatedAt]=desc';
+          sortQuery = query.trim().isNotEmpty ? '&order[relevance]=desc' : '&order[updatedAt]=desc';
       }
       urlString += sortQuery;
 
@@ -316,18 +252,12 @@ class ApiService {
       final response = await http.get(url);
 
       if (response.statusCode == 200) {
-        final Map<String, dynamic> data = json.decode(
-          response.body,
-        );
+        final Map<String, dynamic> data = json.decode(response.body);
         final List<dynamic> mangaList = data['data'] ?? [];
 
-        return mangaList
-            .map((json) => ComicModel.fromJson(json))
-            .toList();
+        return mangaList.map((json) => ComicModel.fromJson(json)).toList();
       } else {
-        throw Exception(
-          'Failed to search comics. Status Code: ${response.statusCode}',
-        );
+        throw Exception('Failed to search comics. Status Code: ${response.statusCode}');
       }
     } catch (e) {
       return [];
@@ -340,41 +270,29 @@ class ApiService {
       final response = await http.get(url);
 
       if (response.statusCode == 200) {
-        final Map<String, dynamic> data = json.decode(
-          response.body,
-        );
+        final Map<String, dynamic> data = json.decode(response.body);
         final List<dynamic> tagList = data['data'] ?? [];
 
-        List<GenreModel> genres = tagList
-            .map((json) => GenreModel.fromJson(json))
-            .toList();
+        List<GenreModel> genres = tagList.map((json) => GenreModel.fromJson(json)).toList();
 
         genres.sort((a, b) => a.name.compareTo(b.name));
 
         return genres;
       } else {
-        throw Exception(
-          'Failed to load genres. Status Code: ${response.statusCode}',
-        );
+        throw Exception('Failed to load genres. Status Code: ${response.statusCode}');
       }
     } catch (e) {
       return [];
     }
   }
 
-  static Future<String?> _getAuthorOrArtistId(
-    String name,
-  ) async {
+  static Future<String?> _getAuthorOrArtistId(String name) async {
     try {
-      final Uri url = Uri.parse(
-        '$_baseUrl/author?name=${Uri.encodeComponent(name)}&limit=1',
-      );
+      final Uri url = Uri.parse('$_baseUrl/author?name=${Uri.encodeComponent(name)}&limit=1');
       final response = await http.get(url);
 
       if (response.statusCode == 200) {
-        final Map<String, dynamic> data = json.decode(
-          response.body,
-        );
+        final Map<String, dynamic> data = json.decode(response.body);
         final List<dynamic> results = data['data'] ?? [];
 
         if (results.isNotEmpty) {
@@ -385,5 +303,102 @@ class ApiService {
       return null;
     }
     return null;
+  }
+
+  static Future<List<ComicModel>> fetchRelatedComicsByIds(List<String> ids, String currentMangaId) async {
+    if (ids.isEmpty) return [];
+    try {
+      final limit = ids.length > 10 ? 10 : ids.length;
+      String urlString =
+          '$_baseUrl/manga'
+          '?limit=$limit'
+          '&includes[]=cover_art'
+          '&hasAvailableChapters=true'
+          '&contentRating[]=safe&contentRating[]=suggestive&contentRating[]=erotica';
+
+      for (String id in ids.take(10)) {
+        urlString += '&ids[]=$id';
+      }
+
+      final Uri url = Uri.parse(urlString);
+      final response = await http.get(url);
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> data = json.decode(response.body);
+        final List<dynamic> mangaList = data['data'] ?? [];
+
+        List<ComicModel> comics = mangaList.map((json) => ComicModel.fromJson(json)).toList();
+        comics.removeWhere((comic) => comic.id == currentMangaId);
+        return comics;
+      } else {
+        throw Exception('Failed to load related comics by IDs');
+      }
+    } catch (e) {
+      return [];
+    }
+  }
+
+  static Future<List<ComicModel>> fetchComicsByAuthor(String authorId, String currentMangaId) async {
+    if (authorId.isEmpty) return [];
+    try {
+      final Uri url = Uri.parse(
+        '$_baseUrl/manga'
+        '?limit=10'
+        '&authors[]=$authorId'
+        '&includes[]=cover_art'
+        '&hasAvailableChapters=true'
+        '&contentRating[]=safe&contentRating[]=suggestive&contentRating[]=erotica',
+      );
+
+      final response = await http.get(url);
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> data = json.decode(response.body);
+        final List<dynamic> mangaList = data['data'] ?? [];
+
+        List<ComicModel> comics = mangaList.map((json) => ComicModel.fromJson(json)).toList();
+        comics.removeWhere((comic) => comic.id == currentMangaId);
+        return comics;
+      } else {
+        throw Exception('Failed to load comics by author');
+      }
+    } catch (e) {
+      return [];
+    }
+  }
+
+  static Future<List<ComicModel>> fetchComicsByTags(List<String> tagIds, String currentMangaId) async {
+    if (tagIds.isEmpty) return [];
+    try {
+      final tagsToQuery = tagIds.take(4).toList();
+
+      String urlString =
+          '$_baseUrl/manga'
+          '?limit=10'
+          '&includes[]=cover_art'
+          '&hasAvailableChapters=true'
+          '&order[followedCount]=desc'
+          '&contentRating[]=safe&contentRating[]=suggestive&contentRating[]=erotica';
+
+      for (String tagId in tagsToQuery) {
+        urlString += '&includedTags[]=$tagId';
+      }
+
+      final Uri url = Uri.parse(urlString);
+      final response = await http.get(url);
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> data = json.decode(response.body);
+        final List<dynamic> mangaList = data['data'] ?? [];
+
+        List<ComicModel> comics = mangaList.map((json) => ComicModel.fromJson(json)).toList();
+        comics.removeWhere((comic) => comic.id == currentMangaId);
+        return comics;
+      } else {
+        throw Exception('Failed to load comics by tags');
+      }
+    } catch (e) {
+      return [];
+    }
   }
 }

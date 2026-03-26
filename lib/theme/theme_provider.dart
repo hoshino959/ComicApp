@@ -21,10 +21,7 @@ class ThemeProvider extends ChangeNotifier {
       return;
     }
 
-    var doc = await FirebaseFirestore.instance
-        .collection("Users")
-        .doc(user.uid)
-        .get();
+    var doc = await FirebaseFirestore.instance.collection("Users").doc(user.uid).get();
 
     String theme = doc.data()!["theme"];
     if (theme == "light") {
@@ -46,9 +43,7 @@ class ThemeProvider extends ChangeNotifier {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString("theme", newTheme);
     } else {
-      await FirebaseFirestore.instance.collection("Users").doc(user.uid).update(
-        {"theme": newTheme},
-      );
+      await FirebaseFirestore.instance.collection("Users").doc(user.uid).update({"theme": newTheme});
     }
     notifyListeners();
   }

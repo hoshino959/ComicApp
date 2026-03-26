@@ -20,9 +20,7 @@ class GenreTag extends StatelessWidget {
         style: TextStyle(
           fontSize: 12,
           fontWeight: FontWeight.w500,
-          color: !isDark
-              ? OkLab(0.82, 0.12, -0.03).toColor()
-              : OkLab(0.53, 0.22, 0.02).toColor(),
+          color: !isDark ? OkLab(0.82, 0.12, -0.03).toColor() : OkLab(0.53, 0.22, 0.02).toColor(),
         ),
       ),
     );

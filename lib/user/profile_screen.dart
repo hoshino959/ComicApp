@@ -34,10 +34,7 @@ class ProfileScreenState extends State<ProfileScreen> {
     setState(() {
       isLoading = true;
     });
-    var doc = await FirebaseFirestore.instance
-        .collection("Users")
-        .doc(FirebaseAuth.instance.currentUser!.uid)
-        .get();
+    var doc = await FirebaseFirestore.instance.collection("Users").doc(FirebaseAuth.instance.currentUser!.uid).get();
 
     setState(() {
       nameFS = doc.data()!["name"];
@@ -67,9 +64,7 @@ class ProfileScreenState extends State<ProfileScreen> {
                 child: Text(
                   'Thay đổi avatar',
                   style: TextStyle(
-                    color: Theme.of(context).brightness == Brightness.dark
-                        ? Colors.white
-                        : Colors.black,
+                    color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black,
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
                   ),
@@ -77,12 +72,7 @@ class ProfileScreenState extends State<ProfileScreen> {
               ),
               ClipRRect(
                 borderRadius: BorderRadius.circular(10),
-                child: Image.file(
-                  image,
-                  width: 250,
-                  height: 250,
-                  fit: BoxFit.cover,
-                ),
+                child: Image.file(image, width: 250, height: 250, fit: BoxFit.cover),
               ),
               SizedBox(height: 10),
               Padding(
@@ -91,8 +81,7 @@ class ProfileScreenState extends State<ProfileScreen> {
                   width: double.infinity,
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor:
-                          Theme.of(context).brightness == Brightness.light
+                      backgroundColor: Theme.of(context).brightness == Brightness.light
                           ? OkLab(0.75, 0.17, -0.0).toColor()
                           : OkLab(0.75, 0.17, -0.01).toColor(),
                       side: BorderSide(color: OkLab(0.88, 0.04, 0).toColor()),
@@ -121,18 +110,14 @@ class ProfileScreenState extends State<ProfileScreen> {
                 child: Container(
                   width: double.infinity,
                   child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      side: BorderSide(color: OkLab(0.88, 0.04, 0).toColor()),
-                    ),
+                    style: ElevatedButton.styleFrom(side: BorderSide(color: OkLab(0.88, 0.04, 0).toColor())),
                     onPressed: () {
                       Navigator.pop(context);
                     },
                     child: Text(
                       'Back',
                       style: TextStyle(
-                        color: Theme.of(context).brightness == Brightness.dark
-                            ? Colors.white
-                            : Colors.black,
+                        color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black,
                       ),
                     ),
                   ),
@@ -153,11 +138,7 @@ class ProfileScreenState extends State<ProfileScreen> {
       });
       String uid = FirebaseAuth.instance.currentUser!.uid;
       CloudinaryResponse response = await cloudinary.uploadFile(
-        CloudinaryFile.fromFile(
-          imageFile.path,
-          identifier: uid,
-          resourceType: CloudinaryResourceType.Image,
-        ),
+        CloudinaryFile.fromFile(imageFile.path, identifier: uid, resourceType: CloudinaryResourceType.Image),
       );
       setState(() {
         isLoading = false;
@@ -178,9 +159,7 @@ class ProfileScreenState extends State<ProfileScreen> {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    final gradient = isDark
-        ? AppColorsDark.gradientBackground
-        : AppColorsLight.gradientBackground;
+    final gradient = isDark ? AppColorsDark.gradientBackground : AppColorsLight.gradientBackground;
 
     return Container(
       decoration: BoxDecoration(gradient: gradient),
@@ -194,10 +173,7 @@ class ProfileScreenState extends State<ProfileScreen> {
                 onPressed: () {
                   Navigator.pop(context);
                 },
-                icon: Icon(
-                  Icons.arrow_back,
-                  color: isDark ? Colors.white : Colors.black,
-                ),
+                icon: Icon(Icons.arrow_back, color: isDark ? Colors.white : Colors.black),
               ),
             ),
             backgroundColor: Colors.transparent,
@@ -229,12 +205,7 @@ class ProfileScreenState extends State<ProfileScreen> {
                               children: [
                                 Text(
                                   'Quản lý cài đặt tài khoản và tùy chọn của bạn',
-                                  style: TextStyle(
-                                    color: !isDark
-                                        ? Colors.black
-                                        : Colors.white,
-                                    fontSize: 16,
-                                  ),
+                                  style: TextStyle(color: !isDark ? Colors.black : Colors.white, fontSize: 16),
                                 ),
                               ],
                             ),
@@ -245,13 +216,9 @@ class ProfileScreenState extends State<ProfileScreen> {
                       Container(
                         width: double.infinity,
                         decoration: BoxDecoration(
-                          color: isDark
-                              ? AppColorsDark.background3
-                              : AppColorsLight.background2,
+                          color: isDark ? AppColorsDark.background3 : AppColorsLight.background2,
                           borderRadius: BorderRadius.circular(20),
-                          boxShadow: [
-                            BoxShadow(blurRadius: 10, color: Colors.black26),
-                          ],
+                          boxShadow: [BoxShadow(blurRadius: 10, color: Colors.black26)],
                         ),
                         padding: EdgeInsets.all(20),
                         child: Column(
@@ -268,14 +235,7 @@ class ProfileScreenState extends State<ProfileScreen> {
                                     ),
                                   ),
                                 if (imgUrl.isNotEmpty)
-                                  ClipOval(
-                                    child: Image.network(
-                                      imgUrl,
-                                      width: 100,
-                                      height: 100,
-                                      fit: BoxFit.cover,
-                                    ),
-                                  ),
+                                  ClipOval(child: Image.network(imgUrl, width: 100, height: 100, fit: BoxFit.cover)),
                                 Positioned(
                                   bottom: 0,
                                   right: 0,
@@ -288,9 +248,7 @@ class ProfileScreenState extends State<ProfileScreen> {
                                       child: Icon(
                                         Icons.camera_alt,
                                         size: 18,
-                                        color: isDark
-                                            ? Colors.black
-                                            : Colors.white,
+                                        color: isDark ? Colors.black : Colors.white,
                                       ),
                                     ),
                                   ),
@@ -303,28 +261,18 @@ class ProfileScreenState extends State<ProfileScreen> {
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                               style: TextStyle(
-                                color: isDark
-                                    ? OkLab(0.83, 0.07, -0.1).toColor()
-                                    : OkLab(0.5, 0.14, -0.22).toColor(),
+                                color: isDark ? OkLab(0.83, 0.07, -0.1).toColor() : OkLab(0.5, 0.14, -0.22).toColor(),
                                 fontSize: 25,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
                             SizedBox(height: 15),
-                            Container(
-                              height: 2,
-                              color: Colors.grey.withValues(alpha: 0.3),
-                            ),
+                            Container(height: 2, color: Colors.grey.withValues(alpha: 0.3)),
                             SizedBox(height: 15),
                             Container(
-                              padding: EdgeInsets.symmetric(
-                                horizontal: 20,
-                                vertical: 10,
-                              ),
+                              padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                               decoration: BoxDecoration(
-                                color: isDark
-                                    ? OkLab(0.41, 0.15, 0.01).toColor()
-                                    : OkLab(0.72, 0.2, -0.04).toColor(),
+                                color: isDark ? OkLab(0.41, 0.15, 0.01).toColor() : OkLab(0.72, 0.2, -0.04).toColor(),
                                 borderRadius: BorderRadius.circular(15),
                               ),
                               child: Row(
@@ -333,11 +281,7 @@ class ProfileScreenState extends State<ProfileScreen> {
                                   SizedBox(width: 15),
                                   Text(
                                     'Thông tin',
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 16,
-                                    ),
+                                    style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
                                   ),
                                 ],
                               ),
@@ -346,24 +290,15 @@ class ProfileScreenState extends State<ProfileScreen> {
                             InkWell(
                               onTap: () async {
                                 await FirebaseAuth.instance.signOut();
-                                Navigator.of(context).pushReplacement(
-                                  MaterialPageRoute(
-                                    builder: (_) => MainScreen(),
-                                  ),
-                                );
+                                Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (_) => MainScreen()));
                               },
                               child: Padding(
-                                padding: EdgeInsets.symmetric(
-                                  horizontal: 20,
-                                  vertical: 10,
-                                ),
+                                padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                                 child: Row(
                                   children: [
                                     Icon(
                                       Icons.logout,
-                                      color:
-                                          Theme.of(context).brightness ==
-                                              ThemeMode.light
+                                      color: Theme.of(context).brightness == ThemeMode.light
                                           ? OkLab(0.64, 0.21, 0.1).toColor()
                                           : OkLab(0.7, 0.18, 0.07).toColor(),
                                     ),
@@ -371,9 +306,7 @@ class ProfileScreenState extends State<ProfileScreen> {
                                     Text(
                                       'Đăng xuất',
                                       style: TextStyle(
-                                        color:
-                                            Theme.of(context).brightness ==
-                                                ThemeMode.light
+                                        color: Theme.of(context).brightness == ThemeMode.light
                                             ? OkLab(0.64, 0.21, 0.1).toColor()
                                             : OkLab(0.7, 0.18, 0.07).toColor(),
                                         fontWeight: FontWeight.bold,
@@ -394,13 +327,9 @@ class ProfileScreenState extends State<ProfileScreen> {
                       Container(
                         width: double.infinity,
                         decoration: BoxDecoration(
-                          color: isDark
-                              ? AppColorsDark.background3
-                              : AppColorsLight.background2,
+                          color: isDark ? AppColorsDark.background3 : AppColorsLight.background2,
                           borderRadius: BorderRadius.circular(20),
-                          boxShadow: [
-                            BoxShadow(blurRadius: 10, color: Colors.black26),
-                          ],
+                          boxShadow: [BoxShadow(blurRadius: 10, color: Colors.black26)],
                         ),
                         padding: EdgeInsets.all(20),
                         child: Column(
@@ -409,33 +338,21 @@ class ProfileScreenState extends State<ProfileScreen> {
                               children: [
                                 Expanded(
                                   child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
+                                    crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
                                       Text(
                                         'Thông tin hồ sơ',
                                         style: TextStyle(
                                           color: isDark
-                                              ? OkLab(
-                                                  0.83,
-                                                  0.07,
-                                                  -0.1,
-                                                ).toColor()
-                                              : OkLab(
-                                                  0.5,
-                                                  0.14,
-                                                  -0.22,
-                                                ).toColor(),
+                                              ? OkLab(0.83, 0.07, -0.1).toColor()
+                                              : OkLab(0.5, 0.14, -0.22).toColor(),
                                           fontWeight: FontWeight.bold,
                                           fontSize: 20,
                                         ),
                                       ),
                                       Text(
                                         'Cập nhật thông tin',
-                                        style: TextStyle(
-                                          color: Colors.grey,
-                                          fontSize: 14,
-                                        ),
+                                        style: TextStyle(color: Colors.grey, fontSize: 14),
                                         maxLines: 1,
                                       ),
                                     ],
@@ -446,33 +363,20 @@ class ProfileScreenState extends State<ProfileScreen> {
                                         style: ElevatedButton.styleFrom(
                                           backgroundColor: isDark
                                               ? OkLab(0.63, 0.24, 0).toColor()
-                                              : OkLab(
-                                                  0.75,
-                                                  0.17,
-                                                  -0.01,
-                                                ).toColor(),
+                                              : OkLab(0.75, 0.17, -0.01).toColor(),
                                         ),
                                         onPressed: () {
                                           setState(() {
                                             isEditing = true;
                                           });
                                         },
-                                        child: Row(
-                                          children: [
-                                            Icon(
-                                              Icons.edit,
-                                              color: Colors.white,
-                                            ),
-                                          ],
-                                        ),
+                                        child: Row(children: [Icon(Icons.edit, color: Colors.white)]),
                                       )
                                     : Row(
                                         children: [
                                           ElevatedButton(
                                             style: ElevatedButton.styleFrom(
-                                              backgroundColor: isDark
-                                                  ? Colors.transparent
-                                                  : Colors.white,
+                                              backgroundColor: isDark ? Colors.transparent : Colors.white,
                                             ),
                                             onPressed: () {
                                               setState(() {
@@ -482,9 +386,7 @@ class ProfileScreenState extends State<ProfileScreen> {
                                             child: Text(
                                               'Hủy',
                                               style: TextStyle(
-                                                color: isDark
-                                                    ? Colors.white
-                                                    : Colors.black,
+                                                color: isDark ? Colors.white : Colors.black,
                                                 fontSize: 14,
                                               ),
                                             ),
@@ -493,82 +395,38 @@ class ProfileScreenState extends State<ProfileScreen> {
                                           ElevatedButton(
                                             style: ElevatedButton.styleFrom(
                                               backgroundColor: isDark
-                                                  ? OkLab(
-                                                      0.63,
-                                                      0.24,
-                                                      0,
-                                                    ).toColor()
-                                                  : OkLab(
-                                                      0.75,
-                                                      0.17,
-                                                      -0.01,
-                                                    ).toColor(),
+                                                  ? OkLab(0.63, 0.24, 0).toColor()
+                                                  : OkLab(0.75, 0.17, -0.01).toColor(),
                                             ),
                                             onPressed: () async {
                                               if (nameController.text.isEmpty) {
                                                 ScaffoldMessenger.of(
                                                   context,
-                                                ).showSnackBar(
-                                                  SnackBar(
-                                                    content: Text(
-                                                      'Tên không được để trống',
-                                                    ),
-                                                  ),
-                                                );
+                                                ).showSnackBar(SnackBar(content: Text('Tên không được để trống')));
                                               } else {
-                                                if (nameController.text.length <
-                                                    50) {
-                                                  if (nameController.text ==
-                                                      nameFS) {
-                                                    ScaffoldMessenger.of(
-                                                      context,
-                                                    ).showSnackBar(
-                                                      SnackBar(
-                                                        content: Text(
-                                                          'Tên không được trùng với tên cũ',
-                                                        ),
-                                                      ),
+                                                if (nameController.text.length < 50) {
+                                                  if (nameController.text == nameFS) {
+                                                    ScaffoldMessenger.of(context).showSnackBar(
+                                                      SnackBar(content: Text('Tên không được trùng với tên cũ')),
                                                     );
                                                   } else {
-                                                    await FirebaseFirestore
-                                                        .instance
+                                                    await FirebaseFirestore.instance
                                                         .collection("Users")
-                                                        .doc(
-                                                          FirebaseAuth
-                                                              .instance
-                                                              .currentUser!
-                                                              .uid,
-                                                        )
-                                                        .update({
-                                                          "name": nameController
-                                                              .text,
-                                                          "gender": gender,
-                                                        });
+                                                        .doc(FirebaseAuth.instance.currentUser!.uid)
+                                                        .update({"name": nameController.text, "gender": gender});
                                                     setState(() {
                                                       getUserData();
                                                       isEditing = false;
                                                     });
                                                   }
                                                 } else {
-                                                  ScaffoldMessenger.of(
-                                                    context,
-                                                  ).showSnackBar(
-                                                    SnackBar(
-                                                      content: Text(
-                                                        'Tên không được quá 50 ký tự',
-                                                      ),
-                                                    ),
+                                                  ScaffoldMessenger.of(context).showSnackBar(
+                                                    SnackBar(content: Text('Tên không được quá 50 ký tự')),
                                                   );
                                                 }
                                               }
                                             },
-                                            child: Text(
-                                              'Lưu',
-                                              style: TextStyle(
-                                                color: Colors.white,
-                                                fontSize: 14,
-                                              ),
-                                            ),
+                                            child: Text('Lưu', style: TextStyle(color: Colors.white, fontSize: 14)),
                                           ),
                                         ],
                                       ),
@@ -577,35 +435,21 @@ class ProfileScreenState extends State<ProfileScreen> {
                             SizedBox(height: 5),
                             Row(
                               children: [
-                                Text(
-                                  'Họ và tên',
-                                  style: TextStyle(
-                                    color: isDark ? Colors.white : Colors.black,
-                                  ),
-                                ),
+                                Text('Họ và tên', style: TextStyle(color: isDark ? Colors.white : Colors.black)),
                               ],
                             ),
                             SizedBox(height: 5),
                             !isEditing
                                 ? Row(
                                     children: [
-                                      Icon(
-                                        Icons.account_circle,
-                                        color: isDark
-                                            ? Colors.white
-                                            : Colors.black,
-                                      ),
+                                      Icon(Icons.account_circle, color: isDark ? Colors.white : Colors.black),
                                       SizedBox(width: 10),
                                       Expanded(
                                         child: Text(
                                           maxLines: 1,
                                           overflow: TextOverflow.ellipsis,
                                           nameFS,
-                                          style: TextStyle(
-                                            color: isDark
-                                                ? Colors.white
-                                                : Colors.black,
-                                          ),
+                                          style: TextStyle(color: isDark ? Colors.white : Colors.black),
                                         ),
                                       ),
                                     ],
@@ -615,36 +459,16 @@ class ProfileScreenState extends State<ProfileScreen> {
                                       TextField(
                                         controller: nameController,
                                         decoration: InputDecoration(
-                                          prefixIcon: Icon(
-                                            Icons.account_circle,
-                                          ),
-                                          contentPadding: EdgeInsets.symmetric(
-                                            vertical: 10,
-                                          ),
+                                          prefixIcon: Icon(Icons.account_circle),
+                                          contentPadding: EdgeInsets.symmetric(vertical: 10),
                                           enabledBorder: OutlineInputBorder(
-                                            borderRadius: BorderRadius.circular(
-                                              15,
-                                            ),
-                                            borderSide: BorderSide(
-                                              color: Color.fromRGBO(
-                                                246,
-                                                51,
-                                                154,
-                                                1.0,
-                                              ),
-                                            ),
+                                            borderRadius: BorderRadius.circular(15),
+                                            borderSide: BorderSide(color: Color.fromRGBO(246, 51, 154, 1.0)),
                                           ),
                                           focusedBorder: OutlineInputBorder(
-                                            borderRadius: BorderRadius.circular(
-                                              15,
-                                            ),
+                                            borderRadius: BorderRadius.circular(15),
                                             borderSide: BorderSide(
-                                              color: Color.fromRGBO(
-                                                246,
-                                                51,
-                                                154,
-                                                1.0,
-                                              ),
+                                              color: Color.fromRGBO(246, 51, 154, 1.0),
                                               width: 3.0,
                                             ),
                                           ),
@@ -713,29 +537,14 @@ class ProfileScreenState extends State<ProfileScreen> {
                               ],
                             ),
                             Row(
-                              children: [
-                                Text(
-                                  'Email',
-                                  style: TextStyle(
-                                    color: isDark ? Colors.white : Colors.black,
-                                  ),
-                                ),
-                              ],
+                              children: [Text('Email', style: TextStyle(color: isDark ? Colors.white : Colors.black))],
                             ),
                             SizedBox(height: 5),
                             Row(
                               children: [
-                                Icon(
-                                  Icons.email,
-                                  color: isDark ? Colors.white : Colors.black,
-                                ),
+                                Icon(Icons.email, color: isDark ? Colors.white : Colors.black),
                                 SizedBox(width: 10),
-                                Text(
-                                  emailFS,
-                                  style: TextStyle(
-                                    color: isDark ? Colors.white : Colors.black,
-                                  ),
-                                ),
+                                Text(emailFS, style: TextStyle(color: isDark ? Colors.white : Colors.black)),
                               ],
                             ),
                           ],

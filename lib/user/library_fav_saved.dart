@@ -15,28 +15,20 @@ class LibraryFavSaved extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark =
-        Provider.of<ThemeProvider>(context).themeMode == ThemeMode.dark;
-    final gradient = isDark
-        ? AppColorsDark.gradientBackground
-        : AppColorsLight.gradientBackground;
+    final isDark = Provider.of<ThemeProvider>(context).themeMode == ThemeMode.dark;
+    final gradient = isDark ? AppColorsDark.gradientBackground : AppColorsLight.gradientBackground;
     final isFav = status == "Favorite";
 
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
-          backgroundColor: isDark
-              ? AppColorsDark.background1
-              : AppColorsLight.background1,
+          backgroundColor: isDark ? AppColorsDark.background1 : AppColorsLight.background1,
           elevation: 0,
           leading: IconButton(
             onPressed: () {
               Navigator.pop(context);
             },
-            icon: Icon(
-              Icons.arrow_back,
-              color: isDark ? Colors.white : Colors.black,
-            ),
+            icon: Icon(Icons.arrow_back, color: isDark ? Colors.white : Colors.black),
           ),
         ),
         body: SizedBox.expand(
@@ -54,21 +46,11 @@ class LibraryFavSaved extends StatelessWidget {
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(25),
                             color: isDark
-                                ? OkLab(
-                                    0.63,
-                                    0.24,
-                                    0,
-                                  ).toColor().withValues(alpha: 0.3)
-                                : OkLab(
-                                    0.75,
-                                    0.17,
-                                    -0.01,
-                                  ).toColor().withValues(alpha: 0.2),
+                                ? OkLab(0.63, 0.24, 0).toColor().withValues(alpha: 0.3)
+                                : OkLab(0.75, 0.17, -0.01).toColor().withValues(alpha: 0.2),
                           ),
                           child: Icon(
-                            isFav
-                                ? Icons.favorite_border
-                                : Icons.bookmark_border_outlined,
+                            isFav ? Icons.favorite_border : Icons.bookmark_border_outlined,
                             size: 40,
                             color: OkLab(0.63, 0.24, 0).toColor(),
                           ),
