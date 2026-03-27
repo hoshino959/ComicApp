@@ -50,6 +50,8 @@ class _DetailScreenState extends State<DetailScreen> {
   int chunkSize = 100;
   int currentChunkIndex = 0;
 
+  int count = 0;
+
   final ScrollController _chunkScrollController = ScrollController();
 
   int selectedTabIndex = 0;
@@ -59,6 +61,17 @@ class _DetailScreenState extends State<DetailScreen> {
     super.initState();
     _fetchData();
     _fetchChapters();
+  }
+
+  Future<void> getCount() async {
+    var snapshot = await FirebaseFirestore.instance
+        .collection('Comments')
+        .doc(widget.id)
+        .collection('comments')
+        .get();
+    setState(() {
+      count = snapshot.docs.length;
+    });
   }
 
   Future<void> checkSavedAndFavorite() async {
@@ -102,6 +115,7 @@ class _DetailScreenState extends State<DetailScreen> {
         isLoading = false;
       });
       checkSavedAndFavorite();
+      getCount();
     } catch (e) {
       if (!mounted) return;
       setState(() {
@@ -824,11 +838,22 @@ class _DetailScreenState extends State<DetailScreen> {
                                     Icons.format_list_bulleted,
                                     isDark,
                                   ),
-                                  _buildTabItem(
-                                    1,
-                                    '',
-                                    Icons.chat_bubble_outline,
-                                    isDark,
+                                  StreamBuilder<QuerySnapshot>(
+                                    stream: FirebaseFirestore.instance
+                                        .collection('Comments')
+                                        .doc(widget.id)
+                                        .collection('comments')
+                                        .snapshots(),
+                                    builder: (context, snapshot) {
+                                      int count =
+                                          snapshot.data?.docs.length ?? 0;
+                                      return _buildTabItem(
+                                        1,
+                                        count == 0 ? '' : ' ($count)',
+                                        Icons.chat_bubble_outline,
+                                        isDark,
+                                      );
+                                    },
                                   ),
                                   _buildTabItem(
                                     2,

@@ -1,8 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:comic_app/models/comment_model.dart';
+import 'package:comic_app/theme/theme_provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:okcolor/models/oklab.dart';
+import 'package:provider/provider.dart';
 
 class CommentSection extends StatefulWidget {
   final String comicId;
@@ -17,8 +18,6 @@ class CommentSection extends StatefulWidget {
 
 class _CommentSectionState extends State<CommentSection> {
   final TextEditingController controller = TextEditingController();
-  int page = 0;
-  final int limit = 10;
   String nameFS = "";
   String imgUrl = "";
   bool isLoading = true;
@@ -53,7 +52,15 @@ class _CommentSectionState extends State<CommentSection> {
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) return;
 
-    if (controller.text.trim().isEmpty) return;
+    if (controller.text.trim().isEmpty) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Vui lòng nhập nội dung')));
+      setState(() {
+        isLoading = false;
+      });
+      return;
+    }
 
     await FirebaseFirestore.instance
         .collection('Comments')
@@ -73,6 +80,9 @@ class _CommentSectionState extends State<CommentSection> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark =
+        Provider.of<ThemeProvider>(context).themeMode == ThemeMode.dark;
+
     return Stack(
       children: [
         Column(
@@ -80,8 +90,17 @@ class _CommentSectionState extends State<CommentSection> {
             Container(
               padding: EdgeInsets.all(12),
               decoration: BoxDecoration(
+                color: isDark
+                    ? OkLab(0.28, -0.01, -0.03).toColor().withValues(alpha: 0.5)
+                    : Colors.white,
                 borderRadius: BorderRadius.circular(15),
-                border: Border.all(color: Colors.grey),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.3),
+                    blurRadius: 10,
+                    offset: Offset(0, 5),
+                  ),
+                ],
               ),
               child: Column(
                 children: [
@@ -105,8 +124,21 @@ class _CommentSectionState extends State<CommentSection> {
                             fit: BoxFit.cover,
                           ),
                         ),
-                      SizedBox(width: 12),
-                      Expanded(child: Text(nameFS)),
+                      SizedBox(width: 10),
+                      Expanded(
+                        child: Text(
+                          nameFS,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            color: isDark
+                                ? OkLab(0.83, 0.07, -0.1).toColor()
+                                : OkLab(0.63, 0.15, -0.22).toColor(),
+                            fontWeight: FontWeight.w500,
+                            fontSize: 16,
+                          ),
+                        ),
+                      ),
                     ],
                   ),
                   SizedBox(height: 10),
@@ -121,11 +153,42 @@ class _CommentSectionState extends State<CommentSection> {
                       ),
                     ),
                   ),
+                  SizedBox(height: 5),
                   Align(
                     alignment: Alignment.centerRight,
-                    child: ElevatedButton(
-                      onPressed: addComment,
-                      child: Text("Đăng"),
+                    child: GestureDetector(
+                      onTap: addComment,
+                      child: Container(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 8,
+                        ),
+                        decoration: BoxDecoration(
+                          color: isDark
+                              ? OkLab(0.63, 0.24, 0).toColor()
+                              : OkLab(0.75, 0.17, -0.01).toColor(),
+                          borderRadius: BorderRadius.circular(15),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              "Đăng",
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w500,
+                                color: Colors.white,
+                              ),
+                            ),
+                            SizedBox(width: 5),
+                            Icon(
+                              Icons.arrow_forward_ios_outlined,
+                              color: Colors.white,
+                              size: 16,
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
                   ),
                 ],
@@ -138,64 +201,75 @@ class _CommentSectionState extends State<CommentSection> {
                   .doc(widget.comicId)
                   .collection('comments')
                   .orderBy('createdAt', descending: true)
-                  .limit((page + 1) * limit)
                   .snapshots(),
-
               builder: (context, snapshot) {
-                if (!snapshot.hasData) {
-                  return CircularProgressIndicator();
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return Center(child: CircularProgressIndicator());
                 }
-
-                List<CommentModel> comments = snapshot.data!.docs.map((doc) {
-                  return CommentModel.fromFirestore(
-                    doc.id,
-                    doc.data() as Map<String, dynamic>,
+                if (snapshot.hasError) {
+                  return Center(
+                    child: Text(
+                      'Lỗi tải bình luận',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
                   );
-                }).toList();
+                }
+                if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                  return Center(
+                    child: Text(
+                      'Chưa có bình luận tại truyện này',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  );
+                }
+                final docs = snapshot.data!.docs;
 
-                return Column(
-                  children: [
-                    ListView.builder(
-                      shrinkWrap: true,
-                      physics: NeverScrollableScrollPhysics(),
-                      itemCount: comments.length,
-                      itemBuilder: (context, index) {
-                        final cmt = comments[index];
+                return ListView.builder(
+                  shrinkWrap: true,
+                  physics: NeverScrollableScrollPhysics(),
+                  itemCount: docs.length,
+                  itemBuilder: (context, index) {
+                    final data = docs[index].data() as Map<String, dynamic>;
 
-                        return FutureBuilder<DocumentSnapshot>(
-                          future: FirebaseFirestore.instance
-                              .collection('Users')
-                              .doc(cmt.userId)
-                              .get(),
+                    final userId = data['userId'] ?? '';
+                    final content = data['content'] ?? '';
+                    final Timestamp? timestamp = data['createdAt'];
+                    final DateTime createdAt = timestamp != null
+                        ? timestamp.toDate()
+                        : DateTime.now();
 
-                          builder: (context, userSnap) {
-                            String username = "User";
-                            String? avatar;
+                    return FutureBuilder<DocumentSnapshot>(
+                      future: FirebaseFirestore.instance
+                          .collection('Users')
+                          .doc(userId)
+                          .get(),
+                      builder: (context, userSnap) {
+                        String userName = "";
+                        String? avatar;
 
-                            if (userSnap.hasData && userSnap.data!.exists) {
-                              final data =
-                                  userSnap.data!.data() as Map<String, dynamic>;
-                              username = data['name'] ?? "User";
-                              avatar = data['avatar'];
-                            }
-
-                            return Container(
-                              margin: EdgeInsets.only(bottom: 10),
-                              padding: EdgeInsets.all(10),
-                              decoration: BoxDecoration(
-                                color: Colors.grey.withValues(alpha: 0.1),
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              child: Row(
+                        if (userSnap.hasData && userSnap.data!.exists) {
+                          final userData =
+                              userSnap.data!.data() as Map<String, dynamic>;
+                          userName = userData['name'];
+                          avatar = userData['avatar'];
+                        }
+                        return Container(
+                          margin: EdgeInsets.only(bottom: 10),
+                          padding: EdgeInsets.all(10),
+                          child: Column(
+                            children: [
+                              Row(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  CircleAvatar(
-                                    backgroundImage: avatar != null
-                                        ? NetworkImage(avatar)
-                                        : null,
+                                  ClipOval(
                                     child: avatar == null
                                         ? Icon(Icons.person)
-                                        : null,
+                                        : Image.network(
+                                            avatar,
+                                            height: 40,
+                                            width: 40,
+                                            fit: BoxFit.cover,
+                                          ),
                                   ),
                                   SizedBox(width: 10),
                                   Expanded(
@@ -204,47 +278,96 @@ class _CommentSectionState extends State<CommentSection> {
                                           CrossAxisAlignment.start,
                                       children: [
                                         Text(
-                                          username,
+                                          userName,
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
                                           style: TextStyle(
-                                            fontWeight: FontWeight.bold,
+                                            fontWeight: FontWeight.w700,
+                                            color: isDark
+                                                ? OkLab(
+                                                    0.83,
+                                                    0.07,
+                                                    -0.1,
+                                                  ).toColor()
+                                                : OkLab(
+                                                    0.63,
+                                                    0.15,
+                                                    -0.22,
+                                                  ).toColor(),
                                           ),
                                         ),
                                         Text(
-                                          formatTime(cmt.createdAt),
-                                          style: TextStyle(fontSize: 12),
+                                          formatTime(createdAt),
+                                          style: TextStyle(
+                                            fontSize: 11,
+                                            color: isDark
+                                                ? OkLab(
+                                                    0.71,
+                                                    0,
+                                                    -0.02,
+                                                  ).toColor()
+                                                : OkLab(
+                                                    0.55,
+                                                    0,
+                                                    -0.03,
+                                                  ).toColor(),
+                                          ),
                                         ),
                                         SizedBox(height: 5),
-                                        Text(cmt.content),
+                                        Container(
+                                          padding: EdgeInsets.symmetric(
+                                            horizontal: 12,
+                                            vertical: 8,
+                                          ),
+                                          decoration: BoxDecoration(
+                                            color: isDark
+                                                ? OkLab(
+                                                    0.28,
+                                                    -0.01,
+                                                    -0.03,
+                                                  ).toColor()
+                                                : OkLab(0.98, 0, 0).toColor(),
+                                            borderRadius: BorderRadius.only(
+                                              bottomLeft: Radius.circular(15),
+                                              bottomRight: Radius.circular(15),
+                                              topRight: Radius.circular(15),
+                                            ),
+                                          ),
+                                          child: Text(
+                                            content,
+                                            style: TextStyle(
+                                              color: isDark
+                                                  ? OkLab(
+                                                      0.71,
+                                                      0,
+                                                      -0.02,
+                                                    ).toColor()
+                                                  : OkLab(
+                                                      0.45,
+                                                      -0.01,
+                                                      -0.03,
+                                                    ).toColor(),
+                                            ),
+                                          ),
+                                        ),
                                       ],
                                     ),
                                   ),
                                 ],
                               ),
-                            );
-                          },
+                              SizedBox(height: 15),
+                              Divider(
+                                thickness: 1,
+                                color: isDark
+                                    ? OkLab(0.28, -0.01, -0.03).toColor()
+                                    : Colors.grey,
+                              ),
+                            ],
+                          ),
                         );
                       },
-                    ),
-
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        for (
-                          int i = 0;
-                          i < (comments.length / limit).ceil();
-                          i++
-                        )
-                          TextButton(
-                            onPressed: () {
-                              setState(() {
-                                page = i;
-                              });
-                            },
-                            child: Text("${i + 1}"),
-                          ),
-                      ],
-                    ),
-                  ],
+                    );
+                  },
                 );
               },
             ),
