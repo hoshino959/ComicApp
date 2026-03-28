@@ -76,26 +76,31 @@ class _DetailScreenState extends State<DetailScreen> {
 
   Future<void> checkSavedAndFavorite() async {
     if (user == null || comicDetail == null) return;
-    final docsFav = await FirebaseFirestore.instance
-        .collection('Users')
-        .doc(user!.uid)
-        .collection('Favorite')
-        .doc(comicDetail!.id)
-        .get();
+    final results = await Future.wait([
+      FirebaseFirestore.instance
+          .collection('Users')
+          .doc(user!.uid)
+          .collection('Favorite')
+          .doc(comicDetail!.id)
+          .get(),
+      FirebaseFirestore.instance
+          .collection('Users')
+          .doc(user!.uid)
+          .collection('Saved')
+          .doc(comicDetail!.id)
+          .get(),
+      FirebaseFirestore.instance
+          .collection('Users')
+          .doc(user!.uid)
+          .collection('Notification')
+          .doc(comicDetail!.id)
+          .get(),
+    ]);
+    final docsFav = results[0];
 
-    final docsSaved = await FirebaseFirestore.instance
-        .collection('Users')
-        .doc(user!.uid)
-        .collection('Saved')
-        .doc(comicDetail!.id)
-        .get();
+    final docsSaved = results[1];
 
-    final docsNotify = await FirebaseFirestore.instance
-        .collection('Users')
-        .doc(user!.uid)
-        .collection('Notification')
-        .doc(comicDetail!.id)
-        .get();
+    final docsNotify = results[1];
 
     if (!mounted) return;
 

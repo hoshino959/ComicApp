@@ -18,9 +18,14 @@ class CommentSection extends StatefulWidget {
 
 class _CommentSectionState extends State<CommentSection> {
   final TextEditingController controller = TextEditingController();
+  String? replyingCommentId;
+  String? replyingUserId;
+  String? replyingUserName;
+  Map<String, bool> showReplies = {};
   String nameFS = "";
   String imgUrl = "";
   bool isLoading = true;
+  bool isLike = false;
 
   String formatTime(DateTime time) {
     return "${time.hour}:${time.minute} - ${time.day}/${time.month}/${time.year}";
@@ -61,17 +66,40 @@ class _CommentSectionState extends State<CommentSection> {
       });
       return;
     }
-
-    await FirebaseFirestore.instance
-        .collection('Comments')
-        .doc(widget.comicId)
-        .collection('comments')
-        .doc()
-        .set({
-          'userId': user.uid,
-          'content': controller.text.trim(),
-          'createdAt': FieldValue.serverTimestamp(),
-        });
+    if (replyingCommentId != null) {
+      await FirebaseFirestore.instance
+          .collection('Comments')
+          .doc(widget.comicId)
+          .collection('comments')
+          .doc(replyingCommentId)
+          .collection('replies')
+          .add({
+            'userId': user.uid,
+            'userName': nameFS,
+            'avatar': imgUrl,
+            'content': controller.text.trim(),
+            'createdAt': FieldValue.serverTimestamp(),
+            'like': 0,
+            'replyToUserId': replyingUserId,
+            'replyToUserName': replyingUserName,
+          });
+      replyingCommentId = null;
+      replyingUserName = null;
+      replyingUserId = null;
+    } else {
+      await FirebaseFirestore.instance
+          .collection('Comments')
+          .doc(widget.comicId)
+          .collection('comments')
+          .add({
+            'userId': user.uid,
+            'content': controller.text.trim(),
+            'createdAt': FieldValue.serverTimestamp(),
+            'userName': nameFS,
+            'avatar': imgUrl,
+            'like': 0,
+          });
+    }
     controller.clear();
     setState(() {
       isLoading = false;
@@ -231,141 +259,284 @@ class _CommentSectionState extends State<CommentSection> {
                   itemBuilder: (context, index) {
                     final data = docs[index].data() as Map<String, dynamic>;
 
-                    final userId = data['userId'] ?? '';
                     final content = data['content'] ?? '';
                     final Timestamp? timestamp = data['createdAt'];
                     final DateTime createdAt = timestamp != null
                         ? timestamp.toDate()
                         : DateTime.now();
+                    final avatar = data['avatar'] ?? '';
+                    final userName = data['userName'] ?? '';
 
-                    return FutureBuilder<DocumentSnapshot>(
-                      future: FirebaseFirestore.instance
-                          .collection('Users')
-                          .doc(userId)
-                          .get(),
-                      builder: (context, userSnap) {
-                        String userName = "";
-                        String? avatar;
+                    final like = data['like'] ?? 0;
+                    final commentId = docs[index].id;
+                    final showReply = showReplies[commentId] ?? false;
 
-                        if (userSnap.hasData && userSnap.data!.exists) {
-                          final userData =
-                              userSnap.data!.data() as Map<String, dynamic>;
-                          userName = userData['name'];
-                          avatar = userData['avatar'];
-                        }
-                        return Container(
-                          margin: EdgeInsets.only(bottom: 10),
-                          padding: EdgeInsets.all(10),
-                          child: Column(
+                    return Container(
+                      margin: EdgeInsets.only(bottom: 10),
+                      padding: EdgeInsets.all(10),
+                      child: Column(
+                        children: [
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Row(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  ClipOval(
-                                    child: avatar == null
-                                        ? Icon(Icons.person)
-                                        : Image.network(
-                                            avatar,
-                                            height: 40,
-                                            width: 40,
-                                            fit: BoxFit.cover,
-                                          ),
-                                  ),
-                                  SizedBox(width: 10),
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          userName,
-                                          maxLines: 1,
-                                          overflow: TextOverflow.ellipsis,
-                                          style: TextStyle(
-                                            fontWeight: FontWeight.w700,
-                                            color: isDark
-                                                ? OkLab(
-                                                    0.83,
-                                                    0.07,
-                                                    -0.1,
-                                                  ).toColor()
-                                                : OkLab(
-                                                    0.63,
-                                                    0.15,
-                                                    -0.22,
-                                                  ).toColor(),
-                                          ),
+                              ClipOval(
+                                child: avatar == null
+                                    ? Icon(Icons.person)
+                                    : Image.network(
+                                        avatar,
+                                        height: 40,
+                                        width: 40,
+                                        fit: BoxFit.cover,
+                                      ),
+                              ),
+                              SizedBox(width: 10),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      userName,
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.w700,
+                                        color: isDark
+                                            ? OkLab(0.83, 0.07, -0.1).toColor()
+                                            : OkLab(
+                                                0.63,
+                                                0.15,
+                                                -0.22,
+                                              ).toColor(),
+                                      ),
+                                    ),
+                                    Text(
+                                      formatTime(createdAt),
+                                      style: TextStyle(
+                                        fontSize: 11,
+                                        color: isDark
+                                            ? OkLab(0.71, 0, -0.02).toColor()
+                                            : OkLab(0.55, 0, -0.03).toColor(),
+                                      ),
+                                    ),
+                                    SizedBox(height: 5),
+                                    Container(
+                                      padding: EdgeInsets.symmetric(
+                                        horizontal: 12,
+                                        vertical: 8,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: isDark
+                                            ? OkLab(
+                                                0.28,
+                                                -0.01,
+                                                -0.03,
+                                              ).toColor()
+                                            : OkLab(0.98, 0, 0).toColor(),
+                                        borderRadius: BorderRadius.only(
+                                          bottomLeft: Radius.circular(15),
+                                          bottomRight: Radius.circular(15),
+                                          topRight: Radius.circular(15),
                                         ),
-                                        Text(
-                                          formatTime(createdAt),
-                                          style: TextStyle(
-                                            fontSize: 11,
-                                            color: isDark
-                                                ? OkLab(
-                                                    0.71,
-                                                    0,
-                                                    -0.02,
-                                                  ).toColor()
-                                                : OkLab(
+                                      ),
+                                      child: Text(
+                                        content,
+                                        style: TextStyle(
+                                          color: isDark
+                                              ? OkLab(0.71, 0, -0.02).toColor()
+                                              : OkLab(
+                                                  0.45,
+                                                  -0.01,
+                                                  -0.03,
+                                                ).toColor(),
+                                        ),
+                                      ),
+                                    ),
+                                    SizedBox(height: 15),
+                                    Row(
+                                      children: [
+                                        if (like > 0)
+                                          Row(
+                                            children: [
+                                              Container(
+                                                padding: EdgeInsets.symmetric(
+                                                  horizontal: 8,
+                                                  vertical: 4,
+                                                ),
+                                                decoration: BoxDecoration(
+                                                  color: OkLab(
+                                                    0.93,
+                                                    -0.01,
+                                                    -0.03,
+                                                  ).toColor(),
+                                                  borderRadius:
+                                                      BorderRadius.circular(10),
+                                                ),
+                                                child: Text('👍'),
+                                              ),
+                                              SizedBox(width: 5),
+                                              Text(
+                                                "$like",
+                                                style: TextStyle(fontSize: 12),
+                                              ),
+                                            ],
+                                          ),
+                                        SizedBox(width: 10),
+                                        StreamBuilder<DocumentSnapshot>(
+                                          stream: FirebaseFirestore.instance
+                                              .collection('Comments')
+                                              .doc(widget.comicId)
+                                              .collection('comments')
+                                              .doc(commentId)
+                                              .collection('likes')
+                                              .doc(
+                                                FirebaseAuth
+                                                    .instance
+                                                    .currentUser!
+                                                    .uid,
+                                              )
+                                              .snapshots(),
+                                          builder: (context, snapshot) {
+                                            final isLike =
+                                                snapshot.data?.exists ?? false;
+                                            return GestureDetector(
+                                              onTap: () async {
+                                                final userId = FirebaseAuth
+                                                    .instance
+                                                    .currentUser!
+                                                    .uid;
+                                                final likeRef =
+                                                    FirebaseFirestore.instance
+                                                        .collection('Comments')
+                                                        .doc(widget.comicId)
+                                                        .collection('comments')
+                                                        .doc(commentId)
+                                                        .collection('likes')
+                                                        .doc(userId);
+                                                if (isLike) {
+                                                  await Future.wait([
+                                                    likeRef.delete(),
+                                                    FirebaseFirestore.instance
+                                                        .collection('Comments')
+                                                        .doc(widget.comicId)
+                                                        .collection('comments')
+                                                        .doc(commentId)
+                                                        .update({
+                                                          'like':
+                                                              FieldValue.increment(
+                                                                -1,
+                                                              ),
+                                                        }),
+                                                  ]);
+                                                } else {
+                                                  await Future.wait([
+                                                    likeRef.set({
+                                                      'userId': userId,
+                                                    }),
+                                                    FirebaseFirestore.instance
+                                                        .collection('Comments')
+                                                        .doc(widget.comicId)
+                                                        .collection('comments')
+                                                        .doc(commentId)
+                                                        .update({
+                                                          'like':
+                                                              FieldValue.increment(
+                                                                1,
+                                                              ),
+                                                        }),
+                                                  ]);
+                                                }
+                                              },
+                                              child: Row(
+                                                children: [
+                                                  !isLike
+                                                      ? Icon(
+                                                          Icons
+                                                              .thumb_up_off_alt_outlined,
+                                                          size: 20,
+                                                          color: OkLab(
+                                                            0.55,
+                                                            0,
+                                                            -0.03,
+                                                          ).toColor(),
+                                                          fontWeight:
+                                                              FontWeight.w600,
+                                                        )
+                                                      : Text(
+                                                          '👍',
+                                                          style: TextStyle(
+                                                            fontSize: 20,
+                                                          ),
+                                                        ),
+                                                  SizedBox(width: 5),
+                                                  Text(
+                                                    'Thích',
+                                                    style: TextStyle(
+                                                      color: !isLike
+                                                          ? OkLab(
+                                                              0.55,
+                                                              0,
+                                                              -0.03,
+                                                            ).toColor()
+                                                          : OkLab(
+                                                              0.62,
+                                                              -0.04,
+                                                              -0.21,
+                                                            ).toColor(),
+                                                      fontWeight:
+                                                          FontWeight.w600,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            );
+                                          },
+                                        ),
+                                        SizedBox(width: 20),
+                                        GestureDetector(
+                                          onTap: () {},
+                                          child: Row(
+                                            children: [
+                                              Icon(
+                                                Icons.chat_bubble_outline_sharp,
+                                                size: 20,
+                                                color: OkLab(
+                                                  0.55,
+                                                  0,
+                                                  -0.03,
+                                                ).toColor(),
+                                                fontWeight: FontWeight.w600,
+                                              ),
+                                              SizedBox(width: 5),
+                                              Text(
+                                                'Trả lời',
+                                                style: TextStyle(
+                                                  color: OkLab(
                                                     0.55,
                                                     0,
                                                     -0.03,
                                                   ).toColor(),
-                                          ),
-                                        ),
-                                        SizedBox(height: 5),
-                                        Container(
-                                          padding: EdgeInsets.symmetric(
-                                            horizontal: 12,
-                                            vertical: 8,
-                                          ),
-                                          decoration: BoxDecoration(
-                                            color: isDark
-                                                ? OkLab(
-                                                    0.28,
-                                                    -0.01,
-                                                    -0.03,
-                                                  ).toColor()
-                                                : OkLab(0.98, 0, 0).toColor(),
-                                            borderRadius: BorderRadius.only(
-                                              bottomLeft: Radius.circular(15),
-                                              bottomRight: Radius.circular(15),
-                                              topRight: Radius.circular(15),
-                                            ),
-                                          ),
-                                          child: Text(
-                                            content,
-                                            style: TextStyle(
-                                              color: isDark
-                                                  ? OkLab(
-                                                      0.71,
-                                                      0,
-                                                      -0.02,
-                                                    ).toColor()
-                                                  : OkLab(
-                                                      0.45,
-                                                      -0.01,
-                                                      -0.03,
-                                                    ).toColor(),
-                                            ),
+                                                  fontWeight: FontWeight.w600,
+                                                ),
+                                              ),
+                                            ],
                                           ),
                                         ),
                                       ],
                                     ),
-                                  ),
-                                ],
-                              ),
-                              SizedBox(height: 15),
-                              Divider(
-                                thickness: 1,
-                                color: isDark
-                                    ? OkLab(0.28, -0.01, -0.03).toColor()
-                                    : Colors.grey,
+                                  ],
+                                ),
                               ),
                             ],
                           ),
-                        );
-                      },
+                          SizedBox(height: 15),
+                          Divider(
+                            thickness: 1,
+                            color: isDark
+                                ? OkLab(0.28, -0.01, -0.03).toColor()
+                                : Colors.grey,
+                          ),
+                        ],
+                      ),
                     );
                   },
                 );
