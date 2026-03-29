@@ -42,9 +42,12 @@ class LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Provider.of<ThemeProvider>(context).themeMode == ThemeMode.dark;
+    final isDark =
+        Provider.of<ThemeProvider>(context).themeMode == ThemeMode.dark;
 
-    final gradient = isDark ? AppColorsDark.gradientBackground : AppColorsLight.gradientBackground;
+    final gradient = isDark
+        ? AppColorsDark.gradientBackground
+        : AppColorsLight.gradientBackground;
 
     return Stack(
       children: [
@@ -60,7 +63,10 @@ class LoginPageState extends State<LoginPage> {
                     onPressed: () {
                       Navigator.pop(context);
                     },
-                    icon: Icon(Icons.arrow_back, color: isDark ? Colors.white : Colors.black),
+                    icon: Icon(
+                      Icons.arrow_back,
+                      color: isDark ? Colors.white : Colors.black,
+                    ),
                   ),
                 ),
                 body: Container(
@@ -76,7 +82,12 @@ class LoginPageState extends State<LoginPage> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               ClipOval(
-                                child: Image.asset('assets/images/logo.png', width: 70, height: 70, fit: BoxFit.cover),
+                                child: Image.asset(
+                                  'assets/images/logo.png',
+                                  width: 70,
+                                  height: 70,
+                                  fit: BoxFit.cover,
+                                ),
                               ),
                               SizedBox(width: 10),
                               Text(
@@ -85,7 +96,9 @@ class LoginPageState extends State<LoginPage> {
                                   fontSize: 50,
                                   fontFamily: 'Brush_Script_MT_Italic',
                                   fontWeight: FontWeight.bold,
-                                  color: isDark ? Color.fromRGBO(246, 51, 154, 1.0) : Color.fromRGBO(230, 0, 118, 1.0),
+                                  color: isDark
+                                      ? Color.fromRGBO(246, 51, 154, 1.0)
+                                      : Color.fromRGBO(230, 0, 118, 1.0),
                                 ),
                               ),
                             ],
@@ -99,7 +112,9 @@ class LoginPageState extends State<LoginPage> {
                                 Container(
                                   width: 300,
                                   decoration: BoxDecoration(
-                                    color: isDark ? Colors.black : Colors.pink.shade100,
+                                    color: isDark
+                                        ? Colors.black
+                                        : Colors.pink.shade100,
                                     borderRadius: BorderRadius.circular(30),
                                   ),
                                   child: Row(
@@ -115,11 +130,21 @@ class LoginPageState extends State<LoginPage> {
                                             });
                                           },
                                           child: Container(
-                                            margin: EdgeInsets.fromLTRB(4, 4, 0, 4),
-                                            padding: EdgeInsets.symmetric(vertical: 12),
+                                            margin: EdgeInsets.fromLTRB(
+                                              4,
+                                              4,
+                                              0,
+                                              4,
+                                            ),
+                                            padding: EdgeInsets.symmetric(
+                                              vertical: 12,
+                                            ),
                                             decoration: BoxDecoration(
-                                              color: isLogin ? Colors.white : Colors.transparent,
-                                              borderRadius: BorderRadius.circular(30),
+                                              color: isLogin
+                                                  ? Colors.white
+                                                  : Colors.transparent,
+                                              borderRadius:
+                                                  BorderRadius.circular(30),
                                             ),
                                             child: Center(
                                               child: Text(
@@ -127,7 +152,12 @@ class LoginPageState extends State<LoginPage> {
                                                 style: TextStyle(
                                                   fontWeight: FontWeight.bold,
                                                   color: isLogin
-                                                      ? Color.fromRGBO(130, 0, 219, 1.0)
+                                                      ? Color.fromRGBO(
+                                                          130,
+                                                          0,
+                                                          219,
+                                                          1.0,
+                                                        )
                                                       : isDark
                                                       ? Colors.grey
                                                       : Colors.black54,
@@ -147,11 +177,21 @@ class LoginPageState extends State<LoginPage> {
                                             });
                                           },
                                           child: Container(
-                                            margin: EdgeInsets.fromLTRB(0, 4, 4, 4),
-                                            padding: EdgeInsets.symmetric(vertical: 12),
+                                            margin: EdgeInsets.fromLTRB(
+                                              0,
+                                              4,
+                                              4,
+                                              4,
+                                            ),
+                                            padding: EdgeInsets.symmetric(
+                                              vertical: 12,
+                                            ),
                                             decoration: BoxDecoration(
-                                              color: !isLogin ? Colors.white : Colors.transparent,
-                                              borderRadius: BorderRadius.circular(30),
+                                              color: !isLogin
+                                                  ? Colors.white
+                                                  : Colors.transparent,
+                                              borderRadius:
+                                                  BorderRadius.circular(30),
                                             ),
                                             child: Center(
                                               child: Text(
@@ -159,7 +199,12 @@ class LoginPageState extends State<LoginPage> {
                                                 style: TextStyle(
                                                   fontWeight: FontWeight.bold,
                                                   color: !isLogin
-                                                      ? Color.fromRGBO(130, 0, 219, 1.0)
+                                                      ? Color.fromRGBO(
+                                                          130,
+                                                          0,
+                                                          219,
+                                                          1.0,
+                                                        )
                                                       : isDark
                                                       ? Colors.grey
                                                       : Colors.black54,
@@ -183,7 +228,12 @@ class LoginPageState extends State<LoginPage> {
                             decoration: BoxDecoration(
                               color: !isDark ? Colors.white : Colors.black87,
                               borderRadius: BorderRadius.circular(20),
-                              boxShadow: [BoxShadow(blurRadius: 10, color: !isDark ? Colors.black12 : Colors.grey)],
+                              boxShadow: [
+                                BoxShadow(
+                                  blurRadius: 10,
+                                  color: !isDark ? Colors.black12 : Colors.grey,
+                                ),
+                              ],
                             ),
                             child: Column(
                               children: [
@@ -194,8 +244,18 @@ class LoginPageState extends State<LoginPage> {
                                             'Quên mật khẩu',
                                             style: TextStyle(
                                               color: !isDark
-                                                  ? Color.fromRGBO(130, 0, 219, 1.0)
-                                                  : Color.fromRGBO(255, 121, 172, 1),
+                                                  ? Color.fromRGBO(
+                                                      130,
+                                                      0,
+                                                      219,
+                                                      1.0,
+                                                    )
+                                                  : Color.fromRGBO(
+                                                      255,
+                                                      121,
+                                                      172,
+                                                      1,
+                                                    ),
                                               fontSize: 24,
                                               fontWeight: FontWeight.bold,
                                             ),
@@ -204,7 +264,9 @@ class LoginPageState extends State<LoginPage> {
                                           Text(
                                             'Nhập email của bạn chúng tôi sẽ gửi link để khôi phục mật khẩu cho bạn.',
                                             style: TextStyle(
-                                              color: !isDark ? Colors.black45 : Colors.grey,
+                                              color: !isDark
+                                                  ? Colors.black45
+                                                  : Colors.grey,
                                               fontSize: 14,
                                             ),
                                             textAlign: TextAlign.center,
@@ -218,8 +280,18 @@ class LoginPageState extends State<LoginPage> {
                                             'Chào mừng trở lại',
                                             style: TextStyle(
                                               color: !isDark
-                                                  ? Color.fromRGBO(130, 0, 219, 1.0)
-                                                  : Color.fromRGBO(255, 121, 172, 1),
+                                                  ? Color.fromRGBO(
+                                                      130,
+                                                      0,
+                                                      219,
+                                                      1.0,
+                                                    )
+                                                  : Color.fromRGBO(
+                                                      255,
+                                                      121,
+                                                      172,
+                                                      1,
+                                                    ),
                                               fontSize: 24,
                                               fontWeight: FontWeight.bold,
                                             ),
@@ -228,7 +300,9 @@ class LoginPageState extends State<LoginPage> {
                                           Text(
                                             'Đăng nhập vào tài khoản của bạn để tiếp tục đọc truyện yêu thích',
                                             style: TextStyle(
-                                              color: !isDark ? Colors.black45 : Colors.grey,
+                                              color: !isDark
+                                                  ? Colors.black45
+                                                  : Colors.grey,
                                               fontSize: 14,
                                             ),
                                             textAlign: TextAlign.center,
@@ -241,8 +315,18 @@ class LoginPageState extends State<LoginPage> {
                                             'Tạo tài khoản',
                                             style: TextStyle(
                                               color: !isDark
-                                                  ? Color.fromRGBO(130, 0, 219, 1.0)
-                                                  : Color.fromRGBO(255, 121, 172, 1),
+                                                  ? Color.fromRGBO(
+                                                      130,
+                                                      0,
+                                                      219,
+                                                      1.0,
+                                                    )
+                                                  : Color.fromRGBO(
+                                                      255,
+                                                      121,
+                                                      172,
+                                                      1,
+                                                    ),
                                               fontSize: 24,
                                               fontWeight: FontWeight.bold,
                                             ),
@@ -251,7 +335,9 @@ class LoginPageState extends State<LoginPage> {
                                           Text(
                                             'Tham gia cộng đồng yêu thích truyện tranh của chúng tôi',
                                             style: TextStyle(
-                                              color: !isDark ? Colors.black45 : Colors.grey,
+                                              color: !isDark
+                                                  ? Colors.black45
+                                                  : Colors.grey,
                                               fontSize: 14,
                                             ),
                                             textAlign: TextAlign.center,
@@ -266,7 +352,9 @@ class LoginPageState extends State<LoginPage> {
                                       style: TextStyle(
                                         fontWeight: FontWeight.bold,
                                         fontSize: 16,
-                                        color: !isDark ? Colors.black : Colors.white,
+                                        color: !isDark
+                                            ? Colors.black
+                                            : Colors.white,
                                       ),
                                     ),
                                   ],
@@ -274,18 +362,37 @@ class LoginPageState extends State<LoginPage> {
                                 SizedBox(height: 5),
                                 TextField(
                                   controller: emailController,
-                                  style: TextStyle(color: !isDark ? Colors.black : Colors.white),
+                                  style: TextStyle(
+                                    color: !isDark
+                                        ? Colors.black
+                                        : Colors.white,
+                                  ),
                                   decoration: InputDecoration(
                                     hintText: 'abcxyz@gmail.com',
                                     hintStyle: TextStyle(color: Colors.grey),
                                     prefixIcon: Icon(Icons.email),
                                     enabledBorder: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(15),
-                                      borderSide: BorderSide(color: Color.fromRGBO(246, 51, 154, 1.0)),
+                                      borderSide: BorderSide(
+                                        color: Color.fromRGBO(
+                                          246,
+                                          51,
+                                          154,
+                                          1.0,
+                                        ),
+                                      ),
                                     ),
                                     focusedBorder: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(15),
-                                      borderSide: BorderSide(color: Color.fromRGBO(246, 51, 154, 1.0), width: 3.0),
+                                      borderSide: BorderSide(
+                                        color: Color.fromRGBO(
+                                          246,
+                                          51,
+                                          154,
+                                          1.0,
+                                        ),
+                                        width: 3.0,
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -302,7 +409,9 @@ class LoginPageState extends State<LoginPage> {
                                                   style: TextStyle(
                                                     fontWeight: FontWeight.bold,
                                                     fontSize: 16,
-                                                    color: !isDark ? Colors.black : Colors.white,
+                                                    color: !isDark
+                                                        ? Colors.black
+                                                        : Colors.white,
                                                   ),
                                                 ),
                                               ),
@@ -312,15 +421,23 @@ class LoginPageState extends State<LoginPage> {
                                                       child: GestureDetector(
                                                         onTap: () {
                                                           setState(() {
-                                                            isForgot = !isForgot;
-                                                            emailController.clear();
+                                                            isForgot =
+                                                                !isForgot;
+                                                            emailController
+                                                                .clear();
                                                           });
                                                         },
                                                         child: Text(
                                                           'Quên mật khẩu',
                                                           style: TextStyle(
                                                             fontSize: 14,
-                                                            color: Color.fromRGBO(246, 51, 154, 1.0),
+                                                            color:
+                                                                Color.fromRGBO(
+                                                                  246,
+                                                                  51,
+                                                                  154,
+                                                                  1.0,
+                                                                ),
                                                           ),
                                                         ),
                                                       ),
@@ -331,32 +448,57 @@ class LoginPageState extends State<LoginPage> {
                                           SizedBox(height: 5),
                                           TextField(
                                             controller: passController,
-                                            style: TextStyle(color: !isDark ? Colors.black : Colors.white),
+                                            style: TextStyle(
+                                              color: !isDark
+                                                  ? Colors.black
+                                                  : Colors.white,
+                                            ),
                                             obscureText: obscurePassword,
                                             decoration: InputDecoration(
                                               enabledBorder: OutlineInputBorder(
-                                                borderRadius: BorderRadius.circular(15),
-                                                borderSide: BorderSide(color: Color.fromRGBO(246, 51, 154, 1.0)),
+                                                borderRadius:
+                                                    BorderRadius.circular(15),
+                                                borderSide: BorderSide(
+                                                  color: Color.fromRGBO(
+                                                    246,
+                                                    51,
+                                                    154,
+                                                    1.0,
+                                                  ),
+                                                ),
                                               ),
                                               focusedBorder: OutlineInputBorder(
-                                                borderRadius: BorderRadius.circular(15),
+                                                borderRadius:
+                                                    BorderRadius.circular(15),
                                                 borderSide: BorderSide(
-                                                  color: Color.fromRGBO(246, 51, 154, 1.0),
+                                                  color: Color.fromRGBO(
+                                                    246,
+                                                    51,
+                                                    154,
+                                                    1.0,
+                                                  ),
                                                   width: 3.0,
                                                 ),
                                               ),
 
                                               hintText: '••••••••',
-                                              hintStyle: TextStyle(color: Colors.grey),
+                                              hintStyle: TextStyle(
+                                                color: Colors.grey,
+                                              ),
                                               prefixIcon: Icon(Icons.lock),
 
                                               suffixIcon: IconButton(
                                                 onPressed: () {
                                                   setState(() {
-                                                    obscurePassword = !obscurePassword;
+                                                    obscurePassword =
+                                                        !obscurePassword;
                                                   });
                                                 },
-                                                icon: Icon(obscurePassword ? Icons.visibility_off : Icons.visibility),
+                                                icon: Icon(
+                                                  obscurePassword
+                                                      ? Icons.visibility_off
+                                                      : Icons.visibility,
+                                                ),
                                               ),
                                             ),
                                           ),
@@ -375,30 +517,52 @@ class LoginPageState extends State<LoginPage> {
                                                 style: TextStyle(
                                                   fontWeight: FontWeight.bold,
                                                   fontSize: 16,
-                                                  color: !isDark ? Colors.black : Colors.white,
+                                                  color: !isDark
+                                                      ? Colors.black
+                                                      : Colors.white,
                                                 ),
                                               ),
                                             ],
                                           ),
                                           SizedBox(height: 5),
                                           TextField(
-                                            style: TextStyle(color: !isDark ? Colors.black : Colors.white),
+                                            style: TextStyle(
+                                              color: !isDark
+                                                  ? Colors.black
+                                                  : Colors.white,
+                                            ),
                                             controller: rePassController,
                                             obscureText: obscurePassword,
                                             decoration: InputDecoration(
                                               enabledBorder: OutlineInputBorder(
-                                                borderRadius: BorderRadius.circular(15),
-                                                borderSide: BorderSide(color: Color.fromRGBO(246, 51, 154, 1.0)),
+                                                borderRadius:
+                                                    BorderRadius.circular(15),
+                                                borderSide: BorderSide(
+                                                  color: Color.fromRGBO(
+                                                    246,
+                                                    51,
+                                                    154,
+                                                    1.0,
+                                                  ),
+                                                ),
                                               ),
                                               focusedBorder: OutlineInputBorder(
-                                                borderRadius: BorderRadius.circular(15),
+                                                borderRadius:
+                                                    BorderRadius.circular(15),
                                                 borderSide: BorderSide(
-                                                  color: Color.fromRGBO(246, 51, 154, 1.0),
+                                                  color: Color.fromRGBO(
+                                                    246,
+                                                    51,
+                                                    154,
+                                                    1.0,
+                                                  ),
                                                   width: 3.0,
                                                 ),
                                               ),
                                               hintText: '••••••••',
-                                              hintStyle: TextStyle(color: Colors.grey),
+                                              hintStyle: TextStyle(
+                                                color: Colors.grey,
+                                              ),
                                               prefixIcon: Icon(Icons.lock),
                                             ),
                                           ),
@@ -412,19 +576,41 @@ class LoginPageState extends State<LoginPage> {
                                                   });
                                                 },
                                                 shape: CircleBorder(),
-                                                side: BorderSide(color: Color.fromRGBO(246, 51, 154, 1.0), width: 2),
+                                                side: BorderSide(
+                                                  color: Color.fromRGBO(
+                                                    246,
+                                                    51,
+                                                    154,
+                                                    1.0,
+                                                  ),
+                                                  width: 2,
+                                                ),
 
-                                                fillColor: WidgetStateProperty.resolveWith<Color>((states) {
-                                                  if (states.contains(WidgetState.selected)) {
-                                                    return Color.fromRGBO(246, 51, 154, 1.0);
-                                                  }
-                                                  return Colors.white;
-                                                }),
+                                                fillColor:
+                                                    WidgetStateProperty.resolveWith<
+                                                      Color
+                                                    >((states) {
+                                                      if (states.contains(
+                                                        WidgetState.selected,
+                                                      )) {
+                                                        return Color.fromRGBO(
+                                                          246,
+                                                          51,
+                                                          154,
+                                                          1.0,
+                                                        );
+                                                      }
+                                                      return Colors.white;
+                                                    }),
                                               ),
                                               Expanded(
                                                 child: Text(
                                                   'Tôi đồng ý với điều khoản dịch vụ',
-                                                  style: TextStyle(color: !isDark ? Colors.black : Colors.white),
+                                                  style: TextStyle(
+                                                    color: !isDark
+                                                        ? Colors.black
+                                                        : Colors.white,
+                                                  ),
                                                 ),
                                               ),
                                             ],
@@ -436,20 +622,37 @@ class LoginPageState extends State<LoginPage> {
                                   child: ElevatedButton(
                                     onPressed: isForgot
                                         ? () async {
-                                            if (!emailController.text.trim().endsWith('@gmail.com')) {
-                                              ScaffoldMessenger.of(context).showSnackBar(
-                                                SnackBar(content: Text('Email không hợp lệ, Email phải có đuôi gmail')),
+                                            if (!emailController.text
+                                                .trim()
+                                                .endsWith('@gmail.com')) {
+                                              ScaffoldMessenger.of(
+                                                context,
+                                              ).showSnackBar(
+                                                SnackBar(
+                                                  content: Text(
+                                                    'Email không hợp lệ, Email phải có đuôi gmail',
+                                                  ),
+                                                ),
                                               );
                                             } else {
                                               try {
                                                 setState(() {
                                                   isLoading = true;
                                                 });
-                                                await FirebaseAuth.instance.sendPasswordResetEmail(
-                                                  email: emailController.text.trim(),
-                                                );
-                                                ScaffoldMessenger.of(context).showSnackBar(
-                                                  SnackBar(content: Text('Đã gửi email khôi phục mật khẩu')),
+                                                await FirebaseAuth.instance
+                                                    .sendPasswordResetEmail(
+                                                      email: emailController
+                                                          .text
+                                                          .trim(),
+                                                    );
+                                                ScaffoldMessenger.of(
+                                                  context,
+                                                ).showSnackBar(
+                                                  SnackBar(
+                                                    content: Text(
+                                                      'Đã gửi email khôi phục mật khẩu',
+                                                    ),
+                                                  ),
                                                 );
                                                 setState(() {
                                                   isForgot = false;
@@ -457,19 +660,38 @@ class LoginPageState extends State<LoginPage> {
                                                   isLoading = false;
                                                   emailController.clear();
                                                 });
-                                              } on FirebaseAuthException catch (e) {
+                                              } on FirebaseAuthException catch (
+                                                e
+                                              ) {
                                                 ScaffoldMessenger.of(
                                                   context,
-                                                ).showSnackBar(SnackBar(content: Text(e.message ?? 'Lỗi gửi email')));
+                                                ).showSnackBar(
+                                                  SnackBar(
+                                                    content: Text(
+                                                      e.message ??
+                                                          'Lỗi gửi email',
+                                                    ),
+                                                  ),
+                                                );
                                               }
                                             }
                                           }
                                         : isLogin
                                         ? () async {
-                                            if (emailController.text.trim().isEmpty ||
-                                                passController.text.trim().isEmpty) {
-                                              ScaffoldMessenger.of(context).showSnackBar(
-                                                SnackBar(content: Text('Vui lòng điền đầy đủ thông tin để đăng nhập')),
+                                            if (emailController.text
+                                                    .trim()
+                                                    .isEmpty ||
+                                                passController.text
+                                                    .trim()
+                                                    .isEmpty) {
+                                              ScaffoldMessenger.of(
+                                                context,
+                                              ).showSnackBar(
+                                                SnackBar(
+                                                  content: Text(
+                                                    'Vui lòng điền đầy đủ thông tin để đăng nhập',
+                                                  ),
+                                                ),
                                               );
                                               return;
                                             }
@@ -478,52 +700,89 @@ class LoginPageState extends State<LoginPage> {
                                               setState(() {
                                                 isLoading = true;
                                               });
-                                              await FirebaseAuth.instance.signInWithEmailAndPassword(
-                                                email: emailController.text.trim(),
-                                                password: passController.text.trim(),
-                                              );
+                                              await FirebaseAuth.instance
+                                                  .signInWithEmailAndPassword(
+                                                    email: emailController.text
+                                                        .trim(),
+                                                    password: passController
+                                                        .text
+                                                        .trim(),
+                                                  );
 
                                               Navigator.pushAndRemoveUntil(
                                                 context,
-                                                MaterialPageRoute(builder: (context) => MainScreen()),
+                                                MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      MainScreen(),
+                                                ),
                                                 (Route<dynamic> route) => false,
                                               );
                                               setState(() {
                                                 isLoading = false;
                                               });
-                                            } on FirebaseAuthException catch (e) {
+                                            } on FirebaseAuthException catch (
+                                              e
+                                            ) {
                                               setState(() {
                                                 isLoading = false;
                                               });
-                                              ScaffoldMessenger.of(context).showSnackBar(
-                                                SnackBar(content: Text(e.message ?? "Đăng nhập thất bại")),
+                                              ScaffoldMessenger.of(
+                                                context,
+                                              ).showSnackBar(
+                                                SnackBar(
+                                                  content: Text(
+                                                    e.message ??
+                                                        "Đăng nhập thất bại",
+                                                  ),
+                                                ),
                                               );
                                             }
                                           }
                                         : (isChecked
                                               ? () async {
-                                                  if (!emailController.text.trim().endsWith('@gmail.com')) {
-                                                    ScaffoldMessenger.of(context).showSnackBar(
+                                                  if (!emailController.text
+                                                      .trim()
+                                                      .endsWith('@gmail.com')) {
+                                                    ScaffoldMessenger.of(
+                                                      context,
+                                                    ).showSnackBar(
                                                       SnackBar(
-                                                        content: Text('Email không hợp lệ, Email phải có đuôi gmail'),
+                                                        content: Text(
+                                                          'Email không hợp lệ, Email phải có đuôi gmail',
+                                                        ),
                                                       ),
                                                     );
                                                   }
 
-                                                  if (passController.text != rePassController.text) {
-                                                    ScaffoldMessenger.of(context).showSnackBar(
+                                                  if (passController.text !=
+                                                      rePassController.text) {
+                                                    ScaffoldMessenger.of(
+                                                      context,
+                                                    ).showSnackBar(
                                                       SnackBar(
-                                                        content: Text('Mật khẩu không trùng với Xác nhận mật khẩu'),
+                                                        content: Text(
+                                                          'Mật khẩu không trùng với Xác nhận mật khẩu',
+                                                        ),
                                                       ),
                                                     );
                                                   }
 
-                                                  if (emailController.text.trim().isEmpty ||
-                                                      passController.text.isEmpty ||
-                                                      rePassController.text.isEmpty) {
-                                                    ScaffoldMessenger.of(context).showSnackBar(
+                                                  if (emailController.text
+                                                          .trim()
+                                                          .isEmpty ||
+                                                      passController
+                                                          .text
+                                                          .isEmpty ||
+                                                      rePassController
+                                                          .text
+                                                          .isEmpty) {
+                                                    ScaffoldMessenger.of(
+                                                      context,
+                                                    ).showSnackBar(
                                                       SnackBar(
-                                                        content: Text('Vui lòng điền đầy đủ thông tin để đăng ký'),
+                                                        content: Text(
+                                                          'Vui lòng điền đầy đủ thông tin để đăng ký',
+                                                        ),
                                                       ),
                                                     );
                                                     return;
@@ -532,59 +791,112 @@ class LoginPageState extends State<LoginPage> {
                                                       setState(() {
                                                         isLoading = true;
                                                       });
-                                                      await FirebaseAuth.instance.createUserWithEmailAndPassword(
-                                                        email: emailController.text.trim(),
-                                                        password: passController.text.trim(),
-                                                      );
-                                                      await FirebaseFirestore.instance
+                                                      await FirebaseAuth
+                                                          .instance
+                                                          .createUserWithEmailAndPassword(
+                                                            email:
+                                                                emailController
+                                                                    .text
+                                                                    .trim(),
+                                                            password:
+                                                                passController
+                                                                    .text
+                                                                    .trim(),
+                                                          );
+                                                      await FirebaseFirestore
+                                                          .instance
                                                           .collection("Users")
-                                                          .doc(FirebaseAuth.instance.currentUser!.uid)
+                                                          .doc(
+                                                            FirebaseAuth
+                                                                .instance
+                                                                .currentUser!
+                                                                .uid,
+                                                          )
                                                           .set({
-                                                            'email': emailController.text.trim(),
-                                                            'password': passController.text,
-                                                            'uid': FirebaseAuth.instance.currentUser!.uid,
-                                                            'name': 'Người dùng mới',
-                                                            'theme': isDark ? 'dark' : 'light',
+                                                            'email':
+                                                                emailController
+                                                                    .text
+                                                                    .trim(),
+                                                            'password':
+                                                                passController
+                                                                    .text,
+                                                            'uid': FirebaseAuth
+                                                                .instance
+                                                                .currentUser!
+                                                                .uid,
+                                                            'name':
+                                                                'Người dùng mới',
+                                                            'theme': isDark
+                                                                ? 'dark'
+                                                                : 'light',
                                                             'gender': '',
-                                                            'avatar': '',
+                                                            'avatar':
+                                                                'https://res.cloudinary.com/dxbtuad7u/image/upload/v1774780859/logo_eehlrv.png',
                                                           });
                                                       ScaffoldMessenger.of(
                                                         context,
-                                                      ).showSnackBar(SnackBar(content: Text("Đăng ký thành công")));
+                                                      ).showSnackBar(
+                                                        SnackBar(
+                                                          content: Text(
+                                                            "Đăng ký thành công",
+                                                          ),
+                                                        ),
+                                                      );
 
                                                       setState(() {
                                                         isLogin = true;
                                                         isLoading = false;
                                                       });
-                                                    } on FirebaseAuthException catch (e) {
+                                                    } on FirebaseAuthException catch (
+                                                      e
+                                                    ) {
                                                       String message;
                                                       switch (e.code) {
                                                         case 'email-already-in-use':
-                                                          message = 'Email đã được sử dụng';
+                                                          message =
+                                                              'Email đã được sử dụng';
                                                           break;
                                                         case 'invalid-email':
-                                                          message = 'Email không hợp lệ';
+                                                          message =
+                                                              'Email không hợp lệ';
                                                           break;
                                                         case 'weak-password':
-                                                          message = 'Mật khẩu quá yếu';
+                                                          message =
+                                                              'Mật khẩu quá yếu';
                                                           break;
                                                         default:
-                                                          message = 'Đã có lỗi xảy ra, vui lòng thử lại';
+                                                          message =
+                                                              'Đã có lỗi xảy ra, vui lòng thử lại';
                                                       }
                                                       setState(() {
                                                         isLoading = false;
                                                       });
                                                       ScaffoldMessenger.of(
                                                         context,
-                                                      ).showSnackBar(SnackBar(content: Text(message)));
+                                                      ).showSnackBar(
+                                                        SnackBar(
+                                                          content: Text(
+                                                            message,
+                                                          ),
+                                                        ),
+                                                      );
                                                     }
                                                   }
                                                 }
                                               : null),
                                     style: ElevatedButton.styleFrom(
-                                      backgroundColor: Color.fromRGBO(246, 51, 154, 1.0),
-                                      padding: EdgeInsets.symmetric(vertical: 10),
-                                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                                      backgroundColor: Color.fromRGBO(
+                                        246,
+                                        51,
+                                        154,
+                                        1.0,
+                                      ),
+                                      padding: EdgeInsets.symmetric(
+                                        vertical: 10,
+                                      ),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(15),
+                                      ),
                                     ),
                                     child: Text(
                                       isForgot
@@ -592,7 +904,10 @@ class LoginPageState extends State<LoginPage> {
                                           : isLogin
                                           ? 'Đăng nhập'
                                           : 'Đăng ký',
-                                      style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.bold,
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -603,7 +918,14 @@ class LoginPageState extends State<LoginPage> {
                                       GestureDetector(
                                         child: Text(
                                           'Quay lại đăng nhập',
-                                          style: TextStyle(color: Color.fromRGBO(246, 51, 154, 1.0)),
+                                          style: TextStyle(
+                                            color: Color.fromRGBO(
+                                              246,
+                                              51,
+                                              154,
+                                              1.0,
+                                            ),
+                                          ),
                                         ),
                                         onTap: () {
                                           setState(() {
@@ -646,13 +968,22 @@ class logoWidget extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        ClipOval(child: Image.asset('assets/images/logo.png', width: 70, height: 70, fit: BoxFit.cover)),
+        ClipOval(
+          child: Image.asset(
+            'assets/images/logo.png',
+            width: 70,
+            height: 70,
+            fit: BoxFit.cover,
+          ),
+        ),
         Text(
           '  Comic Garden',
           style: TextStyle(
             fontSize: 24,
             fontWeight: FontWeight.bold,
-            color: isDark ? Color.fromRGBO(246, 51, 154, 1.0) : Color.fromRGBO(230, 0, 118, 1.0),
+            color: isDark
+                ? Color.fromRGBO(246, 51, 154, 1.0)
+                : Color.fromRGBO(230, 0, 118, 1.0),
           ),
         ),
       ],
