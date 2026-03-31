@@ -18,21 +18,38 @@ class CommentSection extends StatefulWidget {
 
 class _CommentSectionState extends State<CommentSection> {
   final TextEditingController controller = TextEditingController();
-
   final Map<String, TextEditingController> _replyControllers = {};
 
   String? replyingCommentId;
   String? replyingUserId;
   String? replyingUserName;
+
   Map<String, bool> showReplyInput = {};
   Map<String, bool> showReplies = {};
+
   String nameFS = "";
   String imgUrl = "";
   bool isLoading = true;
   bool isLike = false;
 
-  String formatTime(DateTime time) {
-    return "${time.hour}:${time.minute} - ${time.day}/${time.month}/${time.year}";
+  CollectionReference get _commentRef => FirebaseFirestore.instance
+      .collection('Comments')
+      .doc(widget.comicId)
+      .collection('comments');
+
+  @override
+  initState() {
+    super.initState();
+    getUserData();
+  }
+
+  @override
+  void dispose() {
+    controller.dispose();
+    for (var c in _replyControllers.values) {
+      c.dispose();
+    }
+    super.dispose();
   }
 
   Future<void> getUserData() async {
@@ -48,75 +65,40 @@ class _CommentSectionState extends State<CommentSection> {
     });
   }
 
-  @override
-  void dispose() {
-    controller.dispose();
-    for (var c in _replyControllers.values) {
-      c.dispose();
-    }
-    super.dispose();
-  }
-
-  @override
-  initState() {
-    super.initState();
-    getUserData();
-  }
-
   Future<void> addComment() async {
-    setState(() {
-      isLoading = true;
-    });
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) return;
+    if (controller.text.trim().isEmpty) return;
 
-    if (controller.text.trim().isEmpty) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Vui lòng nhập nội dung')));
-      setState(() {
-        isLoading = false;
-      });
-      return;
-    }
+    setState(() => isLoading = true);
+
     if (replyingCommentId != null) {
-      await FirebaseFirestore.instance
-          .collection('Comments')
-          .doc(widget.comicId)
-          .collection('comments')
-          .doc(replyingCommentId)
-          .collection('replies')
-          .add({
-            'userId': user.uid,
-            'userName': nameFS,
-            'avatar': imgUrl,
-            'content': "@$replyingUserName ${controller.text.trim()}",
-            'createdAt': FieldValue.serverTimestamp(),
-            'like': 0,
-            'replyToUserId': replyingUserId,
-            'replyToUserName': replyingUserName,
-          });
+      await _commentRef.doc(replyingCommentId).collection('replies').add({
+        'userId': user.uid,
+        'userName': nameFS,
+        'avatar': imgUrl,
+        'content': "@$replyingUserName ${controller.text.trim()}",
+        'createdAt': FieldValue.serverTimestamp(),
+        'like': 0,
+        'replyToUserId': replyingUserId,
+        'replyToUserName': replyingUserName,
+      });
+
       replyingCommentId = null;
-      replyingUserName = null;
       replyingUserId = null;
+      replyingUserName = null;
     } else {
-      await FirebaseFirestore.instance
-          .collection('Comments')
-          .doc(widget.comicId)
-          .collection('comments')
-          .add({
-            'userId': user.uid,
-            'content': controller.text.trim(),
-            'createdAt': FieldValue.serverTimestamp(),
-            'userName': nameFS,
-            'avatar': imgUrl,
-            'like': 0,
-          });
+      await _commentRef.add({
+        'userId': user.uid,
+        'content': controller.text.trim(),
+        'createdAt': FieldValue.serverTimestamp(),
+        'userName': nameFS,
+        'avatar': imgUrl,
+        'like': 0,
+      });
     }
     controller.clear();
-    setState(() {
-      isLoading = false;
-    });
+    setState(() => isLoading = false);
   }
 
   @override
@@ -128,119 +110,16 @@ class _CommentSectionState extends State<CommentSection> {
       children: [
         Column(
           children: [
-            Container(
-              padding: EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: isDark
-                    ? OkLab(0.28, -0.01, -0.03).toColor().withValues(alpha: 0.5)
-                    : Colors.white,
-                borderRadius: BorderRadius.circular(15),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.3),
-                    blurRadius: 10,
-                    offset: Offset(0, 5),
-                  ),
-                ],
-              ),
-              child: Column(
-                children: [
-                  Row(
-                    children: [
-                      if (imgUrl.isEmpty)
-                        ClipOval(
-                          child: Image.asset(
-                            'assets/images/logo.png',
-                            width: 40,
-                            height: 40,
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                      if (imgUrl.isNotEmpty)
-                        ClipOval(
-                          child: Image.network(
-                            imgUrl,
-                            width: 40,
-                            height: 40,
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                      SizedBox(width: 10),
-                      Expanded(
-                        child: Text(
-                          nameFS,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                            color: isDark
-                                ? OkLab(0.83, 0.07, -0.1).toColor()
-                                : OkLab(0.63, 0.15, -0.22).toColor(),
-                            fontWeight: FontWeight.w500,
-                            fontSize: 16,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 10),
-                  TextField(
-                    controller: controller,
-                    maxLength: 2000,
-                    maxLines: 3,
-                    decoration: InputDecoration(
-                      hintText: "Nhập bình luận...",
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: 5),
-                  Align(
-                    alignment: Alignment.centerRight,
-                    child: GestureDetector(
-                      onTap: addComment,
-                      child: Container(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 8,
-                        ),
-                        decoration: BoxDecoration(
-                          color: isDark
-                              ? OkLab(0.63, 0.24, 0).toColor()
-                              : OkLab(0.75, 0.17, -0.01).toColor(),
-                          borderRadius: BorderRadius.circular(15),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text(
-                              "Đăng",
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w500,
-                                color: Colors.white,
-                              ),
-                            ),
-                            SizedBox(width: 5),
-                            Icon(
-                              Icons.arrow_forward_ios_outlined,
-                              color: Colors.white,
-                              size: 16,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
+            CommentInputBox(
+              isDark: isDark,
+              avatar: imgUrl,
+              userName: nameFS,
+              controller: controller,
+              onSubmit: addComment,
             ),
             SizedBox(height: 20),
             StreamBuilder<QuerySnapshot>(
-              stream: FirebaseFirestore.instance
-                  .collection('Comments')
-                  .doc(widget.comicId)
-                  .collection('comments')
+              stream: _commentRef
                   .orderBy('createdAt', descending: true)
                   .snapshots(),
               builder: (context, snapshot) {
@@ -283,734 +162,394 @@ class _CommentSectionState extends State<CommentSection> {
                     final like = data['like'] ?? 0;
                     final commentId = docs[index].id;
 
-                    return Container(
-                      margin: EdgeInsets.only(bottom: 10),
-                      padding: EdgeInsets.all(10),
-                      child: Column(
-                        children: [
-                          Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                    return StatefulBuilder(
+                      builder: (context, localSetState) {
+                        final isShowReplyInput =
+                            showReplyInput[commentId] ?? false;
+                        return Container(
+                          margin: EdgeInsets.only(bottom: 10),
+                          padding: EdgeInsets.all(10),
+                          child: Column(
                             children: [
-                              ClipOval(
-                                child: Image.network(
-                                  avatar,
-                                  height: 40,
-                                  width: 40,
-                                  fit: BoxFit.cover,
-                                ),
-                              ),
-                              SizedBox(width: 10),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      userName,
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.w700,
-                                        color: isDark
-                                            ? OkLab(0.83, 0.07, -0.1).toColor()
-                                            : OkLab(
-                                                0.63,
-                                                0.15,
-                                                -0.22,
-                                              ).toColor(),
-                                      ),
-                                    ),
-                                    Text(
-                                      formatTime(createdAt),
-                                      style: TextStyle(
-                                        fontSize: 11,
-                                        color: isDark
-                                            ? OkLab(0.71, 0, -0.02).toColor()
-                                            : OkLab(0.55, 0, -0.03).toColor(),
-                                      ),
-                                    ),
-                                    SizedBox(height: 5),
-                                    Container(
-                                      padding: EdgeInsets.symmetric(
-                                        horizontal: 12,
-                                        vertical: 8,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        color: isDark
-                                            ? OkLab(
-                                                0.28,
-                                                -0.01,
-                                                -0.03,
-                                              ).toColor()
-                                            : OkLab(0.98, 0, 0).toColor(),
-                                        borderRadius: BorderRadius.only(
-                                          bottomLeft: Radius.circular(15),
-                                          bottomRight: Radius.circular(15),
-                                          topRight: Radius.circular(15),
+                              Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  _buildAvatar(url: avatar),
+                                  SizedBox(width: 10),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        _userName(
+                                          nameFS: userName,
+                                          isDark: isDark,
                                         ),
-                                      ),
-                                      child: Text(
-                                        content,
-                                        style: TextStyle(
-                                          color: isDark
-                                              ? OkLab(0.71, 0, -0.02).toColor()
-                                              : OkLab(
+                                        _createdAt(
+                                          createdAt: createdAt,
+                                          isDark: isDark,
+                                        ),
+                                        SizedBox(height: 5),
+                                        _content(
+                                          isDark: isDark,
+                                          content: content,
+                                        ),
+                                        CommentActionBar(
+                                          likeCount: like,
+                                          targetRef: FirebaseFirestore.instance
+                                              .collection('Comments')
+                                              .doc(widget.comicId)
+                                              .collection('comments')
+                                              .doc(commentId),
+                                          onReplyTap: () {
+                                            localSetState(() {
+                                              replyingCommentId = commentId;
+                                              replyingUserId = data['userId'];
+                                              replyingUserName =
+                                                  data['userName'];
+                                              showReplyInput[commentId] =
+                                                  !(showReplyInput[commentId] ??
+                                                      false);
+                                            });
+                                          },
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              if (isShowReplyInput)
+                                Padding(
+                                  padding: EdgeInsets.only(top: 10, left: 50),
+                                  child: Container(
+                                    padding: EdgeInsets.all(12),
+                                    decoration: BoxDecoration(
+                                      color: isDark
+                                          ? OkLab(
+                                              0.28,
+                                              -0.01,
+                                              -0.03,
+                                            ).toColor().withValues(alpha: 0.5)
+                                          : Colors.white,
+                                      borderRadius: BorderRadius.circular(15),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.black.withValues(
+                                            alpha: 0.3,
+                                          ),
+                                          blurRadius: 10,
+                                          offset: Offset(0, 5),
+                                        ),
+                                      ],
+                                    ),
+                                    child: Column(
+                                      children: [
+                                        Row(
+                                          children: [
+                                            Text(
+                                              'Trả lời ',
+                                              style: TextStyle(
+                                                color: OkLab(
                                                   0.45,
                                                   -0.01,
                                                   -0.03,
                                                 ).toColor(),
+                                              ),
+                                            ),
+                                            Text(
+                                              '@$replyingUserName',
+                                              style: TextStyle(
+                                                color: OkLab(
+                                                  0.44,
+                                                  0.12,
+                                                  -0.18,
+                                                ).toColor(),
+                                                fontWeight: FontWeight.w700,
+                                              ),
+                                            ),
+                                          ],
                                         ),
-                                      ),
-                                    ),
-                                    Row(
-                                      children: [
-                                        if (like > 0)
-                                          Row(
-                                            children: [
-                                              Container(
+                                        SizedBox(height: 10),
+                                        Row(
+                                          children: [
+                                            _buildAvatar(url: imgUrl),
+                                            SizedBox(width: 10),
+                                            Expanded(
+                                              child: Text(
+                                                nameFS,
+                                                maxLines: 1,
+                                                overflow: TextOverflow.ellipsis,
+                                                style: TextStyle(
+                                                  color: isDark
+                                                      ? OkLab(
+                                                          0.83,
+                                                          0.07,
+                                                          -0.1,
+                                                        ).toColor()
+                                                      : OkLab(
+                                                          0.63,
+                                                          0.15,
+                                                          -0.22,
+                                                        ).toColor(),
+                                                  fontWeight: FontWeight.w500,
+                                                  fontSize: 16,
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        SizedBox(height: 10),
+                                        TextField(
+                                          controller: _replyControllers
+                                              .putIfAbsent(
+                                                commentId,
+                                                () => TextEditingController(),
+                                              ),
+                                          maxLength: 2000,
+                                          maxLines: 3,
+                                          decoration: InputDecoration(
+                                            hintText: "Nhập bình luận",
+                                            border: OutlineInputBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(10),
+                                            ),
+                                          ),
+                                        ),
+                                        SizedBox(height: 5),
+                                        Row(
+                                          children: [
+                                            Spacer(),
+                                            GestureDetector(
+                                              onTap: () {
+                                                localSetState(() {
+                                                  showReplyInput[commentId] =
+                                                      false;
+                                                  _replyControllers[commentId]
+                                                      ?.clear();
+                                                });
+                                              },
+                                              child: Container(
                                                 padding: EdgeInsets.symmetric(
-                                                  horizontal: 8,
-                                                  vertical: 4,
+                                                  horizontal: 12,
+                                                  vertical: 8,
                                                 ),
                                                 decoration: BoxDecoration(
-                                                  color: OkLab(
-                                                    0.93,
-                                                    -0.01,
-                                                    -0.03,
-                                                  ).toColor(),
+                                                  color: isDark
+                                                      ? OkLab(
+                                                          0.97,
+                                                          0,
+                                                          0,
+                                                        ).toColor().withValues(
+                                                          alpha: 0.3,
+                                                        )
+                                                      : Colors.white,
                                                   borderRadius:
-                                                      BorderRadius.circular(10),
+                                                      BorderRadius.circular(15),
+                                                  border: Border.all(
+                                                    width: 2,
+                                                    color: isDark
+                                                        ? OkLab(0.97, 0, 0)
+                                                              .toColor()
+                                                              .withValues(
+                                                                alpha: 0.3,
+                                                              )
+                                                        : OkLab(
+                                                            0.88,
+                                                            0.04,
+                                                            0,
+                                                          ).toColor(),
+                                                  ),
                                                 ),
-                                                child: Text('👍'),
-                                              ),
-                                              SizedBox(width: 5),
-                                              Text(
-                                                "$like",
-                                                style: TextStyle(fontSize: 12),
-                                              ),
-                                            ],
-                                          ),
-                                        StreamBuilder<DocumentSnapshot>(
-                                          stream: FirebaseFirestore.instance
-                                              .collection('Comments')
-                                              .doc(widget.comicId)
-                                              .collection('comments')
-                                              .doc(commentId)
-                                              .collection('likes')
-                                              .doc(
-                                                FirebaseAuth
-                                                    .instance
-                                                    .currentUser!
-                                                    .uid,
-                                              )
-                                              .snapshots(),
-                                          builder: (context, snapshot) {
-                                            final isLike =
-                                                snapshot.data?.exists ?? false;
-                                            return Padding(
-                                              padding: EdgeInsets.all(10),
-                                              child: GestureDetector(
-                                                onTap: () async {
-                                                  final userId = FirebaseAuth
-                                                      .instance
-                                                      .currentUser!
-                                                      .uid;
-                                                  final likeRef =
-                                                      FirebaseFirestore.instance
-                                                          .collection(
-                                                            'Comments',
-                                                          )
-                                                          .doc(widget.comicId)
-                                                          .collection(
-                                                            'comments',
-                                                          )
-                                                          .doc(commentId)
-                                                          .collection('likes')
-                                                          .doc(userId);
-                                                  if (isLike) {
-                                                    await Future.wait([
-                                                      likeRef.delete(),
-                                                      FirebaseFirestore.instance
-                                                          .collection(
-                                                            'Comments',
-                                                          )
-                                                          .doc(widget.comicId)
-                                                          .collection(
-                                                            'comments',
-                                                          )
-                                                          .doc(commentId)
-                                                          .update({
-                                                            'like':
-                                                                FieldValue.increment(
-                                                                  -1,
-                                                                ),
-                                                          }),
-                                                    ]);
-                                                  } else {
-                                                    await Future.wait([
-                                                      likeRef.set({
-                                                        'userId': userId,
-                                                      }),
-                                                      FirebaseFirestore.instance
-                                                          .collection(
-                                                            'Comments',
-                                                          )
-                                                          .doc(widget.comicId)
-                                                          .collection(
-                                                            'comments',
-                                                          )
-                                                          .doc(commentId)
-                                                          .update({
-                                                            'like':
-                                                                FieldValue.increment(
-                                                                  1,
-                                                                ),
-                                                          }),
-                                                    ]);
-                                                  }
-                                                },
-                                                child: Row(
-                                                  children: [
-                                                    !isLike
-                                                        ? Icon(
-                                                            Icons
-                                                                .thumb_up_off_alt_outlined,
-                                                            size: 20,
-                                                            color: OkLab(
-                                                              0.55,
-                                                              0,
-                                                              -0.03,
-                                                            ).toColor(),
-                                                            fontWeight:
-                                                                FontWeight.w600,
-                                                          )
-                                                        : Text(
-                                                            '👍',
-                                                            style: TextStyle(
-                                                              fontSize: 20,
-                                                            ),
-                                                          ),
-                                                    SizedBox(width: 5),
-                                                    Text(
-                                                      'Thích',
-                                                      style: TextStyle(
-                                                        color: !isLike
-                                                            ? OkLab(
-                                                                0.55,
-                                                                0,
-                                                                -0.03,
-                                                              ).toColor()
-                                                            : OkLab(
-                                                                0.62,
-                                                                -0.04,
-                                                                -0.21,
-                                                              ).toColor(),
-                                                        fontWeight:
-                                                            FontWeight.w600,
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                              ),
-                                            );
-                                          },
-                                        ),
-                                        Padding(
-                                          padding: EdgeInsets.all(10),
-                                          child: GestureDetector(
-                                            onTap: () {
-                                              setState(() {
-                                                replyingCommentId = commentId;
-                                                replyingUserId = data['userId'];
-                                                replyingUserName =
-                                                    data['userName'];
-                                                showReplyInput[commentId] =
-                                                    !(showReplyInput[commentId] ??
-                                                        false);
-                                              });
-                                            },
-                                            child: Row(
-                                              children: [
-                                                Icon(
-                                                  Icons
-                                                      .chat_bubble_outline_sharp,
-                                                  size: 20,
-                                                  color: OkLab(
-                                                    0.55,
-                                                    0,
-                                                    -0.03,
-                                                  ).toColor(),
-                                                  fontWeight: FontWeight.w600,
-                                                ),
-                                                SizedBox(width: 5),
-                                                Text(
-                                                  'Trả lời',
+                                                child: Text(
+                                                  "Hủy",
                                                   style: TextStyle(
+                                                    fontSize: 16,
+                                                    fontWeight: FontWeight.w500,
                                                     color: OkLab(
                                                       0.55,
                                                       0,
                                                       -0.03,
                                                     ).toColor(),
-                                                    fontWeight: FontWeight.w600,
                                                   ),
                                                 ),
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                          if (showReplyInput[commentId] ?? false)
-                            Padding(
-                              padding: EdgeInsets.only(top: 10, left: 50),
-                              child: Container(
-                                padding: EdgeInsets.all(12),
-                                decoration: BoxDecoration(
-                                  color: isDark
-                                      ? OkLab(
-                                          0.28,
-                                          -0.01,
-                                          -0.03,
-                                        ).toColor().withValues(alpha: 0.5)
-                                      : Colors.white,
-                                  borderRadius: BorderRadius.circular(15),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black.withValues(
-                                        alpha: 0.3,
-                                      ),
-                                      blurRadius: 10,
-                                      offset: Offset(0, 5),
-                                    ),
-                                  ],
-                                ),
-                                child: Column(
-                                  children: [
-                                    Row(
-                                      children: [
-                                        Text(
-                                          'Trả lời ',
-                                          style: TextStyle(
-                                            color: OkLab(
-                                              0.45,
-                                              -0.01,
-                                              -0.03,
-                                            ).toColor(),
-                                          ),
-                                        ),
-                                        Text(
-                                          '@$replyingUserName',
-                                          style: TextStyle(
-                                            color: OkLab(
-                                              0.44,
-                                              0.12,
-                                              -0.18,
-                                            ).toColor(),
-                                            fontWeight: FontWeight.w700,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    SizedBox(height: 10),
-                                    Row(
-                                      children: [
-                                        ClipOval(
-                                          child: Image.network(
-                                            imgUrl,
-                                            width: 40,
-                                            height: 40,
-                                            fit: BoxFit.cover,
-                                          ),
-                                        ),
-                                        SizedBox(width: 10),
-                                        Expanded(
-                                          child: Text(
-                                            nameFS,
-                                            maxLines: 1,
-                                            overflow: TextOverflow.ellipsis,
-                                            style: TextStyle(
-                                              color: isDark
-                                                  ? OkLab(
-                                                      0.83,
-                                                      0.07,
-                                                      -0.1,
-                                                    ).toColor()
-                                                  : OkLab(
-                                                      0.63,
-                                                      0.15,
-                                                      -0.22,
-                                                    ).toColor(),
-                                              fontWeight: FontWeight.w500,
-                                              fontSize: 16,
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    SizedBox(height: 10),
-                                    TextField(
-                                      controller: _replyControllers.putIfAbsent(
-                                        commentId,
-                                        () => TextEditingController(),
-                                      ),
-                                      maxLength: 2000,
-                                      maxLines: 3,
-                                      decoration: InputDecoration(
-                                        hintText: "Nhập bình luận",
-                                        border: OutlineInputBorder(
-                                          borderRadius: BorderRadius.circular(
-                                            10,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                    SizedBox(height: 5),
-                                    Row(
-                                      children: [
-                                        Spacer(),
-                                        GestureDetector(
-                                          onTap: () {
-                                            setState(() {
-                                              showReplyInput[commentId] = false;
-                                              controller.clear();
-                                            });
-                                          },
-                                          child: Container(
-                                            padding: EdgeInsets.symmetric(
-                                              horizontal: 12,
-                                              vertical: 8,
-                                            ),
-                                            decoration: BoxDecoration(
-                                              color: isDark
-                                                  ? OkLab(0.97, 0, 0)
-                                                        .toColor()
-                                                        .withValues(alpha: 0.3)
-                                                  : Colors.white,
-                                              borderRadius:
-                                                  BorderRadius.circular(15),
-                                              border: Border.all(
-                                                width: 2,
-                                                color: isDark
-                                                    ? OkLab(
-                                                        0.97,
-                                                        0,
-                                                        0,
-                                                      ).toColor().withValues(
-                                                        alpha: 0.3,
-                                                      )
-                                                    : OkLab(
-                                                        0.88,
-                                                        0.04,
-                                                        0,
-                                                      ).toColor(),
                                               ),
                                             ),
-                                            child: Text(
-                                              "Hủy",
-                                              style: TextStyle(
-                                                fontSize: 16,
-                                                fontWeight: FontWeight.w500,
-                                                color: OkLab(
-                                                  0.55,
-                                                  0,
-                                                  -0.03,
-                                                ).toColor(),
+                                            SizedBox(width: 10),
+                                            GestureDetector(
+                                              onTap: () {
+                                                final replyController =
+                                                    _replyControllers[commentId];
+                                                if (replyController != null &&
+                                                    replyController.text
+                                                        .trim()
+                                                        .isNotEmpty) {
+                                                  controller.text =
+                                                      replyController.text;
+                                                  addComment();
+                                                  replyController.clear();
+                                                  localSetState(() {
+                                                    showReplyInput[commentId] =
+                                                        false;
+                                                  });
+                                                }
+                                              },
+                                              child: Container(
+                                                padding: EdgeInsets.symmetric(
+                                                  horizontal: 12,
+                                                  vertical: 8,
+                                                ),
+                                                decoration: BoxDecoration(
+                                                  color: isDark
+                                                      ? OkLab(
+                                                          0.63,
+                                                          0.24,
+                                                          0,
+                                                        ).toColor()
+                                                      : OkLab(
+                                                          0.75,
+                                                          0.17,
+                                                          -0.01,
+                                                        ).toColor(),
+                                                  borderRadius:
+                                                      BorderRadius.circular(15),
+                                                ),
+                                                child: Row(
+                                                  mainAxisSize:
+                                                      MainAxisSize.min,
+                                                  children: [
+                                                    Text(
+                                                      "Đăng",
+                                                      style: TextStyle(
+                                                        fontSize: 16,
+                                                        fontWeight:
+                                                            FontWeight.w500,
+                                                        color: Colors.white,
+                                                      ),
+                                                    ),
+                                                    SizedBox(width: 5),
+                                                    Icon(
+                                                      Icons
+                                                          .arrow_forward_ios_outlined,
+                                                      color: Colors.white,
+                                                      size: 16,
+                                                    ),
+                                                  ],
+                                                ),
                                               ),
                                             ),
-                                          ),
-                                        ),
-                                        SizedBox(width: 10),
-                                        GestureDetector(
-                                          onTap: () {
-                                            final replyController =
-                                                _replyControllers[commentId];
-                                            if (replyController != null &&
-                                                replyController.text
-                                                    .trim()
-                                                    .isNotEmpty) {
-                                              controller.text =
-                                                  replyController.text;
-                                              addComment();
-                                              replyController.clear();
-                                              setState(() {
-                                                showReplyInput[commentId] =
-                                                    false;
-                                              });
-                                            }
-                                          },
-                                          child: Container(
-                                            padding: EdgeInsets.symmetric(
-                                              horizontal: 12,
-                                              vertical: 8,
-                                            ),
-                                            decoration: BoxDecoration(
-                                              color: isDark
-                                                  ? OkLab(
-                                                      0.63,
-                                                      0.24,
-                                                      0,
-                                                    ).toColor()
-                                                  : OkLab(
-                                                      0.75,
-                                                      0.17,
-                                                      -0.01,
-                                                    ).toColor(),
-                                              borderRadius:
-                                                  BorderRadius.circular(15),
-                                            ),
-                                            child: Row(
-                                              mainAxisSize: MainAxisSize.min,
-                                              children: [
-                                                Text(
-                                                  "Đăng",
-                                                  style: TextStyle(
-                                                    fontSize: 16,
-                                                    fontWeight: FontWeight.w500,
-                                                    color: Colors.white,
-                                                  ),
-                                                ),
-                                                SizedBox(width: 5),
-                                                Icon(
-                                                  Icons
-                                                      .arrow_forward_ios_outlined,
-                                                  color: Colors.white,
-                                                  size: 16,
-                                                ),
-                                              ],
-                                            ),
-                                          ),
+                                          ],
                                         ),
                                       ],
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          StreamBuilder<QuerySnapshot>(
-                            stream: FirebaseFirestore.instance
-                                .collection('Comments')
-                                .doc(widget.comicId)
-                                .collection('comments')
-                                .doc(commentId)
-                                .collection('replies')
-                                .orderBy('createdAt', descending: false)
-                                .snapshots(),
-                            builder: (context, snapshot) {
-                              if (!snapshot.hasData) return SizedBox();
-
-                              if (snapshot.data!.docs.length == 0)
-                                return SizedBox();
-                              final isShow = showReplies[commentId] ?? false;
-                              return Column(
-                                children: [
-                                  GestureDetector(
-                                    onTap: () {
-                                      setState(() {
-                                        showReplies[commentId] = !isShow;
-                                      });
-                                    },
-                                    child: Padding(
-                                      padding: EdgeInsets.only(left: 50),
-                                      child: Text(
-                                        isShow
-                                            ? "Ẩn ${snapshot.data!.docs.length} câu trả lời"
-                                            : "Hiện ${snapshot.data!.docs.length} câu trả lời",
-                                        style: TextStyle(
-                                          color: Colors.blue,
-                                          fontWeight: FontWeight.w500,
-                                        ),
-                                      ),
                                     ),
                                   ),
-                                  if (isShow)
-                                    ListView.builder(
-                                      shrinkWrap: true,
-                                      physics: NeverScrollableScrollPhysics(),
-                                      itemCount: snapshot.data!.docs.length,
-                                      itemBuilder: (context, index) {
-                                        final replyData =
-                                            snapshot.data!.docs[index].data()
-                                                as Map<String, dynamic>;
-                                        final replyId =
-                                            snapshot.data!.docs[index].id;
-                                        final contentReply =
-                                            replyData['content'] ?? '';
-                                        final userNameReply =
-                                            replyData['userName'] ?? '';
-                                        final avatarReply =
-                                            replyData['avatar'] ?? '';
-                                        final likeReply =
-                                            replyData['like'] ?? 0;
-                                        final Timestamp? replyTime =
-                                            replyData['createdAt'];
-                                        final DateTime replyCreatedAt =
-                                            replyTime != null
-                                            ? replyTime.toDate()
-                                            : DateTime.now();
-                                        return Padding(
-                                          padding: EdgeInsets.only(
-                                            top: 10,
-                                            left: 50,
+                                ),
+                              if (isShowReplyInput) SizedBox(height: 20),
+                              StreamBuilder<QuerySnapshot>(
+                                stream: FirebaseFirestore.instance
+                                    .collection('Comments')
+                                    .doc(widget.comicId)
+                                    .collection('comments')
+                                    .doc(commentId)
+                                    .collection('replies')
+                                    .orderBy('createdAt', descending: false)
+                                    .snapshots(),
+                                builder: (context, snapshot) {
+                                  if (!snapshot.hasData) return SizedBox();
+
+                                  if (snapshot.data!.docs.length == 0)
+                                    return SizedBox();
+                                  final isShow =
+                                      showReplies[commentId] ?? false;
+                                  return Column(
+                                    children: [
+                                      GestureDetector(
+                                        onTap: () {
+                                          localSetState(() {
+                                            showReplies[commentId] = !isShow;
+                                          });
+                                        },
+                                        child: Padding(
+                                          padding: EdgeInsets.only(left: 50),
+                                          child: Text(
+                                            isShow
+                                                ? "Ẩn ${snapshot.data!.docs.length} câu trả lời"
+                                                : "Hiện ${snapshot.data!.docs.length} câu trả lời",
+                                            style: TextStyle(
+                                              color: Colors.blue,
+                                              fontWeight: FontWeight.w500,
+                                            ),
                                           ),
-                                          child: Column(
-                                            children: [
-                                              Row(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
+                                        ),
+                                      ),
+                                      if (isShow)
+                                        ListView.builder(
+                                          shrinkWrap: true,
+                                          physics:
+                                              NeverScrollableScrollPhysics(),
+                                          itemCount: snapshot.data!.docs.length,
+                                          itemBuilder: (context, index) {
+                                            final replyData =
+                                                snapshot.data!.docs[index]
+                                                        .data()
+                                                    as Map<String, dynamic>;
+                                            final replyId =
+                                                snapshot.data!.docs[index].id;
+                                            final contentReply =
+                                                replyData['content'] ?? '';
+                                            final userNameReply =
+                                                replyData['userName'] ?? '';
+                                            final avatarReply =
+                                                replyData['avatar'] ?? '';
+                                            final likeReply =
+                                                replyData['like'] ?? 0;
+                                            final Timestamp? replyTime =
+                                                replyData['createdAt'];
+                                            final DateTime replyCreatedAt =
+                                                replyTime != null
+                                                ? replyTime.toDate()
+                                                : DateTime.now();
+                                            return Padding(
+                                              padding: EdgeInsets.only(
+                                                top: 10,
+                                                left: 50,
+                                              ),
+                                              child: Column(
                                                 children: [
-                                                  ClipOval(
-                                                    child: Image.network(
-                                                      avatarReply,
-                                                      height: 40,
-                                                      width: 40,
-                                                      fit: BoxFit.cover,
-                                                    ),
-                                                  ),
-                                                  SizedBox(width: 10),
-                                                  Expanded(
-                                                    child: Column(
-                                                      crossAxisAlignment:
-                                                          CrossAxisAlignment
-                                                              .start,
-                                                      children: [
-                                                        Text(
-                                                          userNameReply,
-                                                          maxLines: 1,
-                                                          overflow: TextOverflow
-                                                              .ellipsis,
-                                                          style: TextStyle(
-                                                            fontWeight:
-                                                                FontWeight.w700,
-                                                            color: isDark
-                                                                ? OkLab(
-                                                                    0.83,
-                                                                    0.07,
-                                                                    -0.1,
-                                                                  ).toColor()
-                                                                : OkLab(
-                                                                    0.63,
-                                                                    0.15,
-                                                                    -0.22,
-                                                                  ).toColor(),
-                                                          ),
-                                                        ),
-                                                        Text(
-                                                          formatTime(
-                                                            replyCreatedAt,
-                                                          ),
-                                                          style: TextStyle(
-                                                            fontSize: 11,
-                                                            color: isDark
-                                                                ? OkLab(
-                                                                    0.71,
-                                                                    0,
-                                                                    -0.02,
-                                                                  ).toColor()
-                                                                : OkLab(
-                                                                    0.55,
-                                                                    0,
-                                                                    -0.03,
-                                                                  ).toColor(),
-                                                          ),
-                                                        ),
-                                                        SizedBox(height: 5),
-                                                        Container(
-                                                          padding:
-                                                              EdgeInsets.symmetric(
-                                                                horizontal: 12,
-                                                                vertical: 8,
-                                                              ),
-                                                          decoration: BoxDecoration(
-                                                            color: isDark
-                                                                ? OkLab(
-                                                                    0.28,
-                                                                    -0.01,
-                                                                    -0.03,
-                                                                  ).toColor()
-                                                                : OkLab(
-                                                                    0.98,
-                                                                    0,
-                                                                    0,
-                                                                  ).toColor(),
-                                                            borderRadius: BorderRadius.only(
-                                                              bottomLeft:
-                                                                  Radius.circular(
-                                                                    15,
-                                                                  ),
-                                                              bottomRight:
-                                                                  Radius.circular(
-                                                                    15,
-                                                                  ),
-                                                              topRight:
-                                                                  Radius.circular(
-                                                                    15,
-                                                                  ),
-                                                            ),
-                                                          ),
-                                                          child: Text(
-                                                            contentReply,
-                                                            style: TextStyle(
-                                                              color: isDark
-                                                                  ? OkLab(
-                                                                      0.71,
-                                                                      0,
-                                                                      -0.02,
-                                                                    ).toColor()
-                                                                  : OkLab(
-                                                                      0.45,
-                                                                      -0.01,
-                                                                      -0.03,
-                                                                    ).toColor(),
-                                                            ),
-                                                          ),
-                                                        ),
-                                                        Row(
+                                                  Row(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    children: [
+                                                      _buildAvatar(
+                                                        url: avatarReply,
+                                                      ),
+                                                      SizedBox(width: 10),
+                                                      Expanded(
+                                                        child: Column(
+                                                          crossAxisAlignment:
+                                                              CrossAxisAlignment
+                                                                  .start,
                                                           children: [
-                                                            if (likeReply > 0)
-                                                              Row(
-                                                                children: [
-                                                                  Container(
-                                                                    padding: EdgeInsets.symmetric(
-                                                                      horizontal:
-                                                                          8,
-                                                                      vertical:
-                                                                          4,
-                                                                    ),
-                                                                    decoration: BoxDecoration(
-                                                                      color: OkLab(
-                                                                        0.93,
-                                                                        -0.01,
-                                                                        -0.03,
-                                                                      ).toColor(),
-                                                                      borderRadius:
-                                                                          BorderRadius.circular(
-                                                                            10,
-                                                                          ),
-                                                                    ),
-                                                                    child: Text(
-                                                                      '👍',
-                                                                    ),
-                                                                  ),
-                                                                  SizedBox(
-                                                                    width: 5,
-                                                                  ),
-                                                                  Text(
-                                                                    "$likeReply",
-                                                                    style: TextStyle(
-                                                                      fontSize:
-                                                                          12,
-                                                                    ),
-                                                                  ),
-                                                                ],
-                                                              ),
-                                                            StreamBuilder<
-                                                              DocumentSnapshot
-                                                            >(
-                                                              stream: FirebaseFirestore
+                                                            _userName(
+                                                              nameFS:
+                                                                  userNameReply,
+                                                              isDark: isDark,
+                                                            ),
+                                                            _createdAt(
+                                                              createdAt:
+                                                                  replyCreatedAt,
+                                                              isDark: isDark,
+                                                            ),
+                                                            _content(
+                                                              isDark: isDark,
+                                                              content:
+                                                                  contentReply,
+                                                            ),
+                                                            SizedBox(height: 5),
+                                                            CommentActionBar(
+                                                              likeCount:
+                                                                  likeReply,
+                                                              targetRef: FirebaseFirestore
                                                                   .instance
                                                                   .collection(
                                                                     'Comments',
@@ -1028,250 +567,45 @@ class _CommentSectionState extends State<CommentSection> {
                                                                   .collection(
                                                                     'replies',
                                                                   )
-                                                                  .doc(replyId)
-                                                                  .collection(
-                                                                    'likes',
-                                                                  )
-                                                                  .doc(
-                                                                    FirebaseAuth
-                                                                        .instance
-                                                                        .currentUser!
-                                                                        .uid,
-                                                                  )
-                                                                  .snapshots(),
-                                                              builder: (context, snapshot) {
-                                                                final isLikeReply =
-                                                                    snapshot
-                                                                        .data
-                                                                        ?.exists ??
-                                                                    false;
-                                                                return Padding(
-                                                                  padding:
-                                                                      EdgeInsets.all(
-                                                                        10,
-                                                                      ),
-                                                                  child: GestureDetector(
-                                                                    onTap: () async {
-                                                                      final userId = FirebaseAuth
-                                                                          .instance
-                                                                          .currentUser!
-                                                                          .uid;
-                                                                      final likeReplyRef = FirebaseFirestore
-                                                                          .instance
-                                                                          .collection(
-                                                                            'Comments',
-                                                                          )
-                                                                          .doc(
-                                                                            widget.comicId,
-                                                                          )
-                                                                          .collection(
-                                                                            'comments',
-                                                                          )
-                                                                          .doc(
-                                                                            commentId,
-                                                                          )
-                                                                          .collection(
-                                                                            'replies',
-                                                                          )
-                                                                          .doc(
-                                                                            replyId,
-                                                                          )
-                                                                          .collection(
-                                                                            'likes',
-                                                                          )
-                                                                          .doc(
-                                                                            userId,
-                                                                          );
-                                                                      if (isLikeReply) {
-                                                                        await Future.wait([
-                                                                          likeReplyRef
-                                                                              .delete(),
-                                                                          FirebaseFirestore
-                                                                              .instance
-                                                                              .collection(
-                                                                                'Comments',
-                                                                              )
-                                                                              .doc(
-                                                                                widget.comicId,
-                                                                              )
-                                                                              .collection(
-                                                                                'comments',
-                                                                              )
-                                                                              .doc(
-                                                                                commentId,
-                                                                              )
-                                                                              .collection(
-                                                                                'replies',
-                                                                              )
-                                                                              .doc(
-                                                                                replyId,
-                                                                              )
-                                                                              .update({
-                                                                                'like': FieldValue.increment(
-                                                                                  -1,
-                                                                                ),
-                                                                              }),
-                                                                        ]);
-                                                                      } else {
-                                                                        await Future.wait([
-                                                                          likeReplyRef.set({
-                                                                            'userId':
-                                                                                userId,
-                                                                          }),
-                                                                          FirebaseFirestore
-                                                                              .instance
-                                                                              .collection(
-                                                                                'Comments',
-                                                                              )
-                                                                              .doc(
-                                                                                widget.comicId,
-                                                                              )
-                                                                              .collection(
-                                                                                'comments',
-                                                                              )
-                                                                              .doc(
-                                                                                commentId,
-                                                                              )
-                                                                              .collection(
-                                                                                'replies',
-                                                                              )
-                                                                              .doc(
-                                                                                replyId,
-                                                                              )
-                                                                              .update({
-                                                                                'like': FieldValue.increment(
-                                                                                  1,
-                                                                                ),
-                                                                              }),
-                                                                        ]);
-                                                                      }
-                                                                    },
-                                                                    child: Row(
-                                                                      children: [
-                                                                        !isLikeReply
-                                                                            ? Icon(
-                                                                                Icons.thumb_up_off_alt_outlined,
-                                                                                size: 20,
-                                                                                color: OkLab(
-                                                                                  0.55,
-                                                                                  0,
-                                                                                  -0.03,
-                                                                                ).toColor(),
-                                                                                fontWeight: FontWeight.w600,
-                                                                              )
-                                                                            : Text(
-                                                                                '👍',
-                                                                                style: TextStyle(
-                                                                                  fontSize: 20,
-                                                                                ),
-                                                                              ),
-                                                                        SizedBox(
-                                                                          width:
-                                                                              5,
-                                                                        ),
-                                                                        Text(
-                                                                          'Thích',
-                                                                          style: TextStyle(
-                                                                            color:
-                                                                                !isLikeReply
-                                                                                ? OkLab(
-                                                                                    0.55,
-                                                                                    0,
-                                                                                    -0.03,
-                                                                                  ).toColor()
-                                                                                : OkLab(
-                                                                                    0.62,
-                                                                                    -0.04,
-                                                                                    -0.21,
-                                                                                  ).toColor(),
-                                                                            fontWeight:
-                                                                                FontWeight.w600,
-                                                                          ),
-                                                                        ),
-                                                                      ],
-                                                                    ),
-                                                                  ),
-                                                                );
+                                                                  .doc(replyId),
+                                                              onReplyTap: () {
+                                                                localSetState(() {
+                                                                  replyingCommentId =
+                                                                      commentId;
+                                                                  replyingUserName =
+                                                                      replyData['userName'];
+                                                                  replyingUserId =
+                                                                      replyData['userId'];
+                                                                  showReplyInput[commentId] =
+                                                                      !isShowReplyInput;
+                                                                });
                                                               },
-                                                            ),
-                                                            Padding(
-                                                              padding:
-                                                                  EdgeInsets.all(
-                                                                    10,
-                                                                  ),
-                                                              child: GestureDetector(
-                                                                onTap: () {
-                                                                  setState(() {
-                                                                    replyingCommentId =
-                                                                        commentId;
-                                                                    replyingUserName =
-                                                                        replyData['userName'];
-                                                                    replyingUserId =
-                                                                        replyData['userId'];
-                                                                    showReplyInput[commentId] =
-                                                                        !(showReplyInput[commentId] ??
-                                                                            false);
-                                                                  });
-                                                                },
-                                                                child: Row(
-                                                                  children: [
-                                                                    Icon(
-                                                                      Icons
-                                                                          .chat_bubble_outline_sharp,
-                                                                      size: 20,
-                                                                      color: OkLab(
-                                                                        0.55,
-                                                                        0,
-                                                                        -0.03,
-                                                                      ).toColor(),
-                                                                      fontWeight:
-                                                                          FontWeight
-                                                                              .w600,
-                                                                    ),
-                                                                    SizedBox(
-                                                                      width: 5,
-                                                                    ),
-                                                                    Text(
-                                                                      'Trả lời',
-                                                                      style: TextStyle(
-                                                                        color: OkLab(
-                                                                          0.55,
-                                                                          0,
-                                                                          -0.03,
-                                                                        ).toColor(),
-                                                                        fontWeight:
-                                                                            FontWeight.w600,
-                                                                      ),
-                                                                    ),
-                                                                  ],
-                                                                ),
-                                                              ),
                                                             ),
                                                           ],
                                                         ),
-                                                      ],
-                                                    ),
+                                                      ),
+                                                    ],
                                                   ),
                                                 ],
                                               ),
-                                            ],
-                                          ),
-                                        );
-                                      },
-                                    ),
-                                ],
-                              );
-                            },
+                                            );
+                                          },
+                                        ),
+                                    ],
+                                  );
+                                },
+                              ),
+                              SizedBox(height: 15),
+                              Divider(
+                                thickness: 1,
+                                color: isDark
+                                    ? OkLab(0.28, -0.01, -0.03).toColor()
+                                    : Colors.grey,
+                              ),
+                            ],
                           ),
-                          SizedBox(height: 15),
-                          Divider(
-                            thickness: 1,
-                            color: isDark
-                                ? OkLab(0.28, -0.01, -0.03).toColor()
-                                : Colors.grey,
-                          ),
-                        ],
-                      ),
+                        );
+                      },
                     );
                   },
                 );
@@ -1289,6 +623,314 @@ class _CommentSectionState extends State<CommentSection> {
             ),
           ),
       ],
+    );
+  }
+}
+
+class _content extends StatelessWidget {
+  const _content({required this.isDark, required this.content});
+
+  final bool isDark;
+  final dynamic content;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(
+        color: isDark
+            ? OkLab(0.28, -0.01, -0.03).toColor()
+            : OkLab(0.98, 0, 0).toColor(),
+        borderRadius: BorderRadius.only(
+          bottomLeft: Radius.circular(15),
+          bottomRight: Radius.circular(15),
+          topRight: Radius.circular(15),
+        ),
+      ),
+      child: Text(
+        content,
+        style: TextStyle(
+          color: isDark
+              ? OkLab(0.71, 0, -0.02).toColor()
+              : OkLab(0.45, -0.01, -0.03).toColor(),
+        ),
+      ),
+    );
+  }
+}
+
+class _userName extends StatelessWidget {
+  const _userName({required this.nameFS, required this.isDark});
+
+  final String nameFS;
+  final bool isDark;
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      nameFS,
+      maxLines: 1,
+      overflow: TextOverflow.ellipsis,
+      style: TextStyle(
+        color: isDark
+            ? OkLab(0.83, 0.07, -0.1).toColor()
+            : OkLab(0.63, 0.15, -0.22).toColor(),
+        fontWeight: FontWeight.w500,
+        fontSize: 16,
+      ),
+    );
+  }
+}
+
+class _createdAt extends StatelessWidget {
+  const _createdAt({required this.createdAt, required this.isDark});
+
+  final createdAt;
+  final bool isDark;
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      formatTime(createdAt),
+      style: TextStyle(
+        fontSize: 11,
+        color: isDark
+            ? OkLab(0.71, 0, -0.02).toColor()
+            : OkLab(0.55, 0, -0.03).toColor(),
+      ),
+    );
+  }
+}
+
+String formatTime(DateTime time) {
+  return "${time.hour}:${time.minute} - ${time.day}/${time.month}/${time.year}";
+}
+
+class CommentActionBar extends StatelessWidget {
+  final int likeCount;
+  final DocumentReference targetRef;
+  final VoidCallback onReplyTap;
+
+  const CommentActionBar({
+    super.key,
+    required this.likeCount,
+    required this.targetRef,
+    required this.onReplyTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final userId = FirebaseAuth.instance.currentUser!.uid;
+    final likeRef = targetRef.collection('likes').doc(userId);
+
+    return Row(
+      children: [
+        if (likeCount > 0)
+          Row(
+            children: [
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: OkLab(0.93, -0.01, -0.03).toColor(),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Text('👍'),
+              ),
+              SizedBox(width: 5),
+              Text("$likeCount", style: TextStyle(fontSize: 12)),
+            ],
+          ),
+
+        StreamBuilder<DocumentSnapshot>(
+          stream: likeRef.snapshots(),
+          builder: (context, snapshot) {
+            final isLiked = snapshot.data?.exists ?? false;
+
+            return Padding(
+              padding: EdgeInsets.all(10),
+              child: GestureDetector(
+                onTap: () async {
+                  if (isLiked) {
+                    await Future.wait([
+                      likeRef.delete(),
+                      targetRef.update({'like': FieldValue.increment(-1)}),
+                    ]);
+                  } else {
+                    await Future.wait([
+                      likeRef.set({'userId': userId}),
+                      targetRef.update({'like': FieldValue.increment(1)}),
+                    ]);
+                  }
+                },
+                child: Row(
+                  children: [
+                    !isLiked
+                        ? Icon(
+                            Icons.thumb_up_off_alt_outlined,
+                            size: 20,
+                            color: OkLab(0.55, 0, -0.03).toColor(),
+                            fontWeight: FontWeight.w600,
+                          )
+                        : Text('👍', style: TextStyle(fontSize: 20)),
+                    SizedBox(width: 5),
+                    Text(
+                      'Thích',
+                      style: TextStyle(
+                        color: !isLiked
+                            ? OkLab(0.55, 0, -0.03).toColor()
+                            : OkLab(0.62, -0.04, -0.21).toColor(),
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        ),
+
+        Padding(
+          padding: EdgeInsets.all(10),
+          child: GestureDetector(
+            onTap: onReplyTap,
+            child: Row(
+              children: [
+                Icon(
+                  Icons.chat_bubble_outline_sharp,
+                  size: 20,
+                  color: OkLab(0.55, 0, -0.03).toColor(),
+                  fontWeight: FontWeight.w600,
+                ),
+                SizedBox(width: 5),
+                Text(
+                  'Trả lời',
+                  style: TextStyle(
+                    color: OkLab(0.55, 0, -0.03).toColor(),
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _buildAvatar extends StatelessWidget {
+  const _buildAvatar({required this.url});
+
+  final String url;
+
+  @override
+  Widget build(BuildContext context) {
+    return ClipOval(
+      child: url.isEmpty
+          ? Image.asset(
+              'assets/images/logo.png',
+              width: 40,
+              height: 40,
+              fit: BoxFit.cover,
+            )
+          : Image.network(url, width: 40, height: 40, fit: BoxFit.cover),
+    );
+  }
+}
+
+class CommentInputBox extends StatelessWidget {
+  final bool isDark;
+  final String avatar;
+  final String userName;
+  final TextEditingController controller;
+  final VoidCallback onSubmit;
+
+  const CommentInputBox({
+    super.key,
+    required this.isDark,
+    required this.avatar,
+    required this.userName,
+    required this.controller,
+    required this.onSubmit,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: isDark
+            ? OkLab(0.28, -0.01, -0.03).toColor().withValues(alpha: 0.5)
+            : Colors.white,
+        borderRadius: BorderRadius.circular(15),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.3),
+            blurRadius: 10,
+            offset: Offset(0, 5),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          Row(
+            children: [
+              _buildAvatar(url: avatar),
+              SizedBox(width: 10),
+              Expanded(
+                child: _userName(nameFS: userName, isDark: isDark),
+              ),
+            ],
+          ),
+          SizedBox(height: 10),
+          TextField(
+            controller: controller,
+            maxLength: 2000,
+            maxLines: 3,
+            decoration: InputDecoration(
+              hintText: "Nhập bình luận...",
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
+          ),
+          SizedBox(height: 5),
+          Align(
+            alignment: Alignment.centerRight,
+            child: GestureDetector(
+              onTap: onSubmit,
+              child: Container(
+                padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                decoration: BoxDecoration(
+                  color: isDark
+                      ? OkLab(0.63, 0.24, 0).toColor()
+                      : OkLab(0.75, 0.17, -0.01).toColor(),
+                  borderRadius: BorderRadius.circular(15),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      "Đăng",
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.white,
+                      ),
+                    ),
+                    SizedBox(width: 5),
+                    Icon(
+                      Icons.arrow_forward_ios_outlined,
+                      color: Colors.white,
+                      size: 16,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
