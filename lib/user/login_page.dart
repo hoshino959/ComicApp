@@ -832,6 +832,9 @@ class LoginPageState extends State<LoginPage> {
                                                             'gender': '',
                                                             'avatar':
                                                                 'https://res.cloudinary.com/dxbtuad7u/image/upload/v1774780859/logo_eehlrv.png',
+                                                            'createdAt':
+                                                                FieldValue.serverTimestamp(),
+                                                            'description': '',
                                                           });
                                                       ScaffoldMessenger.of(
                                                         context,
