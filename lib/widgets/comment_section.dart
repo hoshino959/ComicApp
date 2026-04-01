@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:comic_app/theme/theme_provider.dart';
+import 'package:comic_app/widgets/show_info_user.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:okcolor/models/oklab.dart';
@@ -53,7 +54,7 @@ class _CommentSectionState extends State<CommentSection> {
   }
 
   Future<void> getUserData() async {
-    var doc = await FirebaseFirestore.instance
+    final doc = await FirebaseFirestore.instance
         .collection("Users")
         .doc(FirebaseAuth.instance.currentUser!.uid)
         .get();
@@ -65,11 +66,14 @@ class _CommentSectionState extends State<CommentSection> {
     });
   }
 
-  Future<void> addComment() async {
+  Future<void> addComment({String? text}) async {
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) return;
-    if (controller.text.trim().isEmpty) return;
 
+    final content = text ?? controller.text.trim();
+    if (content.isEmpty) return;
+
+    if (!mounted) return;
     setState(() => isLoading = true);
 
     if (replyingCommentId != null) {
@@ -77,27 +81,36 @@ class _CommentSectionState extends State<CommentSection> {
         'userId': user.uid,
         'userName': nameFS,
         'avatar': imgUrl,
-        'content': "@$replyingUserName ${controller.text.trim()}",
+        'content': "@$replyingUserName $content",
         'createdAt': FieldValue.serverTimestamp(),
         'like': 0,
         'replyToUserId': replyingUserId,
         'replyToUserName': replyingUserName,
       });
-
-      replyingCommentId = null;
-      replyingUserId = null;
-      replyingUserName = null;
     } else {
       await _commentRef.add({
         'userId': user.uid,
-        'content': controller.text.trim(),
+        'content': content,
         'createdAt': FieldValue.serverTimestamp(),
         'userName': nameFS,
         'avatar': imgUrl,
         'like': 0,
       });
     }
+
+    await FirebaseFirestore.instance
+        .collection('Comments')
+        .doc(widget.comicId)
+        .set({
+          'totalComments': FieldValue.increment(1),
+        }, SetOptions(merge: true));
+
     controller.clear();
+    replyingCommentId = null;
+    replyingUserId = null;
+    replyingUserName = null;
+
+    if (!mounted) return;
     setState(() => isLoading = false);
   }
 
@@ -159,6 +172,8 @@ class _CommentSectionState extends State<CommentSection> {
                     final avatar = data['avatar'] ?? '';
                     final userName = data['userName'] ?? '';
 
+                    final uid = data['userId'];
+
                     final like = data['like'] ?? 0;
                     final commentId = docs[index].id;
 
@@ -174,7 +189,16 @@ class _CommentSectionState extends State<CommentSection> {
                               Row(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  _buildAvatar(url: avatar),
+                                  GestureDetector(
+                                    child: _buildAvatar(url: avatar),
+                                    onTap: () {
+                                      showDialog(
+                                        context: context,
+                                        builder: (context) =>
+                                            ShowInfoUser(uid: uid),
+                                      );
+                                    },
+                                  ),
                                   SizedBox(width: 10),
                                   Expanded(
                                     child: Column(
@@ -196,11 +220,7 @@ class _CommentSectionState extends State<CommentSection> {
                                         ),
                                         CommentActionBar(
                                           likeCount: like,
-                                          targetRef: FirebaseFirestore.instance
-                                              .collection('Comments')
-                                              .doc(widget.comicId)
-                                              .collection('comments')
-                                              .doc(commentId),
+                                          targetRef: _commentRef.doc(commentId),
                                           onReplyTap: () {
                                             localSetState(() {
                                               replyingCommentId = commentId;
@@ -383,9 +403,10 @@ class _CommentSectionState extends State<CommentSection> {
                                                     replyController.text
                                                         .trim()
                                                         .isNotEmpty) {
-                                                  controller.text =
-                                                      replyController.text;
-                                                  addComment();
+                                                  addComment(
+                                                    text: replyController.text
+                                                        .trim(),
+                                                  );
                                                   replyController.clear();
                                                   localSetState(() {
                                                     showReplyInput[commentId] =
@@ -445,10 +466,7 @@ class _CommentSectionState extends State<CommentSection> {
                                 ),
                               if (isShowReplyInput) SizedBox(height: 20),
                               StreamBuilder<QuerySnapshot>(
-                                stream: FirebaseFirestore.instance
-                                    .collection('Comments')
-                                    .doc(widget.comicId)
-                                    .collection('comments')
+                                stream: _commentRef
                                     .doc(commentId)
                                     .collection('replies')
                                     .orderBy('createdAt', descending: false)
@@ -549,18 +567,7 @@ class _CommentSectionState extends State<CommentSection> {
                                                             CommentActionBar(
                                                               likeCount:
                                                                   likeReply,
-                                                              targetRef: FirebaseFirestore
-                                                                  .instance
-                                                                  .collection(
-                                                                    'Comments',
-                                                                  )
-                                                                  .doc(
-                                                                    widget
-                                                                        .comicId,
-                                                                  )
-                                                                  .collection(
-                                                                    'comments',
-                                                                  )
+                                                              targetRef: _commentRef
                                                                   .doc(
                                                                     commentId,
                                                                   )
@@ -685,7 +692,7 @@ class _userName extends StatelessWidget {
 class _createdAt extends StatelessWidget {
   const _createdAt({required this.createdAt, required this.isDark});
 
-  final createdAt;
+  final DateTime createdAt;
   final bool isDark;
 
   @override
@@ -703,7 +710,8 @@ class _createdAt extends StatelessWidget {
 }
 
 String formatTime(DateTime time) {
-  return "${time.hour}:${time.minute} - ${time.day}/${time.month}/${time.year}";
+  String two(int n) => n.toString().padLeft(2, '0');
+  return "${two(time.hour)}:${two(time.minute)} - ${time.day}/${time.month}/${time.year}";
 }
 
 class CommentActionBar extends StatelessWidget {
@@ -717,6 +725,23 @@ class CommentActionBar extends StatelessWidget {
     required this.targetRef,
     required this.onReplyTap,
   });
+
+  Future<void> toggleLike({required bool isLiked}) async {
+    final userId = FirebaseAuth.instance.currentUser!.uid;
+    final likeRef = targetRef.collection('likes').doc(userId);
+
+    if (isLiked) {
+      await Future.wait([
+        likeRef.delete(),
+        targetRef.update({'like': FieldValue.increment(-1)}),
+      ]);
+    } else {
+      await Future.wait([
+        likeRef.set({'userId': userId}),
+        targetRef.update({'like': FieldValue.increment(1)}),
+      ]);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -750,17 +775,7 @@ class CommentActionBar extends StatelessWidget {
               padding: EdgeInsets.all(10),
               child: GestureDetector(
                 onTap: () async {
-                  if (isLiked) {
-                    await Future.wait([
-                      likeRef.delete(),
-                      targetRef.update({'like': FieldValue.increment(-1)}),
-                    ]);
-                  } else {
-                    await Future.wait([
-                      likeRef.set({'userId': userId}),
-                      targetRef.update({'like': FieldValue.increment(1)}),
-                    ]);
-                  }
+                  await toggleLike(isLiked: isLiked);
                 },
                 child: Row(
                   children: [

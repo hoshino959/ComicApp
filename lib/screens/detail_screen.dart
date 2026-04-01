@@ -843,15 +843,14 @@ class _DetailScreenState extends State<DetailScreen> {
                                     Icons.format_list_bulleted,
                                     isDark,
                                   ),
-                                  StreamBuilder<QuerySnapshot>(
+                                  StreamBuilder<DocumentSnapshot>(
                                     stream: FirebaseFirestore.instance
                                         .collection('Comments')
                                         .doc(widget.id)
-                                        .collection('comments')
                                         .snapshots(),
                                     builder: (context, snapshot) {
                                       int count =
-                                          snapshot.data?.docs.length ?? 0;
+                                          snapshot.data?['totalComments'] ?? 0;
                                       return _buildTabItem(
                                         1,
                                         count == 0 ? '' : ' ($count)',
