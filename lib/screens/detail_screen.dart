@@ -1204,7 +1204,11 @@ class _DetailScreenState extends State<DetailScreen> {
                                         ),
                                       ),
                                     )
-                                  : CommentSection(comicId: widget.id)
+                                  : CommentSection(
+                                      comicId: widget.id,
+                                      comicTitle: comicDetail!.title,
+                                      coverUrl: comicDetail!.coverUrl,
+                                    )
                             else if (selectedTabIndex == 2)
                               RelatedComicsTab(
                                 isDark: isDark,

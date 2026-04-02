@@ -8,8 +8,15 @@ import 'package:provider/provider.dart';
 
 class CommentSection extends StatefulWidget {
   final String comicId;
+  final String comicTitle;
+  final String coverUrl;
 
-  const CommentSection({super.key, required this.comicId});
+  const CommentSection({
+    super.key,
+    required this.comicId,
+    required this.comicTitle,
+    required this.coverUrl,
+  });
 
   @override
   State<StatefulWidget> createState() {
@@ -77,16 +84,39 @@ class _CommentSectionState extends State<CommentSection> {
     setState(() => isLoading = true);
 
     if (replyingCommentId != null) {
-      await _commentRef.doc(replyingCommentId).collection('replies').add({
-        'userId': user.uid,
-        'userName': nameFS,
-        'avatar': imgUrl,
-        'content': "@$replyingUserName $content",
-        'createdAt': FieldValue.serverTimestamp(),
-        'like': 0,
-        'replyToUserId': replyingUserId,
-        'replyToUserName': replyingUserName,
-      });
+      final replyDoc = await _commentRef
+          .doc(replyingCommentId)
+          .collection('replies')
+          .add({
+            'userId': user.uid,
+            'userName': nameFS,
+            'avatar': imgUrl,
+            'content': "@$replyingUserName $content",
+            'createdAt': FieldValue.serverTimestamp(),
+            'like': 0,
+            'replyToUserId': replyingUserId,
+            'replyToUserName': replyingUserName,
+          });
+      if (replyingUserId != null) {
+        await FirebaseFirestore.instance
+            .collection('Notification')
+            .doc(replyingUserId)
+            .collection('comments_notification')
+            .doc(replyDoc.id)
+            .set({
+              'type': 'reply',
+              'comicId': widget.comicId,
+              'comicTitle': widget.comicTitle,
+              'coverUrl': widget.coverUrl,
+              'commentId': replyingCommentId,
+              'replyId': replyDoc.id,
+              'fromUserId': user.uid,
+              'fromUserName': nameFS,
+              'content': content,
+              'createdAt': FieldValue.serverTimestamp(),
+              'status': false,
+            });
+      }
     } else {
       await _commentRef.add({
         'userId': user.uid,

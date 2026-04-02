@@ -419,7 +419,11 @@ class _ReadingScreenState extends State<ReadingScreen> {
                                   ),
                                 ),
                               )
-                            : CommentSection(comicId: widget.chapterId),
+                            : CommentSection(
+                                comicId: widget.chapterId,
+                                comicTitle: widget.title,
+                                coverUrl: widget.coverUrl,
+                              ),
                       ],
                     );
                   }

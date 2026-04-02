@@ -35,7 +35,8 @@ class _NotifyScreenState extends State<NotifyScreen> {
   }
 
   Future<void> loadNotifications() async {
-    List<Map<String, dynamic>> tempList = [];
+    List<Map<String, dynamic>> tempList1 = [];
+    List<Map<String, dynamic>> tempList2 = [];
 
     final comicsSnapshot = await FirebaseFirestore.instance
         .collection('Users')
@@ -53,16 +54,41 @@ class _NotifyScreenState extends State<NotifyScreen> {
           .get();
 
       for (var chap in chaptersSnapshot.docs) {
-        tempList.add(chap.data());
+        tempList1.add(chap.data());
       }
     }
-    tempList.sort((a, b) {
+
+    final notifiesSnapshot = await FirebaseFirestore.instance
+        .collection('Notification')
+        .doc(user!.uid)
+        .collection('comments_notification')
+        .get();
+
+    for (var notifies in notifiesSnapshot.docs) {
+      tempList2.add(notifies.data());
+    }
+
+    tempList1.sort((a, b) {
       final aTime = a['updatedAt'] as Timestamp?;
       final bTime = b['updatedAt'] as Timestamp?;
       return (bTime?.compareTo(aTime ?? Timestamp(0, 0))) ?? 0;
     });
+
+    tempList2.sort((c, d) {
+      final cTime = c['updatedAt'] as Timestamp?;
+      final dTime = d['updatedAt'] as Timestamp?;
+      return (dTime?.compareTo(cTime ?? Timestamp(0, 0))) ?? 0;
+    });
+
     setState(() {
-      allNotifications = tempList;
+      final merged = [...tempList1, ...tempList2];
+      merged.sort((a, b) {
+        final aTime = (a['updatedAt'] ?? a['createdAt']) as Timestamp?;
+        final bTime = (b['updatedAt'] ?? b['createdAt']) as Timestamp?;
+        return (bTime?.compareTo(aTime ?? Timestamp(0, 0))) ?? 0;
+      });
+
+      allNotifications = merged;
       isLoading = false;
       isDisabled = !allNotifications.any((e) => e['status'] == false);
     });
@@ -70,9 +96,14 @@ class _NotifyScreenState extends State<NotifyScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Provider.of<ThemeProvider>(context).themeMode == ThemeMode.dark;
-    final gradient = isDark ? AppColorsDark.gradientBackground : AppColorsLight.gradientBackground;
-    final filtered = showUnreadOnly ? allNotifications.where((e) => e['status'] == false).toList() : allNotifications;
+    final isDark =
+        Provider.of<ThemeProvider>(context).themeMode == ThemeMode.dark;
+    final gradient = isDark
+        ? AppColorsDark.gradientBackground
+        : AppColorsLight.gradientBackground;
+    final filtered = showUnreadOnly
+        ? allNotifications.where((e) => e['status'] == false).toList()
+        : allNotifications;
     return SafeArea(
       child: Stack(
         children: [
@@ -90,7 +121,9 @@ class _NotifyScreenState extends State<NotifyScreen> {
                     Text(
                       'Thông báo',
                       style: TextStyle(
-                        color: isDark ? OkLab(0.83, 0.07, -0.1).toColor() : OkLab(0.5, 0.14, -0.22).toColor(),
+                        color: isDark
+                            ? OkLab(0.83, 0.07, -0.1).toColor()
+                            : OkLab(0.5, 0.14, -0.22).toColor(),
                         fontSize: 24,
                         fontWeight: FontWeight.w700,
                       ),
@@ -100,7 +133,9 @@ class _NotifyScreenState extends State<NotifyScreen> {
                       'Quản lý và xem lại tất cả các thông báo của bạn từ hệ thống.',
                       style: TextStyle(
                         fontSize: 16,
-                        color: isDark ? OkLab(0.7, -0.01, -0.04).toColor() : OkLab(0.55, -0.01, -0.04).toColor(),
+                        color: isDark
+                            ? OkLab(0.7, -0.01, -0.04).toColor()
+                            : OkLab(0.55, -0.01, -0.04).toColor(),
                         fontWeight: FontWeight.w400,
                       ),
                     ),
@@ -109,10 +144,18 @@ class _NotifyScreenState extends State<NotifyScreen> {
                       color: isDark
                           ? (!isDisabled
                                 ? OkLab(0.63, 0.24, 0).toColor()
-                                : OkLab(0.63, 0.24, 0).toColor().withValues(alpha: 0.5))
+                                : OkLab(
+                                    0.63,
+                                    0.24,
+                                    0,
+                                  ).toColor().withValues(alpha: 0.5))
                           : (!isDisabled
                                 ? OkLab(0.75, 0.17, -0.01).toColor()
-                                : OkLab(0.75, 0.17, -0.01).toColor().withValues(alpha: 0.5)),
+                                : OkLab(
+                                    0.75,
+                                    0.17,
+                                    -0.01,
+                                  ).toColor().withValues(alpha: 0.5)),
                       borderRadius: BorderRadius.circular(20),
                       child: InkWell(
                         onTap: isDisabled
@@ -123,12 +166,21 @@ class _NotifyScreenState extends State<NotifyScreen> {
                                 });
                                 for (var item in allNotifications) {
                                   if (item['status'] == false) {
-                                    await FirebaseFirestore.instance
-                                        .collection('Notification')
-                                        .doc(user!.uid)
-                                        .collection(item['comicId'])
-                                        .doc(item['chapterId'])
-                                        .update({'status': true});
+                                    if (item['type'] == 'reply') {
+                                      await FirebaseFirestore.instance
+                                          .collection('Notification')
+                                          .doc(user!.uid)
+                                          .collection('comments_notification')
+                                          .doc(item['replyId'])
+                                          .update({'status': true});
+                                    } else {
+                                      await FirebaseFirestore.instance
+                                          .collection('Notification')
+                                          .doc(user!.uid)
+                                          .collection(item['comicId'])
+                                          .doc(item['chapterId'])
+                                          .update({'status': true});
+                                    }
                                   }
                                 }
                                 await loadNotifications();
@@ -142,9 +194,15 @@ class _NotifyScreenState extends State<NotifyScreen> {
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              Icon(Icons.check_circle_outline, color: Colors.white),
+                              Icon(
+                                Icons.check_circle_outline,
+                                color: Colors.white,
+                              ),
                               SizedBox(width: 10),
-                              Text('Đánh dấu tất cả là đã đọc', style: TextStyle(color: Colors.white)),
+                              Text(
+                                'Đánh dấu tất cả là đã đọc',
+                                style: TextStyle(color: Colors.white),
+                              ),
                             ],
                           ),
                         ),
@@ -160,21 +218,36 @@ class _NotifyScreenState extends State<NotifyScreen> {
                             });
                           },
                           child: Container(
-                            padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+                            padding: EdgeInsets.symmetric(
+                              vertical: 10,
+                              horizontal: 20,
+                            ),
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(20),
                               color: isDark
-                                  ? (!showUnreadOnly ? OkLab(0.63, 0.24, 0).toColor() : Colors.transparent)
-                                  : (!showUnreadOnly ? OkLab(0.75, 0.17, -0.01).toColor() : Colors.white),
+                                  ? (!showUnreadOnly
+                                        ? OkLab(0.63, 0.24, 0).toColor()
+                                        : Colors.transparent)
+                                  : (!showUnreadOnly
+                                        ? OkLab(0.75, 0.17, -0.01).toColor()
+                                        : Colors.white),
                               border: Border.all(
                                 width: 1,
-                                color: OkLab(0.75, 0.17, -0.01).toColor().withValues(alpha: 0.5),
+                                color: OkLab(
+                                  0.75,
+                                  0.17,
+                                  -0.01,
+                                ).toColor().withValues(alpha: 0.5),
                               ),
                             ),
                             child: Text(
                               'Tất cả',
                               style: TextStyle(
-                                color: isDark ? Colors.white : (!showUnreadOnly ? Colors.white : Colors.black),
+                                color: isDark
+                                    ? Colors.white
+                                    : (!showUnreadOnly
+                                          ? Colors.white
+                                          : Colors.black),
                                 fontWeight: FontWeight.w500,
                               ),
                             ),
@@ -188,21 +261,36 @@ class _NotifyScreenState extends State<NotifyScreen> {
                             });
                           },
                           child: Container(
-                            padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+                            padding: EdgeInsets.symmetric(
+                              vertical: 10,
+                              horizontal: 20,
+                            ),
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(20),
                               color: isDark
-                                  ? (showUnreadOnly ? OkLab(0.63, 0.24, 0).toColor() : Colors.transparent)
-                                  : (showUnreadOnly ? OkLab(0.75, 0.17, -0.01).toColor() : Colors.white),
+                                  ? (showUnreadOnly
+                                        ? OkLab(0.63, 0.24, 0).toColor()
+                                        : Colors.transparent)
+                                  : (showUnreadOnly
+                                        ? OkLab(0.75, 0.17, -0.01).toColor()
+                                        : Colors.white),
                               border: Border.all(
                                 width: 1,
-                                color: OkLab(0.75, 0.17, -0.01).toColor().withValues(alpha: 0.5),
+                                color: OkLab(
+                                  0.75,
+                                  0.17,
+                                  -0.01,
+                                ).toColor().withValues(alpha: 0.5),
                               ),
                             ),
                             child: Text(
                               'Chưa đọc',
                               style: TextStyle(
-                                color: isDark ? Colors.white : (showUnreadOnly ? Colors.white : Colors.black),
+                                color: isDark
+                                    ? Colors.white
+                                    : (showUnreadOnly
+                                          ? Colors.white
+                                          : Colors.black),
                                 fontWeight: FontWeight.w500,
                               ),
                             ),
@@ -217,7 +305,19 @@ class _NotifyScreenState extends State<NotifyScreen> {
                       itemCount: filtered.length,
                       itemBuilder: (context, index) {
                         final item = filtered[index];
-                        final publishTime = DateFormat('dd/MM/yyyy').parse(item['publishDate']);
+                        DateTime getTime(Map item) {
+                          if (item['publishDate'] != null) {
+                            return DateFormat(
+                              'dd/MM/yyyy',
+                            ).parse(item['publishDate']);
+                          }
+
+                          final ts = item['updatedAt'] ?? item['createdAt'];
+                          return (ts as Timestamp).toDate();
+                        }
+
+                        final publishTime = getTime(item);
+
                         String timeAgo(DateTime dateTime) {
                           final diff = DateTime.now().difference(dateTime);
 
@@ -244,20 +344,40 @@ class _NotifyScreenState extends State<NotifyScreen> {
                               isLoading = true;
                             });
 
-                            await FirebaseFirestore.instance
-                                .collection('Notification')
-                                .doc(user!.uid)
-                                .collection(item['comicId'])
-                                .doc(item['chapterId'])
-                                .update({'status': true});
+                            if (item['type'] == 'reply') {
+                              await FirebaseFirestore.instance
+                                  .collection('Notification')
+                                  .doc(user!.uid)
+                                  .collection('comments_notification')
+                                  .doc(item['replyId'])
+                                  .update({'status': true});
+                              await loadNotifications();
+                              setState(() => isLoading = false);
 
+                              return;
+                            } else {
+                              await FirebaseFirestore.instance
+                                  .collection('Notification')
+                                  .doc(user!.uid)
+                                  .collection(item['comicId'])
+                                  .doc(item['chapterId'])
+                                  .update({'status': true});
+                            }
                             await loadNotifications();
 
-                            final chapters = await ApiService.fetchAllComicChapters(item['comicId']);
+                            final chapters =
+                                await ApiService.fetchAllComicChapters(
+                                  item['comicId'],
+                                );
 
-                            final index = chapters.indexWhere((c) => c.id == item['chapterId']);
+                            final index = chapters.indexWhere(
+                              (c) => c.id == item['chapterId'],
+                            );
 
-                            final comicDetail = await ApiService.fetchComicDetail(item['comicId']);
+                            final comicDetail =
+                                await ApiService.fetchComicDetail(
+                                  item['comicId'],
+                                );
 
                             Navigator.of(context).push(
                               MaterialPageRoute(
@@ -282,12 +402,18 @@ class _NotifyScreenState extends State<NotifyScreen> {
                             padding: EdgeInsets.all(10),
                             margin: EdgeInsets.only(bottom: 10),
                             decoration: BoxDecoration(
-                              color: isDark ? OkLab(0.23, 0, -0.01).toColor() : Colors.white,
+                              color: isDark
+                                  ? OkLab(0.23, 0, -0.01).toColor()
+                                  : Colors.white,
                               borderRadius: BorderRadius.circular(20),
                               border: Border.all(
                                 width: 1,
                                 color: isDark
-                                    ? OkLab(0.97, 0, 0).toColor().withValues(alpha: 0.15)
+                                    ? OkLab(
+                                        0.97,
+                                        0,
+                                        0,
+                                      ).toColor().withValues(alpha: 0.15)
                                     : OkLab(0.88, 0.04, 0).toColor(),
                               ),
                             ),
@@ -303,41 +429,66 @@ class _NotifyScreenState extends State<NotifyScreen> {
                                         item['coverUrl'] ?? '',
                                         width: 50,
                                         fit: BoxFit.cover,
-                                        errorBuilder: (context, error, stackTrace) {
-                                          return Container(
-                                            width: 50,
-                                            color: Colors.grey[300],
-                                            child: Icon(Icons.broken_image),
-                                          );
-                                        },
+                                        errorBuilder:
+                                            (context, error, stackTrace) {
+                                              return Container(
+                                                width: 50,
+                                                color: Colors.grey[300],
+                                                child: Icon(Icons.broken_image),
+                                              );
+                                            },
                                       ),
                                     ),
                                     SizedBox(width: 10),
 
                                     Expanded(
                                       child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        mainAxisAlignment: MainAxisAlignment.start,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
                                         children: [
                                           Text(
                                             item['comicTitle'],
                                             overflow: TextOverflow.ellipsis,
                                             maxLines: 1,
                                             style: TextStyle(
-                                              color: isDark ? Colors.white : OkLab(0.21, 0, -0.04).toColor(),
+                                              color: isDark
+                                                  ? Colors.white
+                                                  : OkLab(
+                                                      0.21,
+                                                      0,
+                                                      -0.04,
+                                                    ).toColor(),
                                               fontWeight: FontWeight.w700,
                                               fontSize: 16,
                                             ),
                                           ),
                                           SizedBox(height: 10),
                                           Text(
-                                            'CHAPTER • ' + timeAgo(publishTime).toUpperCase(),
+                                            item['type'] == 'reply'
+                                                ? 'BÌNH LUẬN • ' +
+                                                      timeAgo(
+                                                        publishTime,
+                                                      ).toUpperCase()
+                                                : 'CHAPTER • ' +
+                                                      timeAgo(
+                                                        publishTime,
+                                                      ).toUpperCase(),
                                             overflow: TextOverflow.ellipsis,
                                             maxLines: 1,
                                             style: TextStyle(
                                               color: isDark
-                                                  ? OkLab(0.7, -0.01, -0.04).toColor()
-                                                  : OkLab(0.55, -0.01, -0.04).toColor(),
+                                                  ? OkLab(
+                                                      0.7,
+                                                      -0.01,
+                                                      -0.04,
+                                                    ).toColor()
+                                                  : OkLab(
+                                                      0.55,
+                                                      -0.01,
+                                                      -0.04,
+                                                    ).toColor(),
                                               fontWeight: FontWeight.w500,
                                               fontSize: 12,
                                             ),
@@ -350,13 +501,18 @@ class _NotifyScreenState extends State<NotifyScreen> {
                                         width: 10,
                                         height: 10,
                                         margin: EdgeInsets.only(right: 10),
-                                        decoration: BoxDecoration(color: Colors.red, shape: BoxShape.circle),
+                                        decoration: BoxDecoration(
+                                          color: Colors.red,
+                                          shape: BoxShape.circle,
+                                        ),
                                       ),
                                   ],
                                 ),
                                 SizedBox(height: 5),
                                 Text(
-                                  'Đã thêm chapter: ' + item['chapter'],
+                                  item['type'] == 'reply'
+                                      ? '${item['fromUserName']} đã trả lời bạn: ${item['content']}'
+                                      : 'Đã thêm chapter: ' + item['chapter'],
                                   overflow: TextOverflow.ellipsis,
                                   maxLines: 1,
                                   style: TextStyle(
@@ -380,7 +536,9 @@ class _NotifyScreenState extends State<NotifyScreen> {
           ),
           if (isLoading)
             Container(
-              decoration: BoxDecoration(color: Colors.black.withValues(alpha: 0.1)),
+              decoration: BoxDecoration(
+                color: Colors.black.withValues(alpha: 0.1),
+              ),
               child: Center(child: CircularProgressIndicator()),
             ),
         ],
