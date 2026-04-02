@@ -10,7 +10,7 @@ import 'package:comic_app/theme/app_dark_colors.dart';
 import 'package:comic_app/theme/app_light_colors.dart';
 import 'package:comic_app/theme/theme_provider.dart';
 import 'package:comic_app/widgets/chapter_item.dart';
-import 'package:comic_app/widgets/comment_section.dart';
+import 'package:comic_app/comment/comment_section.dart';
 import 'package:comic_app/widgets/expandable_description.dart';
 import 'package:comic_app/widgets/genre_tag.dart';
 import 'package:comic_app/widgets/related_comics_tab.dart';

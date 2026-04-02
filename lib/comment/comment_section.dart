@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:comic_app/theme/theme_provider.dart';
-import 'package:comic_app/widgets/show_info_user.dart';
+import 'package:comic_app/comment/show_info_user.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:okcolor/models/oklab.dart';
@@ -194,6 +194,7 @@ class _CommentSectionState extends State<CommentSection> {
                                     onTap: () {
                                       showDialog(
                                         context: context,
+                                        barrierDismissible: false,
                                         builder: (context) =>
                                             ShowInfoUser(uid: uid),
                                       );
