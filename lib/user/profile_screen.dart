@@ -28,7 +28,9 @@ class ProfileScreenState extends State<ProfileScreen> {
   String gender = "";
   String emailFS = "";
   String imgUrl = "";
+  String bioFS = "";
   TextEditingController nameController = TextEditingController();
+  TextEditingController bioController = TextEditingController();
 
   getUserData() async {
     setState(() {
@@ -45,6 +47,8 @@ class ProfileScreenState extends State<ProfileScreen> {
       emailFS = doc.data()!["email"];
       nameController.text = nameFS;
       imgUrl = doc.data()!["avatar"];
+      bioFS = doc.data()!['description'];
+      bioController.text = bioFS;
       isLoading = false;
     });
   }
@@ -512,50 +516,25 @@ class ProfileScreenState extends State<ProfileScreen> {
                                                   ),
                                                 );
                                               } else {
-                                                if (nameController.text.length <
-                                                    50) {
-                                                  if (nameController.text ==
-                                                      nameFS) {
-                                                    ScaffoldMessenger.of(
-                                                      context,
-                                                    ).showSnackBar(
-                                                      SnackBar(
-                                                        content: Text(
-                                                          'Tên không được trùng với tên cũ',
-                                                        ),
-                                                      ),
-                                                    );
-                                                  } else {
-                                                    await FirebaseFirestore
-                                                        .instance
-                                                        .collection("Users")
-                                                        .doc(
-                                                          FirebaseAuth
-                                                              .instance
-                                                              .currentUser!
-                                                              .uid,
-                                                        )
-                                                        .update({
-                                                          "name": nameController
-                                                              .text,
-                                                          "gender": gender,
-                                                        });
-                                                    setState(() {
-                                                      getUserData();
-                                                      isEditing = false;
+                                                await FirebaseFirestore.instance
+                                                    .collection("Users")
+                                                    .doc(
+                                                      FirebaseAuth
+                                                          .instance
+                                                          .currentUser!
+                                                          .uid,
+                                                    )
+                                                    .update({
+                                                      "name":
+                                                          nameController.text,
+                                                      "gender": gender,
+                                                      'description':
+                                                          bioController.text,
                                                     });
-                                                  }
-                                                } else {
-                                                  ScaffoldMessenger.of(
-                                                    context,
-                                                  ).showSnackBar(
-                                                    SnackBar(
-                                                      content: Text(
-                                                        'Tên không được quá 50 ký tự',
-                                                      ),
-                                                    ),
-                                                  );
-                                                }
+                                                setState(() {
+                                                  getUserData();
+                                                  isEditing = false;
+                                                });
                                               }
                                             },
                                             child: Text(
@@ -577,6 +556,8 @@ class ProfileScreenState extends State<ProfileScreen> {
                                   'Họ và tên',
                                   style: TextStyle(
                                     color: isDark ? Colors.white : Colors.black,
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
                                   ),
                                 ),
                               ],
@@ -610,6 +591,7 @@ class ProfileScreenState extends State<ProfileScreen> {
                                     children: [
                                       TextField(
                                         controller: nameController,
+                                        maxLength: 50,
                                         decoration: InputDecoration(
                                           prefixIcon: Icon(
                                             Icons.account_circle,
@@ -713,6 +695,8 @@ class ProfileScreenState extends State<ProfileScreen> {
                                 Text(
                                   'Email',
                                   style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
                                     color: isDark ? Colors.white : Colors.black,
                                   ),
                                 ),
@@ -734,6 +718,87 @@ class ProfileScreenState extends State<ProfileScreen> {
                                 ),
                               ],
                             ),
+                            SizedBox(height: 5),
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Giới thiệu về bản thân',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                    color: isDark ? Colors.white : Colors.black,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            SizedBox(height: 5),
+                            !isEditing
+                                ? Row(
+                                    children: [
+                                      Icon(
+                                        Icons.info,
+                                        color: isDark
+                                            ? Colors.white
+                                            : Colors.black,
+                                      ),
+                                      SizedBox(width: 10),
+                                      Expanded(
+                                        child: Text(
+                                          maxLines: 5,
+                                          overflow: TextOverflow.ellipsis,
+                                          bioFS,
+                                          style: TextStyle(
+                                            color: isDark
+                                                ? Colors.white
+                                                : Colors.black,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  )
+                                : Column(
+                                    children: [
+                                      TextField(
+                                        controller: bioController,
+                                        maxLength: 100,
+                                        maxLines: 3,
+                                        decoration: InputDecoration(
+                                          prefixIcon: Icon(Icons.info),
+                                          contentPadding: EdgeInsets.symmetric(
+                                            vertical: 10,
+                                          ),
+                                          enabledBorder: OutlineInputBorder(
+                                            borderRadius: BorderRadius.circular(
+                                              15,
+                                            ),
+                                            borderSide: BorderSide(
+                                              color: Color.fromRGBO(
+                                                246,
+                                                51,
+                                                154,
+                                                1.0,
+                                              ),
+                                            ),
+                                          ),
+                                          focusedBorder: OutlineInputBorder(
+                                            borderRadius: BorderRadius.circular(
+                                              15,
+                                            ),
+                                            borderSide: BorderSide(
+                                              color: Color.fromRGBO(
+                                                246,
+                                                51,
+                                                154,
+                                                1.0,
+                                              ),
+                                              width: 3.0,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                           ],
                         ),
                       ),

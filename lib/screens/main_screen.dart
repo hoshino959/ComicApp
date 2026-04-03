@@ -54,6 +54,17 @@ class _MainScreenState extends State<MainScreen> {
               return true;
             }
           }
+          final commentSnapshot = await FirebaseFirestore.instance
+              .collection('Notification')
+              .doc(user!.uid)
+              .collection('comments_notification')
+              .where('status', isEqualTo: false)
+              .limit(1)
+              .get();
+          if (commentSnapshot.docs.isNotEmpty) {
+            setState(() {});
+            return true;
+          }
           setState(() {});
           return false;
         });
@@ -74,8 +85,16 @@ class _MainScreenState extends State<MainScreen> {
         currentIndex: _selectedIndex,
         onTap: _onItemTapped,
         items: <BottomNavigationBarItem>[
-          BottomNavigationBarItem(icon: Icon(Icons.home_outlined), activeIcon: Icon(Icons.home), label: 'Trang chủ'),
-          BottomNavigationBarItem(icon: Icon(Icons.search), activeIcon: Icon(Icons.search), label: 'Tìm kiếm'),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home_outlined),
+            activeIcon: Icon(Icons.home),
+            label: 'Trang chủ',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.search),
+            activeIcon: Icon(Icons.search),
+            label: 'Tìm kiếm',
+          ),
           if (user != null)
             BottomNavigationBarItem(
               icon: StreamBuilder<bool>(
@@ -92,7 +111,10 @@ class _MainScreenState extends State<MainScreen> {
                           child: Container(
                             width: 10,
                             height: 10,
-                            decoration: BoxDecoration(color: Colors.red, shape: BoxShape.circle),
+                            decoration: BoxDecoration(
+                              color: Colors.red,
+                              shape: BoxShape.circle,
+                            ),
                           ),
                         ),
                     ],
@@ -113,7 +135,10 @@ class _MainScreenState extends State<MainScreen> {
                           child: Container(
                             width: 10,
                             height: 10,
-                            decoration: BoxDecoration(color: Colors.red, shape: BoxShape.circle),
+                            decoration: BoxDecoration(
+                              color: Colors.red,
+                              shape: BoxShape.circle,
+                            ),
                           ),
                         ),
                     ],
@@ -122,7 +147,11 @@ class _MainScreenState extends State<MainScreen> {
               ),
               label: 'Thông báo',
             ),
-          BottomNavigationBarItem(icon: Icon(Icons.person_outline), activeIcon: Icon(Icons.person), label: 'Cá nhân'),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person_outline),
+            activeIcon: Icon(Icons.person),
+            label: 'Cá nhân',
+          ),
         ],
       ),
     );

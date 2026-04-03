@@ -35,7 +35,7 @@ class _CommentSectionState extends State<CommentSection> {
   Map<String, bool> showReplyInput = {};
   Map<String, bool> showReplies = {};
 
-  String nameFS = "";
+  String nameFS = '';
   String imgUrl = "";
   bool isLoading = true;
   bool isLike = false;

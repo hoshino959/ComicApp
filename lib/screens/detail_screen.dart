@@ -24,8 +24,15 @@ import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 
 class DetailScreen extends StatefulWidget {
   final String id;
+  final int initialTab;
+  final String? commentId;
 
-  const DetailScreen({super.key, required this.id});
+  const DetailScreen({
+    super.key,
+    required this.id,
+    this.initialTab = 0,
+    this.commentId,
+  });
 
   @override
   State<DetailScreen> createState() => _DetailScreenState();
@@ -59,6 +66,7 @@ class _DetailScreenState extends State<DetailScreen> {
   @override
   void initState() {
     super.initState();
+    selectedTabIndex = widget.initialTab;
     _fetchData();
     _fetchChapters();
   }

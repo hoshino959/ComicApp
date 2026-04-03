@@ -1,5 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:comic_app/api/api_service.dart';
+import 'package:comic_app/comment/comment_section.dart';
+import 'package:comic_app/screens/detail_screen.dart';
 import 'package:comic_app/screens/reading_screen.dart';
 import 'package:comic_app/theme/app_dark_colors.dart';
 import 'package:comic_app/theme/app_light_colors.dart';
@@ -352,6 +354,15 @@ class _NotifyScreenState extends State<NotifyScreen> {
                                   .doc(item['replyId'])
                                   .update({'status': true});
                               await loadNotifications();
+
+                              Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (_) => DetailScreen(
+                                    id: item['comicId'],
+                                    initialTab: 1,
+                                  ),
+                                ),
+                              );
                               setState(() => isLoading = false);
 
                               return;

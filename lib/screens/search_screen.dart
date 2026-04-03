@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:comic_app/api/api_service.dart';
+import 'package:comic_app/api/notify_services.dart';
 import 'package:comic_app/models/chapter_model.dart';
 import 'package:comic_app/models/comic_model.dart';
 import 'package:comic_app/models/genre_model.dart';
@@ -49,7 +50,13 @@ class _SearchScreenState extends State<SearchScreen> {
   bool isFetchedGenres = false;
 
   String selectedStatus = 'Tất cả';
-  final List<String> statusList = ['Tất cả', 'Đang tiến hành', 'Đã hoàn thành', 'Tạm ngưng', 'Đã hủy'];
+  final List<String> statusList = [
+    'Tất cả',
+    'Đang tiến hành',
+    'Đã hoàn thành',
+    'Tạm ngưng',
+    'Đã hủy',
+  ];
 
   String selectedSort = 'Mới cập nhật';
   final List<String> sortList = [
@@ -69,10 +76,11 @@ class _SearchScreenState extends State<SearchScreen> {
   void initState() {
     super.initState();
     searchComics();
-    checkChapterNews();
+    _initData();
 
     _scrollController.addListener(() {
-      if (_scrollController.position.pixels >= _scrollController.position.maxScrollExtent - 200) {
+      if (_scrollController.position.pixels >=
+          _scrollController.position.maxScrollExtent - 200) {
         if (!isFetchingMore && !isLoading && hasMore) {
           searchComics(isLoadMore: true);
         }
@@ -94,59 +102,14 @@ class _SearchScreenState extends State<SearchScreen> {
     });
   }
 
-  Future<void> checkChapterNews() async {
-    final user = FirebaseAuth.instance.currentUser;
-
-    if (user == null) return;
-    final snapshot = await FirebaseFirestore.instance
-        .collection('Users')
-        .doc(user.uid)
-        .collection('Notification')
-        .get();
-
-    for (var doc in snapshot.docs) {
-      final comicId = doc.id;
-      final totalChaptersFS = doc['totalChapters'] ?? 0;
-
-      final chapters = await ApiService.fetchAllComicChapters(comicId);
-      final comicDetail = await ApiService.fetchComicDetail(comicId);
-
-      if (chapters.isEmpty) continue;
-
-      final totalChaptersAPI = chapters.length;
-
-      if (totalChaptersFS < totalChaptersAPI) {
-        final sortedChapters = List<ChapterModel>.from(chapters);
-        sortedChapters.sort((a, b) => b.publishDate.compareTo(a.publishDate));
-        final diff = (totalChaptersAPI - totalChaptersFS).toInt();
-        final newChapters = sortedChapters.take(diff).toList();
-        for (var chap in newChapters) {
-          final docRef = FirebaseFirestore.instance
-              .collection('Notification')
-              .doc(user.uid)
-              .collection(comicId)
-              .doc(chap.id);
-          final exists = await docRef.get();
-          if (exists.exists) continue;
-          await docRef.set({
-            'comicId': comicId,
-            'comicTitle': comicDetail?.title,
-            'coverUrl': comicDetail?.coverUrl,
-            'chapter': chap.chapterTitle,
-            'chapterId': chap.id,
-            'publishDate': chap.publishDate,
-            'updatedAt': FieldValue.serverTimestamp(),
-            'status': false,
-          });
-        }
-        await FirebaseFirestore.instance
-            .collection('Users')
-            .doc(user.uid)
-            .collection('Notification')
-            .doc(comicId)
-            .update({'totalChapters': chapters.length});
-      }
-    }
+  Future<void> _initData() async {
+    setState(() {
+      isLoading = true;
+    });
+    await Future.wait([NotifyServices().checkChapterNews()]);
+    setState(() {
+      isLoading = false;
+    });
   }
 
   void searchComics({bool isLoadMore = false}) async {
@@ -201,7 +164,11 @@ class _SearchScreenState extends State<SearchScreen> {
   }
 
   void _scrollToTop() {
-    _scrollController.animateTo(0, duration: const Duration(milliseconds: 500), curve: Curves.easeInOut);
+    _scrollController.animateTo(
+      0,
+      duration: const Duration(milliseconds: 500),
+      curve: Curves.easeInOut,
+    );
   }
 
   @override
@@ -213,9 +180,12 @@ class _SearchScreenState extends State<SearchScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Provider.of<ThemeProvider>(context).themeMode == ThemeMode.dark;
+    final isDark =
+        Provider.of<ThemeProvider>(context).themeMode == ThemeMode.dark;
 
-    final gradient = isDark ? AppColorsDark.gradientBackground : AppColorsLight.gradientBackground;
+    final gradient = isDark
+        ? AppColorsDark.gradientBackground
+        : AppColorsLight.gradientBackground;
 
     return Scaffold(
       backgroundColor: Colors.transparent,
@@ -239,14 +209,18 @@ class _SearchScreenState extends State<SearchScreen> {
                   style: TextStyle(
                     fontSize: 30,
                     fontWeight: FontWeight.w700,
-                    color: isDark ? OkLab(0.83, 0.07, -0.1).toColor() : OkLab(0.5, 0.14, -0.22).toColor(),
+                    color: isDark
+                        ? OkLab(0.83, 0.07, -0.1).toColor()
+                        : OkLab(0.5, 0.14, -0.22).toColor(),
                   ),
                 ),
                 const SizedBox(height: 8),
                 Text(
                   'Tìm truyện yêu thích tiếp theo của bạn',
                   style: TextStyle(
-                    color: isDark ? OkLab(0.71, 0, -0.02).toColor() : OkLab(0.45, -0.01, -0.03).toColor(),
+                    color: isDark
+                        ? OkLab(0.71, 0, -0.02).toColor()
+                        : OkLab(0.45, -0.01, -0.03).toColor(),
                     fontSize: 16,
                   ),
                 ),
@@ -254,10 +228,14 @@ class _SearchScreenState extends State<SearchScreen> {
                 Container(
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(30),
-                    boxShadow: [BoxShadow(blurRadius: 5, color: Colors.grey.shade300)],
+                    boxShadow: [
+                      BoxShadow(blurRadius: 5, color: Colors.grey.shade300),
+                    ],
                   ),
                   child: TextField(
-                    style: TextStyle(color: isDark ? Colors.white : Colors.black),
+                    style: TextStyle(
+                      color: isDark ? Colors.white : Colors.black,
+                    ),
                     controller: _searchController,
                     decoration: InputDecoration(
                       filled: true,
@@ -266,13 +244,18 @@ class _SearchScreenState extends State<SearchScreen> {
                         borderRadius: BorderRadius.circular(30),
                         borderSide: BorderSide(
                           width: 2,
-                          color: isDark ? OkLab(0.46, 0.19, 0.01).toColor() : OkLab(0.9, 0.06, -0.02).toColor(),
+                          color: isDark
+                              ? OkLab(0.46, 0.19, 0.01).toColor()
+                              : OkLab(0.9, 0.06, -0.02).toColor(),
                         ),
                       ),
 
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(30),
-                        borderSide: BorderSide(color: OkLab(0.63, 0.24, 0).toColor(), width: 3),
+                        borderSide: BorderSide(
+                          color: OkLab(0.63, 0.24, 0).toColor(),
+                          width: 3,
+                        ),
                       ),
                       prefixIcon: Icon(Icons.search),
                       hintText: 'Tìm kiếm',
@@ -282,10 +265,12 @@ class _SearchScreenState extends State<SearchScreen> {
                       setState(() {
                         currentSearchValue = value;
 
-                        if (value.trim().isNotEmpty && (orderBy == 'default' || orderBy == 'updatedAt')) {
+                        if (value.trim().isNotEmpty &&
+                            (orderBy == 'default' || orderBy == 'updatedAt')) {
                           selectedSort = 'Liên quan nhất';
                           orderBy = 'relevance';
-                        } else if (value.trim().isEmpty && (orderBy == 'default' || orderBy == 'relevance')) {
+                        } else if (value.trim().isEmpty &&
+                            (orderBy == 'default' || orderBy == 'relevance')) {
                           selectedSort = 'Mới cập nhật';
                           orderBy = 'updatedAt';
                         }
@@ -308,19 +293,34 @@ class _SearchScreenState extends State<SearchScreen> {
                     InkWell(
                       onTap: () => _showFilterModal(context),
                       child: Container(
-                        padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 8,
+                        ),
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(20),
                           border: Border.all(
-                            color: isDark ? Colors.white.withValues(alpha: 0.3) : Colors.black.withValues(alpha: 0.3),
+                            color: isDark
+                                ? Colors.white.withValues(alpha: 0.3)
+                                : Colors.black.withValues(alpha: 0.3),
                             width: 2,
                           ),
                         ),
                         child: Row(
                           children: [
-                            Icon(Icons.filter_alt_outlined, size: 16, fontWeight: FontWeight.bold),
+                            Icon(
+                              Icons.filter_alt_outlined,
+                              size: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
                             const SizedBox(width: 6),
-                            Text('Bộ lọc', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
+                            Text(
+                              'Bộ lọc',
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
                           ],
                         ),
                       ),
@@ -329,19 +329,34 @@ class _SearchScreenState extends State<SearchScreen> {
                     InkWell(
                       onTap: () => _showConfModal(context),
                       child: Container(
-                        padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 8,
+                        ),
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(20),
                           border: Border.all(
-                            color: isDark ? Colors.white.withValues(alpha: 0.3) : Colors.black.withValues(alpha: 0.3),
+                            color: isDark
+                                ? Colors.white.withValues(alpha: 0.3)
+                                : Colors.black.withValues(alpha: 0.3),
                             width: 2,
                           ),
                         ),
                         child: Row(
                           children: [
-                            Icon(Icons.settings_outlined, size: 16, fontWeight: FontWeight.bold),
+                            Icon(
+                              Icons.settings_outlined,
+                              size: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
                             const SizedBox(width: 6),
-                            Text('Cấu hình tìm kiếm', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
+                            Text(
+                              'Cấu hình tìm kiếm',
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
                           ],
                         ),
                       ),
@@ -358,18 +373,22 @@ class _SearchScreenState extends State<SearchScreen> {
                     child: GridView.builder(
                       controller: _scrollController,
                       itemCount: comics!.length,
-                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 2,
-                        crossAxisSpacing: 16,
-                        mainAxisSpacing: 16,
-                        mainAxisExtent: 320,
-                      ),
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 2,
+                            crossAxisSpacing: 16,
+                            mainAxisSpacing: 16,
+                            mainAxisExtent: 320,
+                          ),
                       itemBuilder: (context, index) {
                         return InkWell(
                           onTap: () => {
                             Navigator.push(
                               context,
-                              MaterialPageRoute(builder: (context) => DetailScreen(id: comics![index].id)),
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    DetailScreen(id: comics![index].id),
+                              ),
                             ),
                           },
                           child: ComicCard(
@@ -392,7 +411,10 @@ class _SearchScreenState extends State<SearchScreen> {
                   Padding(
                     padding: const EdgeInsets.symmetric(vertical: 20.0),
                     child: Center(
-                      child: Text('Đã tải hết truyện', style: TextStyle(color: AppColors.textColor)),
+                      child: Text(
+                        'Đã tải hết truyện',
+                        style: TextStyle(color: AppColors.textColor),
+                      ),
                     ),
                   ),
               ],
@@ -430,15 +452,25 @@ class _SearchScreenState extends State<SearchScreen> {
                   children: [
                     Row(
                       children: const [
-                        Icon(Icons.filter_alt_outlined, color: Color(0xFFFF2E7E)),
+                        Icon(
+                          Icons.filter_alt_outlined,
+                          color: Color(0xFFFF2E7E),
+                        ),
                         SizedBox(width: 6),
                         Text(
                           'Bộ lọc',
-                          style: TextStyle(color: Color(0xFFFF2E7E), fontSize: 20, fontWeight: FontWeight.bold),
+                          style: TextStyle(
+                            color: Color(0xFFFF2E7E),
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ],
                     ),
-                    Divider(color: Colors.white.withValues(alpha: 0.1), height: 32),
+                    Divider(
+                      color: Colors.white.withValues(alpha: 0.1),
+                      height: 32,
+                    ),
 
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -446,28 +478,42 @@ class _SearchScreenState extends State<SearchScreen> {
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Text('Thể loại', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                            const Text(
+                              'Thể loại',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
                             Text(
                               'Chọn một hoặc nhiều thể loại',
-                              style: TextStyle(color: Colors.white.withValues(alpha: 0.7)),
+                              style: TextStyle(
+                                color: Colors.white.withValues(alpha: 0.7),
+                              ),
                             ),
                           ],
                         ),
                         InkWell(
                           onTap: () {
-                            _showGenreDialog(context, tempGenres, tempIdGenres, (
-                              Map<String, List<String>> returnedGenres,
-                            ) {
-                              setModalState(() {
-                                tempGenres = returnedGenres['nameGenres']!;
-                                tempIdGenres = returnedGenres['idGenres']!;
-                              });
-                            });
+                            _showGenreDialog(
+                              context,
+                              tempGenres,
+                              tempIdGenres,
+                              (Map<String, List<String>> returnedGenres) {
+                                setModalState(() {
+                                  tempGenres = returnedGenres['nameGenres']!;
+                                  tempIdGenres = returnedGenres['idGenres']!;
+                                });
+                              },
+                            );
                           },
                           child: Container(
                             padding: const EdgeInsets.all(8),
                             decoration: BoxDecoration(
-                              border: Border.all(color: Colors.white.withValues(alpha: 0.3), width: 1),
+                              border: Border.all(
+                                color: Colors.white.withValues(alpha: 0.3),
+                                width: 1,
+                              ),
                               shape: BoxShape.circle,
                               color: Colors.transparent,
                             ),
@@ -490,11 +536,18 @@ class _SearchScreenState extends State<SearchScreen> {
 
                           if (tempGenres.length > 10)
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 12,
+                                vertical: 6,
+                              ),
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(20),
-                                color: const Color(0xFFFF2E7E).withValues(alpha: 0.2),
-                                border: Border.all(color: const Color(0xFFFF2E7E)),
+                                color: const Color(
+                                  0xFFFF2E7E,
+                                ).withValues(alpha: 0.2),
+                                border: Border.all(
+                                  color: const Color(0xFFFF2E7E),
+                                ),
                               ),
                               child: Text(
                                 '+${tempGenres.length - 10}',
@@ -507,9 +560,18 @@ class _SearchScreenState extends State<SearchScreen> {
                             ),
                         ],
                       ),
-                    Divider(color: Colors.white.withValues(alpha: 0.1), height: 32),
+                    Divider(
+                      color: Colors.white.withValues(alpha: 0.1),
+                      height: 32,
+                    ),
 
-                    const Text('Trạng thái', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                    const Text(
+                      'Trạng thái',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                     const SizedBox(height: 10),
                     CustomDropdown(
                       value: tempStatus,
@@ -520,9 +582,18 @@ class _SearchScreenState extends State<SearchScreen> {
                         });
                       },
                     ),
-                    Divider(color: Colors.white.withValues(alpha: 0.1), height: 32),
+                    Divider(
+                      color: Colors.white.withValues(alpha: 0.1),
+                      height: 32,
+                    ),
 
-                    const Text('Sắp xếp theo', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                    const Text(
+                      'Sắp xếp theo',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                     const SizedBox(height: 10),
                     CustomDropdown(
                       value: tempSort,
@@ -533,7 +604,10 @@ class _SearchScreenState extends State<SearchScreen> {
                         });
                       },
                     ),
-                    Divider(color: Colors.white.withValues(alpha: 0.1), height: 32),
+                    Divider(
+                      color: Colors.white.withValues(alpha: 0.1),
+                      height: 32,
+                    ),
 
                     Row(
                       mainAxisAlignment: MainAxisAlignment.end,
@@ -542,7 +616,9 @@ class _SearchScreenState extends State<SearchScreen> {
                           onTap: () {
                             Navigator.pop(context, {
                               'status': 'Tất cả',
-                              'sort': currentSearchValue.isEmpty ? 'Mới cập nhật' : 'Liên quan nhất',
+                              'sort': currentSearchValue.isEmpty
+                                  ? 'Mới cập nhật'
+                                  : 'Liên quan nhất',
                               'genreNames': [],
                               'genreIds': [],
                             });
@@ -552,15 +628,26 @@ class _SearchScreenState extends State<SearchScreen> {
                               color: const Color(0xFFEF4444),
                               borderRadius: BorderRadius.circular(24),
                             ),
-                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 10,
+                            ),
                             child: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: const [
-                                Icon(Icons.close, size: 16, color: Colors.white),
+                                Icon(
+                                  Icons.close,
+                                  size: 16,
+                                  color: Colors.white,
+                                ),
                                 SizedBox(width: 4),
                                 Text(
                                   'Xoá tất cả',
-                                  style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13),
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 13,
+                                  ),
                                 ),
                               ],
                             ),
@@ -582,10 +669,17 @@ class _SearchScreenState extends State<SearchScreen> {
                               color: const Color(0xFFFF2E7E),
                               borderRadius: BorderRadius.circular(24),
                             ),
-                            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 20,
+                              vertical: 10,
+                            ),
                             child: const Text(
                               'Áp dụng bộ lọc',
-                              style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13),
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 13,
+                              ),
                             ),
                           ),
                         ),
@@ -677,10 +771,16 @@ class _SearchScreenState extends State<SearchScreen> {
             }
             return AlertDialog(
               backgroundColor: const Color(0xFF1E1528),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
               title: const Text(
                 'Chọn thể loại',
-                style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
               content: SizedBox(
                 width: double.maxFinite,
@@ -705,7 +805,9 @@ class _SearchScreenState extends State<SearchScreen> {
                             displayedGenres = allGenres;
                           } else {
                             displayedGenres = allGenres.where((genre) {
-                              return genre.name.toLowerCase().contains(query.toLowerCase());
+                              return genre.name.toLowerCase().contains(
+                                query.toLowerCase(),
+                              );
                             }).toList();
                           }
                         });
@@ -713,9 +815,15 @@ class _SearchScreenState extends State<SearchScreen> {
                     ),
                     const SizedBox(height: 8),
                     if (isLoadingGenre)
-                      const SizedBox(height: 300, child: Center(child: CircularProgressIndicator()))
+                      const SizedBox(
+                        height: 300,
+                        child: Center(child: CircularProgressIndicator()),
+                      )
                     else if (displayedGenres.isEmpty)
-                      const SizedBox(height: 300, child: Center(child: Text('Không có thể loại')))
+                      const SizedBox(
+                        height: 300,
+                        child: Center(child: Text('Không có thể loại')),
+                      )
                     else ...[
                       Expanded(
                         child: ListView.builder(
@@ -726,11 +834,19 @@ class _SearchScreenState extends State<SearchScreen> {
                             final isChecked = tempSelectedName.contains(genre);
 
                             return CheckboxListTile(
-                              title: Text(genre, style: const TextStyle(color: Colors.white, fontSize: 15)),
+                              title: Text(
+                                genre,
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 15,
+                                ),
+                              ),
                               value: isChecked,
                               activeColor: const Color(0xFFFF2E7E),
                               checkColor: Colors.white,
-                              side: BorderSide(color: Colors.white.withValues(alpha: 0.5)),
+                              side: BorderSide(
+                                color: Colors.white.withValues(alpha: 0.5),
+                              ),
                               contentPadding: EdgeInsets.zero,
                               onChanged: (bool? value) {
                                 setDialogState(() {
@@ -754,18 +870,29 @@ class _SearchScreenState extends State<SearchScreen> {
               actions: [
                 TextButton(
                   onPressed: () => Navigator.pop(context),
-                  child: const Text('Hủy', style: TextStyle(color: Colors.grey)),
+                  child: const Text(
+                    'Hủy',
+                    style: TextStyle(color: Colors.grey),
+                  ),
                 ),
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFFFF2E7E),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
                   ),
                   onPressed: () {
                     Navigator.pop(context);
-                    onConfirm({'idGenres': tempSelectedId, 'nameGenres': tempSelectedName});
+                    onConfirm({
+                      'idGenres': tempSelectedId,
+                      'nameGenres': tempSelectedName,
+                    });
                   },
-                  child: const Text('Xong', style: TextStyle(color: Colors.white)),
+                  child: const Text(
+                    'Xong',
+                    style: TextStyle(color: Colors.white),
+                  ),
                 ),
               ],
             );
@@ -804,7 +931,9 @@ class _SearchScreenState extends State<SearchScreen> {
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
                           border: Border.all(
-                            color: isSelected ? const Color(0xFFFF2E7E) : Colors.white.withValues(alpha: 0.3),
+                            color: isSelected
+                                ? const Color(0xFFFF2E7E)
+                                : Colors.white.withValues(alpha: 0.3),
                             width: isSelected ? 6 : 1,
                           ),
                         ),
@@ -813,8 +942,12 @@ class _SearchScreenState extends State<SearchScreen> {
                       Text(
                         title,
                         style: TextStyle(
-                          color: isSelected ? const Color(0xFFFF2E7E) : Colors.white,
-                          fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                          color: isSelected
+                              ? const Color(0xFFFF2E7E)
+                              : Colors.white,
+                          fontWeight: isSelected
+                              ? FontWeight.bold
+                              : FontWeight.normal,
                         ),
                       ),
                     ],
@@ -840,22 +973,36 @@ class _SearchScreenState extends State<SearchScreen> {
                         SizedBox(width: 6),
                         Text(
                           'Cấu hình tìm kiếm',
-                          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Color(0xFFFF2E7E)),
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFFFF2E7E),
+                          ),
                         ),
                       ],
                     ),
-                    Divider(color: Colors.white.withValues(alpha: 0.1), height: 32),
+                    Divider(
+                      color: Colors.white.withValues(alpha: 0.1),
+                      height: 32,
+                    ),
 
                     const Text(
                       'Tìm kiếm theo',
-                      style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                     const SizedBox(height: 8),
                     buildRadioOption('Tiêu đề'),
                     buildRadioOption('Tác giả'),
                     buildRadioOption('Họa sĩ'),
 
-                    Divider(color: Colors.white.withValues(alpha: 0.1), height: 32),
+                    Divider(
+                      color: Colors.white.withValues(alpha: 0.1),
+                      height: 32,
+                    ),
 
                     InkWell(
                       onTap: () {
@@ -871,20 +1018,34 @@ class _SearchScreenState extends State<SearchScreen> {
                               width: 20,
                               height: 20,
                               decoration: BoxDecoration(
-                                color: tempIsR18 ? const Color(0xFFFF2E7E) : Colors.transparent,
+                                color: tempIsR18
+                                    ? const Color(0xFFFF2E7E)
+                                    : Colors.transparent,
                                 borderRadius: BorderRadius.circular(4),
                                 border: Border.all(
-                                  color: tempIsR18 ? const Color(0xFFFF2E7E) : Colors.white.withValues(alpha: 0.3),
+                                  color: tempIsR18
+                                      ? const Color(0xFFFF2E7E)
+                                      : Colors.white.withValues(alpha: 0.3),
                                 ),
                               ),
-                              child: tempIsR18 ? const Icon(Icons.check, size: 16, color: Colors.white) : null,
+                              child: tempIsR18
+                                  ? const Icon(
+                                      Icons.check,
+                                      size: 16,
+                                      color: Colors.white,
+                                    )
+                                  : null,
                             ),
                             const SizedBox(width: 12),
                             Text(
                               'Hiển thị nội dung R18',
                               style: TextStyle(
-                                color: tempIsR18 ? const Color(0xFFFF2E7E) : Colors.white,
-                                fontWeight: tempIsR18 ? FontWeight.bold : FontWeight.normal,
+                                color: tempIsR18
+                                    ? const Color(0xFFFF2E7E)
+                                    : Colors.white,
+                                fontWeight: tempIsR18
+                                    ? FontWeight.bold
+                                    : FontWeight.normal,
                               ),
                             ),
                           ],
@@ -892,11 +1053,17 @@ class _SearchScreenState extends State<SearchScreen> {
                       ),
                     ),
 
-                    Divider(color: Colors.white.withValues(alpha: 0.1), height: 32),
+                    Divider(
+                      color: Colors.white.withValues(alpha: 0.1),
+                      height: 32,
+                    ),
 
                     InkWell(
                       onTap: () {
-                        Navigator.pop(context, {'searchBy': tempSearchBy, 'isR18': tempIsR18});
+                        Navigator.pop(context, {
+                          'searchBy': tempSearchBy,
+                          'isR18': tempIsR18,
+                        });
                       },
                       child: Container(
                         width: double.infinity,
@@ -908,7 +1075,10 @@ class _SearchScreenState extends State<SearchScreen> {
                         child: const Center(
                           child: Text(
                             'Áp dụng',
-                            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                         ),
                       ),
