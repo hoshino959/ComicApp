@@ -1142,6 +1142,8 @@ class _DetailScreenState extends State<DetailScreen> {
                                                     status: comicDetail!.status,
                                                   );
 
+                                                  if (!context.mounted) return;
+
                                                   Navigator.push(
                                                     context,
 

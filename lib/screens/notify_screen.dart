@@ -1,6 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:comic_app/api/api_service.dart';
-import 'package:comic_app/comment/comment_section.dart';
 import 'package:comic_app/screens/detail_screen.dart';
 import 'package:comic_app/screens/reading_screen.dart';
 import 'package:comic_app/theme/app_dark_colors.dart';
@@ -355,6 +354,8 @@ class _NotifyScreenState extends State<NotifyScreen> {
                                   .update({'status': true});
                               await loadNotifications();
 
+                              if (!context.mounted) return;
+
                               Navigator.of(context).push(
                                 MaterialPageRoute(
                                   builder: (_) => DetailScreen(
@@ -389,6 +390,8 @@ class _NotifyScreenState extends State<NotifyScreen> {
                                 await ApiService.fetchComicDetail(
                                   item['comicId'],
                                 );
+
+                            if (!context.mounted) return;
 
                             Navigator.of(context).push(
                               MaterialPageRoute(
@@ -478,14 +481,8 @@ class _NotifyScreenState extends State<NotifyScreen> {
                                           SizedBox(height: 10),
                                           Text(
                                             item['type'] == 'reply'
-                                                ? 'BÌNH LUẬN • ' +
-                                                      timeAgo(
-                                                        publishTime,
-                                                      ).toUpperCase()
-                                                : 'CHAPTER • ' +
-                                                      timeAgo(
-                                                        publishTime,
-                                                      ).toUpperCase(),
+                                                ? 'BÌNH LUẬN • ${timeAgo(publishTime).toUpperCase()}'
+                                                : 'CHAPTER • ${timeAgo(publishTime).toUpperCase()}',
                                             overflow: TextOverflow.ellipsis,
                                             maxLines: 1,
                                             style: TextStyle(
@@ -523,7 +520,7 @@ class _NotifyScreenState extends State<NotifyScreen> {
                                 Text(
                                   item['type'] == 'reply'
                                       ? '${item['fromUserName']} đã trả lời bạn: ${item['content']}'
-                                      : 'Đã thêm chapter: ' + item['chapter'],
+                                      : 'Đã thêm chapter: ${item['chapter']}',
                                   overflow: TextOverflow.ellipsis,
                                   maxLines: 1,
                                   style: TextStyle(

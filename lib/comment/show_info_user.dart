@@ -87,14 +87,14 @@ class _ShowInfoUserState extends State<ShowInfoUser> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const SizedBox(height: 5),
-                      _infoText(info: email, status: 'Email'),
+                      InfoText(info: email, status: 'Email'),
                       const SizedBox(height: 5),
-                      _infoText(
+                      InfoText(
                         info: formatDate(createdAt),
                         status: 'Ngày tham gia',
                       ),
                       const SizedBox(height: 5),
-                      _infoText(info: gender, status: 'Giới tính'),
+                      InfoText(info: gender, status: 'Giới tính'),
                       const SizedBox(height: 5),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.start,
@@ -167,8 +167,8 @@ class _ShowInfoUserState extends State<ShowInfoUser> {
   }
 }
 
-class _infoText extends StatelessWidget {
-  const _infoText({super.key, required this.info, required this.status});
+class InfoText extends StatelessWidget {
+  const InfoText({super.key, required this.info, required this.status});
 
   final String info;
 

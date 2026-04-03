@@ -220,7 +220,7 @@ class _CommentSectionState extends State<CommentSection> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   GestureDetector(
-                                    child: _buildAvatar(url: avatar),
+                                    child: BuildAvatarComment(url: avatar),
                                     onTap: () {
                                       showDialog(
                                         context: context,
@@ -236,16 +236,16 @@ class _CommentSectionState extends State<CommentSection> {
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
                                       children: [
-                                        _userName(
+                                        UserNameComment(
                                           nameFS: userName,
                                           isDark: isDark,
                                         ),
-                                        _createdAt(
+                                        CreatedAtComment(
                                           createdAt: createdAt,
                                           isDark: isDark,
                                         ),
                                         SizedBox(height: 5),
-                                        _content(
+                                        ContentComment(
                                           isDark: isDark,
                                           content: content,
                                         ),
@@ -323,7 +323,7 @@ class _CommentSectionState extends State<CommentSection> {
                                         SizedBox(height: 10),
                                         Row(
                                           children: [
-                                            _buildAvatar(url: imgUrl),
+                                            BuildAvatarComment(url: imgUrl),
                                             SizedBox(width: 10),
                                             Expanded(
                                               child: Text(
@@ -505,8 +505,9 @@ class _CommentSectionState extends State<CommentSection> {
                                 builder: (context, snapshot) {
                                   if (!snapshot.hasData) return SizedBox();
 
-                                  if (snapshot.data!.docs.length == 0)
+                                  if (snapshot.data!.docs.isEmpty) {
                                     return SizedBox();
+                                  }
                                   final isShow =
                                       showReplies[commentId] ?? false;
                                   return Column(
@@ -569,7 +570,7 @@ class _CommentSectionState extends State<CommentSection> {
                                                         CrossAxisAlignment
                                                             .start,
                                                     children: [
-                                                      _buildAvatar(
+                                                      BuildAvatarComment(
                                                         url: avatarReply,
                                                       ),
                                                       SizedBox(width: 10),
@@ -579,17 +580,17 @@ class _CommentSectionState extends State<CommentSection> {
                                                               CrossAxisAlignment
                                                                   .start,
                                                           children: [
-                                                            _userName(
+                                                            UserNameComment(
                                                               nameFS:
                                                                   userNameReply,
                                                               isDark: isDark,
                                                             ),
-                                                            _createdAt(
+                                                            CreatedAtComment(
                                                               createdAt:
                                                                   replyCreatedAt,
                                                               isDark: isDark,
                                                             ),
-                                                            _content(
+                                                            ContentComment(
                                                               isDark: isDark,
                                                               content:
                                                                   contentReply,
@@ -665,8 +666,12 @@ class _CommentSectionState extends State<CommentSection> {
   }
 }
 
-class _content extends StatelessWidget {
-  const _content({required this.isDark, required this.content});
+class ContentComment extends StatelessWidget {
+  const ContentComment({
+    super.key,
+    required this.isDark,
+    required this.content,
+  });
 
   final bool isDark;
   final dynamic content;
@@ -697,8 +702,12 @@ class _content extends StatelessWidget {
   }
 }
 
-class _userName extends StatelessWidget {
-  const _userName({required this.nameFS, required this.isDark});
+class UserNameComment extends StatelessWidget {
+  const UserNameComment({
+    super.key,
+    required this.nameFS,
+    required this.isDark,
+  });
 
   final String nameFS;
   final bool isDark;
@@ -720,8 +729,12 @@ class _userName extends StatelessWidget {
   }
 }
 
-class _createdAt extends StatelessWidget {
-  const _createdAt({required this.createdAt, required this.isDark});
+class CreatedAtComment extends StatelessWidget {
+  const CreatedAtComment({
+    super.key,
+    required this.createdAt,
+    required this.isDark,
+  });
 
   final DateTime createdAt;
   final bool isDark;
@@ -864,8 +877,8 @@ class CommentActionBar extends StatelessWidget {
   }
 }
 
-class _buildAvatar extends StatelessWidget {
-  const _buildAvatar({required this.url});
+class BuildAvatarComment extends StatelessWidget {
+  const BuildAvatarComment({super.key, required this.url});
 
   final String url;
 
@@ -921,10 +934,10 @@ class CommentInputBox extends StatelessWidget {
         children: [
           Row(
             children: [
-              _buildAvatar(url: avatar),
+              BuildAvatarComment(url: avatar),
               SizedBox(width: 10),
               Expanded(
-                child: _userName(nameFS: userName, isDark: isDark),
+                child: UserNameComment(nameFS: userName, isDark: isDark),
               ),
             ],
           ),

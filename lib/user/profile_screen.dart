@@ -10,6 +10,8 @@ import 'package:image_picker/image_picker.dart';
 import 'package:okcolor/models/oklab.dart';
 
 class ProfileScreen extends StatefulWidget {
+  const ProfileScreen({super.key});
+
   @override
   State<StatefulWidget> createState() {
     return ProfileScreenState();
@@ -32,7 +34,7 @@ class ProfileScreenState extends State<ProfileScreen> {
   TextEditingController nameController = TextEditingController();
   TextEditingController bioController = TextEditingController();
 
-  getUserData() async {
+  Future<void> getUserData() async {
     setState(() {
       isLoading = true;
     });
@@ -53,7 +55,7 @@ class ProfileScreenState extends State<ProfileScreen> {
     });
   }
 
-  pickAndUploadImage() async {
+  Future<void> pickAndUploadImage() async {
     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
     if (pickedFile == null) {
       return;
@@ -91,7 +93,7 @@ class ProfileScreenState extends State<ProfileScreen> {
               SizedBox(height: 10),
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 30),
-                child: Container(
+                child: SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
@@ -122,7 +124,7 @@ class ProfileScreenState extends State<ProfileScreen> {
               ),
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 30),
-                child: Container(
+                child: SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
@@ -150,7 +152,7 @@ class ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  uploadToCloudinary(File imageFile) async {
+  Future uploadToCloudinary(File imageFile) async {
     try {
       setState(() {
         isLoading = true;
@@ -346,6 +348,7 @@ class ProfileScreenState extends State<ProfileScreen> {
                             InkWell(
                               onTap: () async {
                                 await FirebaseAuth.instance.signOut();
+                                if (!context.mounted) return;
                                 Navigator.of(context).pushReplacement(
                                   MaterialPageRoute(
                                     builder: (_) => MainScreen(),
@@ -363,7 +366,7 @@ class ProfileScreenState extends State<ProfileScreen> {
                                       Icons.logout,
                                       color:
                                           Theme.of(context).brightness ==
-                                              ThemeMode.light
+                                              Brightness.light
                                           ? OkLab(0.64, 0.21, 0.1).toColor()
                                           : OkLab(0.7, 0.18, 0.07).toColor(),
                                     ),
@@ -373,7 +376,7 @@ class ProfileScreenState extends State<ProfileScreen> {
                                       style: TextStyle(
                                         color:
                                             Theme.of(context).brightness ==
-                                                ThemeMode.light
+                                                Brightness.light
                                             ? OkLab(0.64, 0.21, 0.1).toColor()
                                             : OkLab(0.7, 0.18, 0.07).toColor(),
                                         fontWeight: FontWeight.bold,

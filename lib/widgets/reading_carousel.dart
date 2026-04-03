@@ -8,7 +8,6 @@ import 'package:comic_app/screens/reading_screen.dart';
 import 'package:comic_app/theme/theme_provider.dart';
 import 'package:comic_app/widgets/status_chip.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:okcolor/models/oklab.dart';
 import 'package:provider/provider.dart';
@@ -379,6 +378,7 @@ class _ReadingCarouselState extends State<ReadingCarousel> {
                                           final index = chapters.indexWhere(
                                             (c) => c.id == chapterId,
                                           );
+                                          if (!context.mounted) return;
                                           Navigator.push(
                                             context,
                                             MaterialPageRoute(
@@ -409,6 +409,7 @@ class _ReadingCarouselState extends State<ReadingCarousel> {
                                           );
                                         } else {
                                           final index = chapters.length - 1;
+                                          if (!context.mounted) return;
                                           Navigator.push(
                                             context,
                                             MaterialPageRoute(

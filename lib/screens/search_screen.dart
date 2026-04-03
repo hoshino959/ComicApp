@@ -1,9 +1,7 @@
 import 'dart:async';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:comic_app/api/api_service.dart';
 import 'package:comic_app/api/notify_services.dart';
-import 'package:comic_app/models/chapter_model.dart';
 import 'package:comic_app/models/comic_model.dart';
 import 'package:comic_app/models/genre_model.dart';
 import 'package:comic_app/screens/detail_screen.dart';
@@ -14,7 +12,6 @@ import 'package:comic_app/theme/theme_provider.dart';
 import 'package:comic_app/widgets/comic_card.dart';
 import 'package:comic_app/widgets/custom_dropdown.dart';
 import 'package:comic_app/widgets/genre_tag.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:okcolor/models/oklab.dart';
 import 'package:provider/provider.dart';

@@ -645,6 +645,7 @@ class LoginPageState extends State<LoginPage> {
                                                           .text
                                                           .trim(),
                                                     );
+                                                if (!context.mounted) return;
                                                 ScaffoldMessenger.of(
                                                   context,
                                                 ).showSnackBar(
@@ -708,6 +709,7 @@ class LoginPageState extends State<LoginPage> {
                                                         .text
                                                         .trim(),
                                                   );
+                                              if (!context.mounted) return;
 
                                               Navigator.pushAndRemoveUntil(
                                                 context,
@@ -836,6 +838,10 @@ class LoginPageState extends State<LoginPage> {
                                                                 FieldValue.serverTimestamp(),
                                                             'description': '',
                                                           });
+                                                      if (!context.mounted) {
+                                                        return;
+                                                      }
+
                                                       ScaffoldMessenger.of(
                                                         context,
                                                       ).showSnackBar(
@@ -956,39 +962,6 @@ class LoginPageState extends State<LoginPage> {
             color: Colors.black.withValues(alpha: 0.3),
             child: Center(child: CircularProgressIndicator()),
           ),
-      ],
-    );
-  }
-}
-
-class logoWidget extends StatelessWidget {
-  const logoWidget({super.key, required this.isDark});
-
-  final bool isDark;
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        ClipOval(
-          child: Image.asset(
-            'assets/images/logo.png',
-            width: 70,
-            height: 70,
-            fit: BoxFit.cover,
-          ),
-        ),
-        Text(
-          '  Comic Garden',
-          style: TextStyle(
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-            color: isDark
-                ? Color.fromRGBO(246, 51, 154, 1.0)
-                : Color.fromRGBO(230, 0, 118, 1.0),
-          ),
-        ),
       ],
     );
   }

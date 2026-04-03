@@ -1,7 +1,4 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:comic_app/api/api_service.dart';
 import 'package:comic_app/api/notify_services.dart';
-import 'package:comic_app/models/chapter_model.dart';
 import 'package:comic_app/screens/main_screen.dart';
 import 'package:comic_app/theme/app_dark_colors.dart';
 import 'package:comic_app/theme/app_light_colors.dart';
@@ -73,7 +70,7 @@ class UserScreenState extends State<UserScreen> {
                     ),
 
                     SizedBox(height: 50),
-                    dashLine(),
+                    DashLine(),
                     SizedBox(height: 4),
 
                     //userInfo
@@ -262,7 +259,7 @@ class UserScreenState extends State<UserScreen> {
                     ),
                     SizedBox(height: 4),
 
-                    dashLine(),
+                    DashLine(),
                     SizedBox(height: 4),
 
                     if (user != null)
@@ -272,6 +269,7 @@ class UserScreenState extends State<UserScreen> {
                             isLoading = true;
                           });
                           await FirebaseAuth.instance.signOut();
+                          if (!context.mounted) return;
                           Navigator.of(context).pushReplacement(
                             MaterialPageRoute(builder: (_) => MainScreen()),
                           );
@@ -324,8 +322,8 @@ class UserScreenState extends State<UserScreen> {
   }
 }
 
-class dashLine extends StatelessWidget {
-  const dashLine({super.key});
+class DashLine extends StatelessWidget {
+  const DashLine({super.key});
 
   @override
   Widget build(BuildContext context) {

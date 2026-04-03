@@ -64,7 +64,11 @@ class _ReadingListState extends State<ReadingList> {
 
   Future<void> updateComic() async {
     final user = FirebaseAuth.instance.currentUser;
-    final snapshot = await FirebaseFirestore.instance.collection('Users').doc(user!.uid).collection('Reading').get();
+    final snapshot = await FirebaseFirestore.instance
+        .collection('Users')
+        .doc(user!.uid)
+        .collection('Reading')
+        .get();
     for (var doc in snapshot.docs) {
       final data = doc.data();
 
@@ -90,10 +94,12 @@ class _ReadingListState extends State<ReadingList> {
       double progress = (chapterIndex / newTotalChapters);
 
       if (oldTotalChapters != newTotalChapters) {
-        await FirebaseFirestore.instance.collection('Users').doc(user.uid).collection('Reading').doc(comicId).update({
-          'totalChapters': newTotalChapters,
-          'progress': progress,
-        });
+        await FirebaseFirestore.instance
+            .collection('Users')
+            .doc(user.uid)
+            .collection('Reading')
+            .doc(comicId)
+            .update({'totalChapters': newTotalChapters, 'progress': progress});
       }
       if (oldCoverUrl != newCoverUrl) {
         updateFireStore(comicId, 'coverUrl', newCoverUrl);
@@ -107,18 +113,29 @@ class _ReadingListState extends State<ReadingList> {
     }
   }
 
-  Future<void> updateFireStore(String comicId, String string, dynamic dynamic) async {
+  Future<void> updateFireStore(
+    String comicId,
+    String string,
+    dynamic dynamic,
+  ) async {
     final user = FirebaseAuth.instance.currentUser;
-    await FirebaseFirestore.instance.collection('Users').doc(user!.uid).collection('Reading').doc(comicId).update({
-      string: dynamic,
-    });
+    await FirebaseFirestore.instance
+        .collection('Users')
+        .doc(user!.uid)
+        .collection('Reading')
+        .doc(comicId)
+        .update({string: dynamic});
   }
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Provider.of<ThemeProvider>(context).themeMode == ThemeMode.dark;
+    final isDark =
+        Provider.of<ThemeProvider>(context).themeMode == ThemeMode.dark;
     if (isLoading) {
-      return SizedBox(height: 200, child: Center(child: CircularProgressIndicator()));
+      return SizedBox(
+        height: 200,
+        child: Center(child: CircularProgressIndicator()),
+      );
     }
     return StreamBuilder<QuerySnapshot>(
       stream: readingStream,
@@ -171,12 +188,23 @@ class _ReadingListState extends State<ReadingList> {
                 border: Border.all(
                   width: 1,
                   color: isDark
-                      ? OkLab(0.37, -0.01, -0.04).toColor().withValues(alpha: 0.8)
+                      ? OkLab(
+                          0.37,
+                          -0.01,
+                          -0.04,
+                        ).toColor().withValues(alpha: 0.8)
                       : OkLab(0.88, 0.04, 0).toColor(),
                 ),
                 borderRadius: BorderRadius.circular(20),
-                color: isDark ? AppColorsDark.background2 : AppColorsLight.background2,
-                boxShadow: [BoxShadow(blurRadius: 10, color: Colors.black.withValues(alpha: 0.1))],
+                color: isDark
+                    ? AppColorsDark.background2
+                    : AppColorsLight.background2,
+                boxShadow: [
+                  BoxShadow(
+                    blurRadius: 10,
+                    color: Colors.black.withValues(alpha: 0.1),
+                  ),
+                ],
               ),
               child: ListView.builder(
                 shrinkWrap: true,
@@ -250,8 +278,16 @@ class _ReadingListState extends State<ReadingList> {
                                           style: TextStyle(
                                             fontSize: 12,
                                             color: isDark
-                                                ? OkLab(0.55, -0.01, -0.04).toColor()
-                                                : OkLab(0.7, -0.01, -0.04).toColor(),
+                                                ? OkLab(
+                                                    0.55,
+                                                    -0.01,
+                                                    -0.04,
+                                                  ).toColor()
+                                                : OkLab(
+                                                    0.7,
+                                                    -0.01,
+                                                    -0.04,
+                                                  ).toColor(),
                                             fontWeight: FontWeight.bold,
                                           ),
                                         ),
@@ -266,13 +302,23 @@ class _ReadingListState extends State<ReadingList> {
                                           overflow: TextOverflow.ellipsis,
                                           maxLines: 1,
                                           "$chapterTitle",
-                                          style: TextStyle(fontSize: 12, color: isDark ? Colors.white : Colors.black),
+                                          style: TextStyle(
+                                            fontSize: 12,
+                                            color: isDark
+                                                ? Colors.white
+                                                : Colors.black,
+                                          ),
                                         ),
                                       ),
                                       Spacer(),
                                       Text(
                                         "${(progress * 100).toInt()}%",
-                                        style: TextStyle(fontSize: 12, color: isDark ? Colors.white : Colors.black),
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                          color: isDark
+                                              ? Colors.white
+                                              : Colors.black,
+                                        ),
                                       ),
                                     ],
                                   ),
@@ -290,16 +336,30 @@ class _ReadingListState extends State<ReadingList> {
                                     children: [
                                       IconButton(
                                         onPressed: () async {
-                                          await ReadingComic.deleteReading(comicId: comicId, collection: 'Reading');
+                                          await ReadingComic.deleteReading(
+                                            comicId: comicId,
+                                            collection: 'Reading',
+                                          );
                                         },
-                                        icon: Icon(Icons.delete_outline, color: isDark ? Colors.white : Colors.black),
+                                        icon: Icon(
+                                          Icons.delete_outline,
+                                          color: isDark
+                                              ? Colors.white
+                                              : Colors.black,
+                                        ),
                                       ),
                                       Expanded(
                                         child: ElevatedButton(
                                           onPressed: () async {
-                                            final chapters = await ApiService.fetchAllComicChapters(comicId);
+                                            final chapters =
+                                                await ApiService.fetchAllComicChapters(
+                                                  comicId,
+                                                );
                                             if (progress < 1) {
-                                              final index = chapters.indexWhere((c) => c.id == chapterId);
+                                              final index = chapters.indexWhere(
+                                                (c) => c.id == chapterId,
+                                              );
+                                              if (!context.mounted) return;
                                               Navigator.push(
                                                 context,
                                                 MaterialPageRoute(
@@ -309,7 +369,9 @@ class _ReadingListState extends State<ReadingList> {
                                                     chapterId: chapterId,
                                                     title: comicTitle,
                                                     chapterTitle: chapterTitle,
-                                                    uploaderName: chapters[index].uploaderName,
+                                                    uploaderName:
+                                                        chapters[index]
+                                                            .uploaderName,
                                                     chapters: chapters,
                                                     index: index,
                                                     status: status,
@@ -329,16 +391,22 @@ class _ReadingListState extends State<ReadingList> {
                                               );
                                             } else {
                                               final index = chapters.length - 1;
+                                              if (!context.mounted) return;
                                               Navigator.push(
                                                 context,
                                                 MaterialPageRoute(
                                                   builder: (_) => ReadingScreen(
                                                     comicId: comicId,
                                                     coverUrl: coverUrl,
-                                                    chapterId: chapters[index].id,
+                                                    chapterId:
+                                                        chapters[index].id,
                                                     title: comicTitle,
-                                                    chapterTitle: chapters[index].chapterTitle,
-                                                    uploaderName: chapters[index].uploaderName,
+                                                    chapterTitle:
+                                                        chapters[index]
+                                                            .chapterTitle,
+                                                    uploaderName:
+                                                        chapters[index]
+                                                            .uploaderName,
                                                     chapters: chapters,
                                                     index: index,
                                                     status: status,
@@ -351,7 +419,8 @@ class _ReadingListState extends State<ReadingList> {
                                                 comicTitle: comicTitle,
                                                 coverUrl: coverUrl,
                                                 chapterId: chapters[index].id,
-                                                chapterTitle: chapters[index].chapterTitle,
+                                                chapterTitle: chapters[index]
+                                                    .chapterTitle,
                                                 chapterIndex: 1,
                                                 totalChapters: totalChapters,
                                                 status: status,
@@ -360,18 +429,31 @@ class _ReadingListState extends State<ReadingList> {
                                           },
                                           style: ElevatedButton.styleFrom(
                                             backgroundColor: !isDark
-                                                ? OkLab(0.75, 0.17, -0.01).toColor()
-                                                : OkLab(0.63, 0.24, 0).toColor(),
+                                                ? OkLab(
+                                                    0.75,
+                                                    0.17,
+                                                    -0.01,
+                                                  ).toColor()
+                                                : OkLab(
+                                                    0.63,
+                                                    0.24,
+                                                    0,
+                                                  ).toColor(),
                                           ),
                                           child: Row(
-                                            mainAxisAlignment: MainAxisAlignment.center,
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
                                             children: [
                                               Icon(
-                                                progress.toInt() == 1 ? Icons.replay : Icons.play_arrow_sharp,
+                                                progress.toInt() == 1
+                                                    ? Icons.replay
+                                                    : Icons.play_arrow_sharp,
                                                 color: Colors.white,
                                               ),
                                               Text(
-                                                progress.toInt() == 1 ? " Đọc lại" : " Đọc tiếp tục",
+                                                progress.toInt() == 1
+                                                    ? " Đọc lại"
+                                                    : " Đọc tiếp tục",
                                                 style: TextStyle(
                                                   fontSize: 12,
                                                   color: Colors.white,
@@ -390,7 +472,11 @@ class _ReadingListState extends State<ReadingList> {
                           ],
                         ),
                         SizedBox(height: 30),
-                        if (index != docs.length - 1) Container(color: Colors.grey.withValues(alpha: 0.3), height: 1),
+                        if (index != docs.length - 1)
+                          Container(
+                            color: Colors.grey.withValues(alpha: 0.3),
+                            height: 1,
+                          ),
                       ],
                     ),
                   );

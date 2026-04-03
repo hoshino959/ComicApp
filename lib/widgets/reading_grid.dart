@@ -65,7 +65,11 @@ class _ReadingGridState extends State<ReadingGrid> {
 
   Future<void> updateComic() async {
     final user = FirebaseAuth.instance.currentUser;
-    final snapshot = await FirebaseFirestore.instance.collection('Users').doc(user!.uid).collection('Reading').get();
+    final snapshot = await FirebaseFirestore.instance
+        .collection('Users')
+        .doc(user!.uid)
+        .collection('Reading')
+        .get();
     for (var doc in snapshot.docs) {
       final data = doc.data();
 
@@ -91,10 +95,12 @@ class _ReadingGridState extends State<ReadingGrid> {
       double progress = (chapterIndex / newTotalChapters);
 
       if (oldTotalChapters != newTotalChapters) {
-        await FirebaseFirestore.instance.collection('Users').doc(user.uid).collection('Reading').doc(comicId).update({
-          'totalChapters': newTotalChapters,
-          'progress': progress,
-        });
+        await FirebaseFirestore.instance
+            .collection('Users')
+            .doc(user.uid)
+            .collection('Reading')
+            .doc(comicId)
+            .update({'totalChapters': newTotalChapters, 'progress': progress});
       }
       if (oldCoverUrl != newCoverUrl) {
         updateFireStore(comicId, 'coverUrl', newCoverUrl);
@@ -108,11 +114,18 @@ class _ReadingGridState extends State<ReadingGrid> {
     }
   }
 
-  Future<void> updateFireStore(String comicId, String string, dynamic dynamic) async {
+  Future<void> updateFireStore(
+    String comicId,
+    String string,
+    dynamic dynamic,
+  ) async {
     final user = FirebaseAuth.instance.currentUser;
-    await FirebaseFirestore.instance.collection('Users').doc(user!.uid).collection('Reading').doc(comicId).update({
-      string: dynamic,
-    });
+    await FirebaseFirestore.instance
+        .collection('Users')
+        .doc(user!.uid)
+        .collection('Reading')
+        .doc(comicId)
+        .update({string: dynamic});
   }
 
   String formatViews(int views) {
@@ -129,7 +142,8 @@ class _ReadingGridState extends State<ReadingGrid> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Provider.of<ThemeProvider>(context).themeMode == ThemeMode.dark;
+    final isDark =
+        Provider.of<ThemeProvider>(context).themeMode == ThemeMode.dark;
     return StreamBuilder<QuerySnapshot>(
       stream: readingStream,
       builder: (context, snapshot) {
@@ -194,7 +208,10 @@ class _ReadingGridState extends State<ReadingGrid> {
               shrinkWrap: true,
               physics: NeverScrollableScrollPhysics(),
               itemCount: docs.length,
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2, childAspectRatio: ratio),
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                childAspectRatio: ratio,
+              ),
               itemBuilder: (context, index) {
                 final data = docs[index].data() as Map<String, dynamic>;
                 final comicId = data['comicId'];
@@ -206,15 +223,30 @@ class _ReadingGridState extends State<ReadingGrid> {
 
                 return GestureDetector(
                   onTap: () {
-                    Navigator.of(context).push(MaterialPageRoute(builder: (_) => DetailScreen(id: comicId)));
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (_) => DetailScreen(id: comicId),
+                      ),
+                    );
                   },
                   child: Container(
                     padding: EdgeInsets.all(10),
                     child: Container(
                       decoration: BoxDecoration(
-                        color: isDark ? OkLab(0.28, -0.01, -0.03).toColor().withValues(alpha: 0.8) : Colors.white,
+                        color: isDark
+                            ? OkLab(
+                                0.28,
+                                -0.01,
+                                -0.03,
+                              ).toColor().withValues(alpha: 0.8)
+                            : Colors.white,
                         borderRadius: BorderRadius.circular(15),
-                        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.3), blurRadius: 10)],
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.3),
+                            blurRadius: 10,
+                          ),
+                        ],
                       ),
                       child: Column(
                         children: [
@@ -237,7 +269,11 @@ class _ReadingGridState extends State<ReadingGrid> {
                                   },
                                 ),
                               ),
-                              Positioned(child: StatusChip(status: status), bottom: 10, right: 10),
+                              Positioned(
+                                bottom: 10,
+                                right: 10,
+                                child: StatusChip(status: status),
+                              ),
                             ],
                           ),
                           Container(
@@ -272,18 +308,43 @@ class _ReadingGridState extends State<ReadingGrid> {
                                 SizedBox(height: 5),
                                 Row(
                                   children: [
-                                    Icon(Icons.menu_book_outlined, color: OkLab(0.84, 0.05, 0.12).toColor(), size: 16),
+                                    Icon(
+                                      Icons.menu_book_outlined,
+                                      color: OkLab(0.84, 0.05, 0.12).toColor(),
+                                      size: 16,
+                                    ),
                                     SizedBox(width: 5),
                                     Text(
                                       totalChapters.toString(),
-                                      style: TextStyle(color: isDark ? Colors.white : Colors.black, fontSize: 14),
+                                      style: TextStyle(
+                                        color: isDark
+                                            ? Colors.white
+                                            : Colors.black,
+                                        fontSize: 14,
+                                      ),
                                     ),
                                     SizedBox(width: 10),
-                                    Icon(Icons.remove_red_eye, color: OkLab(0.71, -0.04, -0.16).toColor(), size: 16),
+                                    Icon(
+                                      Icons.remove_red_eye,
+                                      color: OkLab(
+                                        0.71,
+                                        -0.04,
+                                        -0.16,
+                                      ).toColor(),
+                                      size: 16,
+                                    ),
                                     SizedBox(width: 5),
                                     Text(
-                                      formatViews(totalChapters * 10000 + Random().nextInt(9999)),
-                                      style: TextStyle(color: isDark ? Colors.white : Colors.black, fontSize: 14),
+                                      formatViews(
+                                        totalChapters * 10000 +
+                                            Random().nextInt(9999),
+                                      ),
+                                      style: TextStyle(
+                                        color: isDark
+                                            ? Colors.white
+                                            : Colors.black,
+                                        fontSize: 14,
+                                      ),
                                     ),
                                   ],
                                 ),
