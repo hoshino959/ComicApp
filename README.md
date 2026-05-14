@@ -68,6 +68,7 @@ Dự án được phát triển bằng Flutter kết hợp Firebase để quản
 | Cloud Firestore | Database realtime |
 | Firebase Storage | Lưu trữ hình ảnh |
 | Provider | State Management |
+| Cloudinary | Quản lý và lưu trữ hình ảnh |
 
 ---
 
