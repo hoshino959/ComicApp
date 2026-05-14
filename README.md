@@ -2,10 +2,11 @@
 
 # 📚 ComicApp
 
-Ứng dụng đọc truyện tranh được phát triển bằng Flutter & Firebase.
+Ứng dụng đọc truyện tranh được phát triển bằng Flutter, Firebase & MangaDex API.
 
 <img src="https://img.shields.io/badge/Flutter-3.x-blue?style=for-the-badge&logo=flutter"/>
 <img src="https://img.shields.io/badge/Firebase-Backend-orange?style=for-the-badge&logo=firebase"/>
+<img src="https://img.shields.io/badge/MangaDex-API-red?style=for-the-badge"/>
 <img src="https://img.shields.io/badge/Platform-Android-green?style=for-the-badge&logo=android"/>
 
 </div>
@@ -14,15 +15,17 @@
 
 # ✨ Giới thiệu
 
-ComicApp là ứng dụng đọc truyện tranh trên Android được xây dựng nhằm giúp người dùng:
+ComicApp là ứng dụng đọc truyện tranh trên Android được xây dựng bằng Flutter kết hợp Firebase và MangaDex API.
+
+Ứng dụng cho phép người dùng:
 
 - Đọc truyện online
-- Tìm kiếm truyện nhanh chóng
+- Tìm kiếm truyện theo tên/cấu hình
+- Theo dõi tiến độ đọc truyện
 - Lưu truyện yêu thích
-- Bình luận truyện
-- Trải nghiệm giao diện hiện đại với Dark Mode
-
-Dự án được phát triển bằng Flutter kết hợp Firebase để quản lý dữ liệu và xác thực người dùng.
+- Bình luận theo truyện/chapter
+- Nhận thông báo chapter mới
+- Tùy chỉnh Dark Mode / Light Mode
 
 ---
 
@@ -32,29 +35,97 @@ Dự án được phát triển bằng Flutter kết hợp Firebase để quản
 - Đăng ký tài khoản
 - Đăng nhập
 - Đăng xuất
+- Quên mật khẩu
 - Firebase Authentication
 
-## 📖 Đọc truyện
-- Hiển thị danh sách truyện
-- Xem chi tiết truyện
-- Danh sách chapter
-- Đọc chapter online
+---
 
-## 🔍 Tìm kiếm
+## 👤 Hồ sơ cá nhân
+- Chỉnh sửa avatar
+- Chỉnh sửa:
+  - Bio
+  - Giới tính
+  - Tên hiển thị
+- Upload avatar bằng Cloudinary
+- Lưu dữ liệu với Firebase Firestore
+
+---
+
+## 📚 Thư viện cá nhân
+- Lưu tiến độ truyện đang đọc
+- Hiển thị lịch sử đọc truyện
+- Hiển thị truyện đã yêu thích
+- Hiển thị truyện đã lưu
+
+Dữ liệu được đồng bộ bằng Firebase Firestore.
+
+---
+
+## 🔔 Thông báo
+- Thông báo khi:
+  - Comment được reply
+  - Truyện có chapter mới
+
+Sử dụng Firebase Firestore để lưu dữ liệu thông báo.
+
+---
+
+## 🔍 Tìm kiếm truyện
+
+### Tìm kiếm cơ bản
 - Tìm kiếm truyện theo tên
-- Lọc truyện nhanh
 
-## ❤️ Yêu thích
-- Thêm/Xóa truyện yêu thích
-- Đồng bộ dữ liệu với Firebase
+### Tìm kiếm nâng cao
+- Lọc theo:
+  - Thể loại
+  - Tác giả
+  - Tiêu đề
 
-## 💬 Bình luận
-- Người dùng có thể bình luận truyện
-- Hiển thị thời gian và thông tin người dùng
+Dữ liệu truyện được lấy từ MangaDex API.
+
+---
+
+## 🏠 Trang chủ
+- Banner truyện nổi bật
+- Danh sách truyện mới cập nhật
+
+---
+
+## 📖 Đọc truyện
+
+### Chi tiết truyện
+- Thông tin truyện
+- Ảnh bìa
+- Mô tả
+- Tác giả
+- Thể loại
+
+### Chapter
+- Danh sách chapter
+- Đọc truyện theo chapter
+- Đọc truyện mới nhất/cũ nhất
+
+### Bình luận
+- Bình luận theo truyện
+- Bình luận theo chapter
+- Thích comment
+- Reply comment
+
+### Truyện liên quan
+- Hiển thị các truyện có cùng tác giả
+
+### Tương tác
+- Thêm truyện vào:
+  - Yêu thích
+  - Lưu truyện
+  - Theo dõi thông báo
+
+---
 
 ## 🌙 Giao diện
 - Dark Mode / Light Mode
 - Responsive UI
+- Provider State Management
 
 ---
 
@@ -64,89 +135,18 @@ Dự án được phát triển bằng Flutter kết hợp Firebase để quản
 |---|---|
 | Flutter | Framework phát triển ứng dụng |
 | Dart | Ngôn ngữ lập trình |
-| Firebase Auth | Xác thực người dùng |
+| Firebase Authentication | Xác thực người dùng |
 | Cloud Firestore | Database realtime |
-| Firebase Storage | Lưu trữ hình ảnh |
 | Provider | State Management |
-| Cloudinary | Quản lý và lưu trữ hình ảnh |
-
----
-
-# 📂 Cấu trúc thư mục
-
-```plaintext
-lib/
-│
-├── models/        # Data models
-├── screens/       # UI screens
-├── widgets/       # Reusable widgets
-├── services/      # Firebase services
-├── providers/     # State management
-├── theme/         # Theme & dark mode
-└── main.dart
-```
-
----
-
-# ⚙️ Cài đặt dự án
-
-## 1️⃣ Clone repository
-
-```bash
-git clone https://github.com/hoshino959/ComicApp.git
-```
-
----
-
-## 2️⃣ Di chuyển vào thư mục project
-
-```bash
-cd ComicApp
-```
-
----
-
-## 3️⃣ Cài dependencies
-
-```bash
-flutter pub get
-```
-
----
-
-## 4️⃣ Firebase Setup
-
-Tạo project trên Firebase:
-
-- Firebase Authentication
-- Cloud Firestore
-- Firebase Storage
-
-Sau đó tải file:
-
-```plaintext
-google-services.json
-```
-
-và đặt vào:
-
-```plaintext
-android/app/google-services.json
-```
-
----
-
-## 5️⃣ Chạy ứng dụng
-
-```bash
-flutter run
-```
+| Cloudinary | Upload & lưu trữ avatar |
+| MangaDex API | Dữ liệu truyện tranh |
+| CachedNetworkImage | Cache hình ảnh |
 
 ---
 
 # 📱 Screenshots
 
-> Bạn có thể thêm ảnh giao diện ở đây
+> Bạn có thể thêm ảnh giao diện tại đây
 
 ## 🏠 Home Screen
 ![Home](screenshots/home.png)
@@ -157,27 +157,5 @@ flutter run
 ## 🌙 Dark Mode
 ![DarkMode](screenshots/darkmode.png)
 
----
-
-# 🎯 Mục tiêu dự án
-
-Dự án được thực hiện nhằm:
-
-- Học Flutter & Firebase
-- Xây dựng ứng dụng thực tế
-- Cải thiện kỹ năng Mobile Development
-- Tìm hiểu State Management với Provider
-
----
-
-# 👨‍💻 Tác giả
-
-## None Nope
-
-- GitHub: https://github.com/hoshino959
-
----
-
-# 📄 License
-
-This project is for educational and personal development purposes.
+## 👤 Profile Screen
+![Profile](screenshots/profile.png)
