@@ -857,8 +857,15 @@ class _DetailScreenState extends State<DetailScreen> {
                                         .doc(widget.id)
                                         .snapshots(),
                                     builder: (context, snapshot) {
-                                      int count =
-                                          snapshot.data?['totalComments'] ?? 0;
+                                      int count = 0;
+
+                                      try {
+                                        count =
+                                            snapshot.data?['totalComments'] ??
+                                            0;
+                                      } catch (e) {
+                                        count = 0;
+                                      }
                                       return _buildTabItem(
                                         1,
                                         count == 0 ? '' : ' ($count)',
