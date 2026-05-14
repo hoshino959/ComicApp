@@ -146,16 +146,55 @@ Dữ liệu truyện được lấy từ MangaDex API.
 
 # 📱 Screenshots
 
-> Bạn có thể thêm ảnh giao diện tại đây
+## 👤 Authentication
+
+<div align="center">
+<img width="250" alt="1" src="https://github.com/user-attachments/assets/af7d5ec6-177b-49cc-bbd5-999cc924403e" />
+<img width="250" alt="2" src="https://github.com/user-attachments/assets/b32f7a5f-12c3-4940-a318-35070c272755" />
+<img width="250" alt="3" src="https://github.com/user-attachments/assets/10a38e69-04f2-4aad-bd09-744b4318b5ce" />
+</div>
 
 ## 🏠 Home Screen
-![Home](screenshots/home.png)
+
+<div align="center">
+<img width="250" alt="4" src="https://github.com/user-attachments/assets/36031a76-dc76-45d1-90c4-1101feb25150" />
+</div>
 
 ## 📖 Detail Screen
-![Detail](screenshots/detail.png)
 
-## 🌙 Dark Mode
-![DarkMode](screenshots/darkmode.png)
+<div align="center">
+<img width="250" alt="5" src="https://github.com/user-attachments/assets/4ada3b37-99da-406a-92a4-747de21dc096" />
+</div>
 
-## 👤 Profile Screen
-![Profile](screenshots/profile.png)
+## 📖 Reader Screen
+
+<div align="center">
+<img width="250" alt="6" src="https://github.com/user-attachments/assets/9fd58878-d8b9-494b-9b06-6361452c2b0c" />
+</div>
+
+## 🔍 Search & Filter
+
+<div align="center">
+<img width="250" alt="7" src="https://github.com/user-attachments/assets/a17d388a-5f71-4d77-830a-1404ed33d115" />
+</div>
+
+## 📚 Library
+
+<div align="center">
+<img width="250" alt="8" src="https://github.com/user-attachments/assets/2839ebf3-2d11-4879-a1b6-70cfda8b5f2a" />
+<img width="250" alt="9" src="https://github.com/user-attachments/assets/90aea13d-1b07-4865-9dee-b1843a726ff3" />
+<img width="250" alt="10" src="https://github.com/user-attachments/assets/faa11dd8-3cb9-447e-b152-6e8cbc5ef1c9" />
+</div>
+
+## 👤 Profile
+
+<div align="center">
+  <img width="250" alt="11" src="https://github.com/user-attachments/assets/a0a95c42-6cbe-428e-9cb1-451d42de85b8" />
+</div>
+
+## 🔔 Interaction
+
+<div align="center">
+<img width="250" alt="12" src="https://github.com/user-attachments/assets/0a414f0c-1245-4d53-82fd-c0d0346ebfe0" />
+<img width="250" alt="13" src="https://github.com/user-attachments/assets/a94fef5a-7225-40cd-a6fe-296d0c616767" />
+</div>
