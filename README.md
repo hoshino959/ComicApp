@@ -149,52 +149,61 @@ Dữ liệu truyện được lấy từ MangaDex API.
 ## 👤 Authentication
 
 <div align="center">
-<img width="250" alt="1" src="https://github.com/user-attachments/assets/af7d5ec6-177b-49cc-bbd5-999cc924403e" />
-<img width="250" alt="2" src="https://github.com/user-attachments/assets/b32f7a5f-12c3-4940-a318-35070c272755" />
-<img width="250" alt="3" src="https://github.com/user-attachments/assets/10a38e69-04f2-4aad-bd09-744b4318b5ce" />
+<img width="200" alt="1" src="https://github.com/user-attachments/assets/16e9b4cc-bacc-4e2d-9b58-1eba2e2d98a5" />
+<img width="200" alt="2" src="https://github.com/user-attachments/assets/487b833e-9dbb-45d7-8fea-1c9ff46ec491" />
+<img width="200" alt="3" src="https://github.com/user-attachments/assets/35eb32d5-208f-4712-b28a-c2ed80f7e8e2" />
+<img width="200" alt="4" src="https://github.com/user-attachments/assets/e1fecd2f-4dd7-4128-9b5f-2ad522cea152" />
+<img width="200" alt="5" src="https://github.com/user-attachments/assets/1e9df50b-801e-4703-969f-b8fcdbc4db3f" />
+<img width="200" alt="6" src="https://github.com/user-attachments/assets/99dabaad-6e48-4829-92cd-af519dd9b754" />
 </div>
 
 ## 🏠 Home Screen
 
 <div align="center">
-<img width="250" alt="4" src="https://github.com/user-attachments/assets/36031a76-dc76-45d1-90c4-1101feb25150" />
+<img width="200" alt="7" src="https://github.com/user-attachments/assets/f6a585f9-cb6e-4410-b488-0476e710e669" />
+<img width="200" alt="8" src="https://github.com/user-attachments/assets/93e16bc7-dd40-4e5b-8c78-e4c621ddae8a" />
 </div>
 
 ## 📖 Detail Screen
 
 <div align="center">
-<img width="250" alt="5" src="https://github.com/user-attachments/assets/4ada3b37-99da-406a-92a4-747de21dc096" />
+<img width="200" alt="9" src="https://github.com/user-attachments/assets/6fcab3ff-6c7c-4488-b89d-4d5b75d09ccd" />
+<img width="200" alt="10" src="https://github.com/user-attachments/assets/a7b8a6d7-4932-40e7-a46b-5d512b010cd3" />
 </div>
 
 ## 📖 Reader Screen
 
 <div align="center">
-<img width="250" alt="6" src="https://github.com/user-attachments/assets/9fd58878-d8b9-494b-9b06-6361452c2b0c" />
+<img width="200" alt="11" src="https://github.com/user-attachments/assets/e7b13921-ff1b-4012-b942-c5ef92d304d7" />
+<img width="200" alt="12" src="https://github.com/user-attachments/assets/971c7818-c770-445f-8185-338acb748ab3" />
 </div>
 
 ## 🔍 Search & Filter
 
 <div align="center">
-<img width="250" alt="7" src="https://github.com/user-attachments/assets/a17d388a-5f71-4d77-830a-1404ed33d115" />
+<img width="200" alt="13" src="https://github.com/user-attachments/assets/9f70cf77-80d5-453e-9e4e-82c5d94c1409" />
+<img width="200" alt="14" src="https://github.com/user-attachments/assets/78f26ba0-604c-409a-ab58-d317950febbd" />
+<img width="200" alt="15" src="https://github.com/user-attachments/assets/3ab59196-ddd0-4a72-9146-b8c40890f254" />
 </div>
 
 ## 📚 Library
 
 <div align="center">
-<img width="250" alt="8" src="https://github.com/user-attachments/assets/2839ebf3-2d11-4879-a1b6-70cfda8b5f2a" />
-<img width="250" alt="9" src="https://github.com/user-attachments/assets/90aea13d-1b07-4865-9dee-b1843a726ff3" />
-<img width="250" alt="10" src="https://github.com/user-attachments/assets/faa11dd8-3cb9-447e-b152-6e8cbc5ef1c9" />
+<img width="200" alt="16" src="https://github.com/user-attachments/assets/a28c60f4-93e8-4d7c-a4de-14cd05d922c7" />
+<img width="200" alt="17" src="https://github.com/user-attachments/assets/fa782f6d-8c33-417d-8457-43ee646b06bf" />
+<img width="200" alt="18" src="https://github.com/user-attachments/assets/981ec9c6-2243-4454-bfa4-ec42f7aab939" />
 </div>
 
 ## 👤 Profile
 
 <div align="center">
-  <img width="250" alt="11" src="https://github.com/user-attachments/assets/a0a95c42-6cbe-428e-9cb1-451d42de85b8" />
+<img width="200" alt="19" src="https://github.com/user-attachments/assets/659752d0-19c8-415a-8ecc-3e48706eb2f4" />
+<img width="200" alt="20" src="https://github.com/user-attachments/assets/4e550eef-5a2b-4455-afe9-b0bdf58f2f77" />
 </div>
 
 ## 🔔 Interaction
 
 <div align="center">
-<img width="250" alt="12" src="https://github.com/user-attachments/assets/0a414f0c-1245-4d53-82fd-c0d0346ebfe0" />
-<img width="250" alt="13" src="https://github.com/user-attachments/assets/a94fef5a-7225-40cd-a6fe-296d0c616767" />
+<img width="200" alt="21" src="https://github.com/user-attachments/assets/350e578c-e836-4b42-8e65-ac0984d73abb" />
+<img width="200" alt="22" src="https://github.com/user-attachments/assets/c48ecaab-5e35-4cdf-af66-fa9d6eceb2f6" />
 </div>
