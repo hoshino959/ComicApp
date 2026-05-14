@@ -436,11 +436,15 @@ class _SearchScreenState extends State<SearchScreen> {
       builder: (context) {
         return StatefulBuilder(
           builder: (context, setModalState) {
+            final isDark =
+                Provider.of<ThemeProvider>(context).themeMode == ThemeMode.dark;
             return SafeArea(
               child: Container(
                 padding: const EdgeInsets.all(20),
-                decoration: const BoxDecoration(
-                  color: Color(0xFF1E1528),
+                decoration: BoxDecoration(
+                  color: !isDark
+                      ? AppColorsLight.background3
+                      : Color(0xFF1E1528),
                   borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
                 ),
                 child: Column(
@@ -448,16 +452,20 @@ class _SearchScreenState extends State<SearchScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Row(
-                      children: const [
+                      children: [
                         Icon(
                           Icons.filter_alt_outlined,
-                          color: Color(0xFFFF2E7E),
+                          color: isDark
+                              ? OkLab(0.83, 0.07, -0.1).toColor()
+                              : OkLab(0.5, 0.14, -0.22).toColor(),
                         ),
                         SizedBox(width: 6),
                         Text(
                           'Bộ lọc',
                           style: TextStyle(
-                            color: Color(0xFFFF2E7E),
+                            color: isDark
+                                ? OkLab(0.83, 0.07, -0.1).toColor()
+                                : OkLab(0.5, 0.14, -0.22).toColor(),
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
                           ),
@@ -465,7 +473,9 @@ class _SearchScreenState extends State<SearchScreen> {
                       ],
                     ),
                     Divider(
-                      color: Colors.white.withValues(alpha: 0.1),
+                      color: isDark
+                          ? Colors.white.withValues(alpha: 0.1)
+                          : Colors.black.withValues(alpha: 0.2),
                       height: 32,
                     ),
 
@@ -485,7 +495,9 @@ class _SearchScreenState extends State<SearchScreen> {
                             Text(
                               'Chọn một hoặc nhiều thể loại',
                               style: TextStyle(
-                                color: Colors.white.withValues(alpha: 0.7),
+                                color: isDark
+                                    ? Colors.white.withValues(alpha: 0.7)
+                                    : Colors.black.withValues(alpha: 0.7),
                               ),
                             ),
                           ],
@@ -508,13 +520,18 @@ class _SearchScreenState extends State<SearchScreen> {
                             padding: const EdgeInsets.all(8),
                             decoration: BoxDecoration(
                               border: Border.all(
-                                color: Colors.white.withValues(alpha: 0.3),
-                                width: 1,
+                                color: isDark ? Colors.white : Colors.black,
+                                width: 2,
                               ),
                               shape: BoxShape.circle,
                               color: Colors.transparent,
                             ),
-                            child: const Icon(Icons.add, size: 18),
+                            child: Icon(
+                              Icons.add,
+                              size: 20,
+                              color: isDark ? Colors.white : Colors.black,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                         ),
                       ],
@@ -747,6 +764,8 @@ class _SearchScreenState extends State<SearchScreen> {
     await showDialog(
       context: context,
       builder: (BuildContext context) {
+        final isDark =
+            Provider.of<ThemeProvider>(context).themeMode == ThemeMode.dark;
         return StatefulBuilder(
           builder: (context, setDialogState) {
             if (!isFetchedGenres) {
@@ -767,14 +786,16 @@ class _SearchScreenState extends State<SearchScreen> {
                   });
             }
             return AlertDialog(
-              backgroundColor: const Color(0xFF1E1528),
+              backgroundColor: !isDark
+                  ? AppColorsLight.background2
+                  : Color(0xFF1E1528),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(16),
               ),
-              title: const Text(
+              title: Text(
                 'Chọn thể loại',
                 style: TextStyle(
-                  color: Colors.white,
+                  color: !isDark ? Colors.black : Colors.white,
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
                 ),
@@ -788,7 +809,9 @@ class _SearchScreenState extends State<SearchScreen> {
                       controller: _searchGenreController,
                       decoration: InputDecoration(
                         filled: true,
-                        fillColor: Color(0xFF231A2F),
+                        fillColor: isDark
+                            ? Color(0xFF231A2F)
+                            : AppColorsLight.background1,
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(30),
                           borderSide: BorderSide.none,
@@ -833,8 +856,8 @@ class _SearchScreenState extends State<SearchScreen> {
                             return CheckboxListTile(
                               title: Text(
                                 genre,
-                                style: const TextStyle(
-                                  color: Colors.white,
+                                style: TextStyle(
+                                  color: !isDark ? Colors.black : Colors.white,
                                   fontSize: 15,
                                 ),
                               ),
