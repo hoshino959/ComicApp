@@ -27,8 +27,6 @@ ComicApp là ứng dụng đọc truyện tranh trên Android được xây dự
 - Nhận thông báo chapter mới
 - Tùy chỉnh Dark Mode / Light Mode
 
-Dự án được thực hiện nhằm nâng cao kỹ năng Mobile Development với Flutter và Firebase.
-
 ---
 
 # 🚀 Tính năng chính
@@ -82,7 +80,6 @@ Sử dụng Firebase Firestore để lưu dữ liệu thông báo.
   - Thể loại
   - Tác giả
   - Tiêu đề
-  - Nội dung R18
 
 Dữ liệu truyện được lấy từ MangaDex API.
 
@@ -91,7 +88,6 @@ Dữ liệu truyện được lấy từ MangaDex API.
 ## 🏠 Trang chủ
 - Banner truyện nổi bật
 - Danh sách truyện mới cập nhật
-- Hiển thị dữ liệu realtime từ MangaDex API
 
 ---
 
@@ -107,12 +103,16 @@ Dữ liệu truyện được lấy từ MangaDex API.
 ### Chapter
 - Danh sách chapter
 - Đọc truyện theo chapter
+- Đọc truyện mới nhất/cũ nhất
 
 ### Bình luận
 - Bình luận theo truyện
 - Bình luận theo chapter
 - Thích comment
 - Reply comment
+
+### Truyện liên quan
+- Hiển thị các truyện có cùng tác giả
 
 ### Tương tác
 - Thêm truyện vào:
@@ -137,106 +137,10 @@ Dữ liệu truyện được lấy từ MangaDex API.
 | Dart | Ngôn ngữ lập trình |
 | Firebase Authentication | Xác thực người dùng |
 | Cloud Firestore | Database realtime |
-| Firebase Cloud Messaging | Push Notification |
 | Provider | State Management |
 | Cloudinary | Upload & lưu trữ avatar |
 | MangaDex API | Dữ liệu truyện tranh |
 | CachedNetworkImage | Cache hình ảnh |
-
----
-
-# 📂 Cấu trúc thư mục
-
-```plaintext
-lib/
-│
-├── models/          # Data models
-├── screens/         # UI screens
-├── widgets/         # Reusable widgets
-├── services/        # Firebase/API services
-├── providers/       # State management
-├── theme/           # Theme & dark mode
-├── utils/           # Helper functions
-└── main.dart
-```
-
----
-
-# ⚙️ Cài đặt dự án
-
-## 1️⃣ Clone repository
-
-```bash
-git clone https://github.com/hoshino959/ComicApp.git
-```
-
----
-
-## 2️⃣ Di chuyển vào thư mục project
-
-```bash
-cd ComicApp
-```
-
----
-
-## 3️⃣ Cài dependencies
-
-```bash
-flutter pub get
-```
-
----
-
-## 4️⃣ Firebase Setup
-
-Tạo project trên Firebase và bật:
-
-- Firebase Authentication
-- Cloud Firestore
-- Firebase Cloud Messaging
-
-Sau đó thêm file:
-
-```plaintext
-google-services.json
-```
-
-vào:
-
-```plaintext
-android/app/google-services.json
-```
-
----
-
-## 5️⃣ Cloudinary Setup
-
-Tạo tài khoản Cloudinary và cấu hình API dùng để upload avatar người dùng.
-
----
-
-## 6️⃣ Chạy ứng dụng
-
-```bash
-flutter run
-```
-
----
-
-# 🌐 API sử dụng
-
-## MangaDex API
-
-Dùng để:
-- Lấy danh sách truyện
-- Lấy thông tin truyện
-- Danh sách chapter
-- Tìm kiếm & lọc truyện
-
-```plaintext
-https://api.mangadex.org
-```
 
 ---
 
@@ -255,16 +159,3 @@ https://api.mangadex.org
 
 ## 👤 Profile Screen
 ![Profile](screenshots/profile.png)
-
----
-
-# 🎯 Mục tiêu dự án
-
-Dự án được thực hiện nhằm:
-
-- Học Flutter & Firebase
-- Làm việc với REST API thực tế
-- Xây dựng ứng dụng mobile hoàn chỉnh
-- Cải thiện kỹ năng UI/UX
-- Tìm hiểu State Management với Provider
-- Áp dụng Firebase vào ứng dụng thực tế
