@@ -144,6 +144,87 @@ Dữ liệu truyện được lấy từ MangaDex API.
 
 ---
 
+# 📂 Cấu trúc thư mục
+
+```bash
+lib/
+│
+├── api/
+│   ├── api_service.dart
+│   └── notify_services.dart
+│
+├── comment/
+│   ├── comment_section.dart
+│   ├── report_dialog.dart
+│   └── show_info_user.dart
+│
+├── models/
+│   ├── chapter_model.dart
+│   ├── chapter_page_model.dart
+│   ├── comic_detail_model.dart
+│   ├── comic_model.dart
+│   ├── genre_model.dart
+│   └── reading_comic.dart
+│
+├── screens/
+│   ├── detail_screen.dart
+│   ├── home_screen.dart
+│   ├── main_screen.dart
+│   ├── notify_screen.dart
+│   ├── reading_screen.dart
+│   └── search_screen.dart
+│
+├── theme/
+│   ├── app_colors.dart
+│   ├── app_dark_colors.dart
+│   ├── app_light_colors.dart
+│   └── theme_provider.dart
+│
+├── user/
+│   ├── library_all.dart
+│   ├── library_fav_saved.dart
+│   ├── library_screen.dart
+│   ├── login_page.dart
+│   ├── profile_screen.dart
+│   └── user_screen.dart
+│
+├── widgets/
+│   ├── chapter_item.dart
+│   ├── comic_card.dart
+│   ├── custom_dropdown.dart
+│   ├── expandable_description.dart
+│   ├── genre_tag.dart
+│   ├── reading_carousel.dart
+│   ├── reading_grid.dart
+│   ├── reading_list.dart
+│   ├── related_comics_tab.dart
+│   ├── status_chip.dart
+│   └── stat_item.dart
+│
+├── auth_gate.dart
+├── firebase_options.dart
+└── main.dart
+```
+
+---
+
+# 🧩 Mô tả cấu trúc
+
+| Thư mục | Chức năng |
+|---|---|
+| `api/` | Xử lý API MangaDex & Notification Services |
+| `comment/` | Hệ thống comment, report & thông tin user |
+| `models/` | Data models của ứng dụng |
+| `screens/` | Các màn hình chính của app |
+| `theme/` | Quản lý màu sắc & Dark/Light Mode |
+| `user/` | Chức năng người dùng, profile & thư viện |
+| `widgets/` | Các widget reusable dùng nhiều nơi |
+| `main.dart` | Entry point của ứng dụng |
+| `auth_gate.dart` | Điều hướng xác thực đăng nhập |
+| `firebase_options.dart` | Firebase configuration |
+
+---
+
 # 📱 Screenshots
 
 ## 👤 Authentication
