@@ -413,6 +413,10 @@ flutter run
 - State management sử dụng Provider → khó scale lớn
 - Chưa tối ưu caching nâng cao
 - Chưa có unit test / integration test
+- Performance chưa tối ưu khi load Reading History:
+  - Việc đồng bộ dữ liệu lịch sử đọc cần nhiều lần truy vấn (Firestore + API)
+  - Chưa áp dụng caching hoặc batch request
+  - Có thể gây delay khi render Library
 
 ---
 
@@ -422,3 +426,7 @@ flutter run
 - Áp dụng Riverpod hoặc BLoC
 - Tối ưu performance khi đọc chapter dài
 - Thêm unit test & integration test
+- Tối ưu performance cho Reading History:
+  - Áp dụng caching (local storage / Hive)
+  - Giảm số lần gọi API & Firestore
+  - Sử dụng batch fetch hoặc pagination
