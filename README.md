@@ -51,22 +51,10 @@ ComicApp là ứng dụng đọc truyện tranh trên Android được xây dự
 
 ---
 
-## 📚 Thư viện cá nhân
-- Lưu tiến độ truyện đang đọc
-- Hiển thị lịch sử đọc truyện
-- Hiển thị truyện đã yêu thích
-- Hiển thị truyện đã lưu
-
-Dữ liệu được đồng bộ bằng Firebase Firestore.
-
----
-
-## 🔔 Thông báo
-- Thông báo khi:
-  - Comment được reply
-  - Truyện có chapter mới
-
-Sử dụng Firebase Firestore để lưu dữ liệu thông báo.
+## 🏠 Trang chủ
+- Banner truyện nổi bật
+- Danh sách truyện mới cập nhật
+- Carousel truyện random
 
 ---
 
@@ -85,23 +73,19 @@ Dữ liệu truyện được lấy từ MangaDex API.
 
 ---
 
-## 🏠 Trang chủ
-- Banner truyện nổi bật
-- Danh sách truyện mới cập nhật
-
----
-
 ## 📖 Đọc truyện
 
 ### Chi tiết truyện
-- Thông tin truyện
 - Ảnh bìa
+- Tên truyện
 - Mô tả
 - Tác giả
 - Thể loại
+- Trạng thái
 
 ### Chapter
 - Danh sách chapter
+- Sắp xếp chapter mới/cũ
 - Đọc truyện theo chapter
 - Đọc truyện mới nhất/cũ nhất
 
@@ -111,6 +95,12 @@ Dữ liệu truyện được lấy từ MangaDex API.
 - Thích comment
 - Reply comment
 
+### Reader Screen
+- Đọc truyện theo chiều dọc
+- Responsive UI
+- Tối ưu trải nghiệm mobile
+- Theo dõi tiến độ đọc
+
 ### Truyện liên quan
 - Hiển thị các truyện có cùng tác giả
 
@@ -119,6 +109,38 @@ Dữ liệu truyện được lấy từ MangaDex API.
   - Yêu thích
   - Lưu truyện
   - Theo dõi thông báo
+
+---
+
+## 💬 Hệ thống bình luận
+- Bình luận theo truyện
+- Reply comment
+- Like comment
+- Report comment
+- Realtime update với Firestore
+- Hiển thị thông tin user
+- Nested replies
+- Quản lý trạng thái hiển thị replies
+- Realtime sync dữ liệu comment
+
+---
+
+## 📚 Thư viện cá nhân
+- Theo dõi tiến độ đọc
+- Xem lịch sử đọc truyện
+- Lưu truyện yêu thích
+- Lưu truyện để đọc sau
+
+Dữ liệu được đồng bộ bằng Firebase Firestore.
+
+---
+
+## 🔔 Notification System
+- Thông báo khi:
+  - Comment được reply
+  - Truyện có chapter mới
+
+Sử dụng Firebase Firestore để lưu dữ liệu thông báo.
 
 ---
 
@@ -141,6 +163,8 @@ Dữ liệu truyện được lấy từ MangaDex API.
 | Cloudinary | Upload & lưu trữ avatar |
 | MangaDex API | Dữ liệu truyện tranh |
 | CachedNetworkImage | Cache hình ảnh |
+| Carousel Slider |	Banner & slider |
+| Smooth Page Indicator | Indicator cho carousel |
 
 ---
 
@@ -238,14 +262,29 @@ lib/
 <img width="200" alt="6" src="https://github.com/user-attachments/assets/99dabaad-6e48-4829-92cd-af519dd9b754" />
 </div>
 
-## 🏠 Home Screen
+## 👤 Hồ sơ cá nhân
+
+<div align="center">
+<img width="200" alt="19" src="https://github.com/user-attachments/assets/659752d0-19c8-415a-8ecc-3e48706eb2f4" />
+<img width="200" alt="20" src="https://github.com/user-attachments/assets/4e550eef-5a2b-4455-afe9-b0bdf58f2f77" />
+</div>
+
+## 🏠 Trang chủ
 
 <div align="center">
 <img width="200" alt="7" src="https://github.com/user-attachments/assets/f6a585f9-cb6e-4410-b488-0476e710e669" />
 <img width="200" alt="8" src="https://github.com/user-attachments/assets/93e16bc7-dd40-4e5b-8c78-e4c621ddae8a" />
 </div>
 
-## 📖 Detail Screen
+## 🔍 Tìm kiếm truyện
+
+<div align="center">
+<img width="200" alt="13" src="https://github.com/user-attachments/assets/9f70cf77-80d5-453e-9e4e-82c5d94c1409" />
+<img width="200" alt="14" src="https://github.com/user-attachments/assets/78f26ba0-604c-409a-ab58-d317950febbd" />
+<img width="200" alt="15" src="https://github.com/user-attachments/assets/3ab59196-ddd0-4a72-9146-b8c40890f254" />
+</div>
+
+## 📖 Chi tiết truyện & Chapter
 
 <div align="center">
 <img width="200" alt="9" src="https://github.com/user-attachments/assets/6fcab3ff-6c7c-4488-b89d-4d5b75d09ccd" />
@@ -259,15 +298,19 @@ lib/
 <img width="200" alt="12" src="https://github.com/user-attachments/assets/971c7818-c770-445f-8185-338acb748ab3" />
 </div>
 
-## 🔍 Search & Filter
+## 📖 Truyện liên quan
 
 <div align="center">
-<img width="200" alt="13" src="https://github.com/user-attachments/assets/9f70cf77-80d5-453e-9e4e-82c5d94c1409" />
-<img width="200" alt="14" src="https://github.com/user-attachments/assets/78f26ba0-604c-409a-ab58-d317950febbd" />
-<img width="200" alt="15" src="https://github.com/user-attachments/assets/3ab59196-ddd0-4a72-9146-b8c40890f254" />
+<img width="200" alt="23" src="https://github.com/user-attachments/assets/92f68ac0-0872-42d8-a388-1b2476ac48c1" />
 </div>
 
-## 📚 Library
+## 💬 Hệ thống bình luận
+
+<div align="center">
+<img width="200" alt="21" src="https://github.com/user-attachments/assets/350e578c-e836-4b42-8e65-ac0984d73abb" />
+</div>
+
+## 📚 Thư viện cá nhân
 
 <div align="center">
 <img width="200" alt="16" src="https://github.com/user-attachments/assets/a28c60f4-93e8-4d7c-a4de-14cd05d922c7" />
@@ -275,16 +318,8 @@ lib/
 <img width="200" alt="18" src="https://github.com/user-attachments/assets/981ec9c6-2243-4454-bfa4-ec42f7aab939" />
 </div>
 
-## 👤 Profile
+## 🔔 Notification System
 
 <div align="center">
-<img width="200" alt="19" src="https://github.com/user-attachments/assets/659752d0-19c8-415a-8ecc-3e48706eb2f4" />
-<img width="200" alt="20" src="https://github.com/user-attachments/assets/4e550eef-5a2b-4455-afe9-b0bdf58f2f77" />
-</div>
-
-## 🔔 Interaction
-
-<div align="center">
-<img width="200" alt="21" src="https://github.com/user-attachments/assets/350e578c-e836-4b42-8e65-ac0984d73abb" />
 <img width="200" alt="22" src="https://github.com/user-attachments/assets/c48ecaab-5e35-4cdf-af66-fa9d6eceb2f6" />
 </div>
