@@ -29,6 +29,30 @@ ComicApp là ứng dụng đọc truyện tranh trên Android được xây dự
 
 ---
 
+# 🏗️ Architecture
+
+Ứng dụng được tổ chức theo hướng **Feature-based structure** kết hợp với phân tách layer cơ bản:
+
+- **Presentation Layer**
+  - Screens, Widgets
+  - Xử lý UI & tương tác người dùng
+
+- **Data Layer**
+  - API Services (MangaDex API)
+  - Firebase Services (Auth, Firestore)
+
+- **State Management**
+  - Sử dụng Provider (ChangeNotifier)
+
+⚠️ Lưu ý:
+- Chưa áp dụng Clean Architecture hoàn chỉnh
+- Chưa sử dụng Repository & UseCase layer
+- Business logic vẫn nằm một phần trong UI
+
+📌 Phù hợp với ứng dụng quy mô nhỏ → trung bình
+
+---
+
 # 🚀 Tính năng chính
 
 ## 👤 Authentication
@@ -232,6 +256,28 @@ lib/
 
 ---
 
+# 🔄 App Flow
+
+Luồng khởi động:
+
+1. App start
+2. Mở trực tiếp Home Screen
+
+📌 Lưu ý:
+- Authentication được xử lý bên trong các chức năng cụ thể (profile, comment, library...)
+- Nếu user chưa đăng nhập, app sẽ yêu cầu login khi cần
+
+Luồng chính:
+- Home → Detail → Chapter → Reading → Comment
+
+Luồng phụ:
+- Search → Detail
+- Profile → Login (nếu chưa đăng nhập) → User Profile
+- Library → Login (nếu chưa đăng nhập)
+- Notification → Detail
+
+---
+
 # 🧩 Mô tả cấu trúc
 
 | Thư mục | Chức năng |
@@ -246,6 +292,41 @@ lib/
 | `main.dart` | Entry point của ứng dụng |
 | `auth_gate.dart` | Điều hướng xác thực đăng nhập |
 | `firebase_options.dart` | Firebase configuration |
+
+---
+
+# ⚙️ Setup & Run
+
+## 1. Clone project
+
+```bash
+git clone https://github.com/hoshino959/ComicApp.git
+cd ComicApp
+```
+
+## 2. Cài dependencies
+
+```bash
+flutter pub get
+```
+
+## 3. Cấu hình Firebase
+
+- Thêm file `google-services.json` vào:
+
+```text
+android/app/
+```
+
+- Enable:
+  - Firebase Authentication
+  - Cloud Firestore
+
+## 4. Run app
+
+```bash
+flutter run
+```
 
 ---
 
@@ -323,3 +404,21 @@ lib/
 <div align="center">
 <img width="200" alt="22" src="https://github.com/user-attachments/assets/c48ecaab-5e35-4cdf-af66-fa9d6eceb2f6" />
 </div>
+
+---
+
+# ⚠️ Limitations
+
+- Chưa áp dụng Clean Architecture
+- State management sử dụng Provider → khó scale lớn
+- Chưa tối ưu caching nâng cao
+- Chưa có unit test / integration test
+
+---
+
+# 🚀 Future Improvements
+
+- Refactor sang Clean Architecture
+- Áp dụng Riverpod hoặc BLoC
+- Tối ưu performance khi đọc chapter dài
+- Thêm unit test & integration test
