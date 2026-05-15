@@ -430,3 +430,11 @@ flutter run
   - Áp dụng caching (local storage / Hive)
   - Giảm số lần gọi API & Firestore
   - Sử dụng batch fetch hoặc pagination
+
+---
+
+# 📄 Assets & Credits
+
+- Dữ liệu truyện được cung cấp bởi MangaDex API
+- Một số hình ảnh (logo, banner, thumbnail) được sử dụng cho mục đích học tập và demo
+- Bản quyền hình ảnh thuộc về các tác giả và nhà phát hành tương ứng
