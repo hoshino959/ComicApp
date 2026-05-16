@@ -32,7 +32,7 @@ ComicApp là ứng dụng đọc truyện tranh trên Android được xây dự
 # 🎬 Demo & 📦 APK
 
 ## 🎥 Video Demo
-👉 https://youtu.be/kzdJkT4kp-A
+👉 https://youtube.com/shorts/D9rL0I2r8fw?feature=share
 
 ## 📲 Download APK
 👉 https://github.com/hoshino959/ComicApp/releases/latest
