@@ -13,6 +13,17 @@
 
 ---
 
+# 📬 Liên hệ
+### 👤 Nguyễn Hoàng Phước Thịnh (Phụ trách: Content & Reading Features)
+- 📞 0793 880 503
+- 📧 hoshinonguyen1@gmail.com
+
+### 👤 Nguyễn Phước Nhân (Phụ trách: User System & Social Features)
+- 📞 0943 777 242
+- 📧 nguyen.nhan6704@gmail.com  
+
+---
+
 # ✨ Giới thiệu
 
 ComicApp là ứng dụng đọc truyện tranh trên Android được xây dựng bằng Flutter kết hợp Firebase và MangaDex API.
@@ -26,6 +37,29 @@ ComicApp là ứng dụng đọc truyện tranh trên Android được xây dự
 - Bình luận theo truyện/chapter
 - Nhận thông báo chapter mới
 - Tùy chỉnh Dark Mode / Light Mode
+
+---
+
+# 👨‍💻 Vai trò & đóng góp
+
+## 👥 Nguyễn Hoàng Phước Thịnh
+**Phụ trách:** Content & Reading Features
+- Trang chủ (Home Screen)
+- Tìm kiếm (Search)
+- Chi tiết truyện (Comic Detail)
+- Xử lý chapter (Chapter Handling)
+- Màn hình đọc truyện (Reader Screen)
+- Truyện liên quan (Related Comics)
+
+## 👤 Nguyễn Phước Nhân
+**Phụ trách:** User System & Social Features
+- Xác thực người dùng (Authentication)
+- Hồ sơ & dữ liệu người dùng (Profile & User Data)
+- Hệ thống bình luận (Comments System)
+- Yêu thích / Lưu / Theo dõi truyện
+- Thư viện cá nhân (Personal Library)
+- Hệ thống thông báo (Notification System)
+- Dark Mode / Light Mode
 
 ---
 
