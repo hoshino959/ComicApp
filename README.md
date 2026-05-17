@@ -20,7 +20,7 @@ ComicApp là ứng dụng đọc truyện tranh trên Android được xây dự
 Ứng dụng cho phép người dùng:
 
 - Đọc truyện online
-- Tìm kiếm truyện theo tên/cấu hình
+- Tìm kiếm truyện
 - Theo dõi tiến độ đọc truyện
 - Lưu truyện yêu thích
 - Bình luận theo truyện/chapter
@@ -53,13 +53,6 @@ ComicApp là ứng dụng đọc truyện tranh trên Android được xây dự
 
 - **State Management**
   - Sử dụng Provider (ChangeNotifier)
-
-⚠️ Lưu ý:
-- Chưa áp dụng Clean Architecture hoàn chỉnh
-- Chưa sử dụng Repository & UseCase layer
-- Business logic vẫn nằm một phần trong UI
-
-📌 Phù hợp với ứng dụng quy mô nhỏ → trung bình
 
 ---
 
@@ -266,28 +259,6 @@ lib/
 
 ---
 
-# 🔄 App Flow
-
-Luồng khởi động:
-
-1. App start
-2. Mở trực tiếp Home Screen
-
-📌 Lưu ý:
-- Authentication được xử lý bên trong các chức năng cụ thể (profile, comment, library...)
-- Nếu user chưa đăng nhập, app sẽ yêu cầu login khi cần
-
-Luồng chính:
-- Home → Detail → Chapter → Reading → Comment
-
-Luồng phụ:
-- Search → Detail
-- Profile → Login (nếu chưa đăng nhập) → User Profile
-- Library → Login (nếu chưa đăng nhập)
-- Notification → Detail
-
----
-
 # 🧩 Mô tả cấu trúc
 
 | Thư mục | Chức năng |
@@ -414,37 +385,3 @@ flutter run
 <div align="center">
 <img width="200" alt="22" src="https://github.com/user-attachments/assets/c48ecaab-5e35-4cdf-af66-fa9d6eceb2f6" />
 </div>
-
----
-
-# ⚠️ Limitations
-
-- Chưa áp dụng Clean Architecture
-- State management sử dụng Provider → khó scale lớn
-- Chưa tối ưu caching nâng cao
-- Chưa có unit test / integration test
-- Performance chưa tối ưu khi load Reading History:
-  - Việc đồng bộ dữ liệu lịch sử đọc cần nhiều lần truy vấn (Firestore + API)
-  - Chưa áp dụng caching hoặc batch request
-  - Có thể gây delay khi render Library
-
----
-
-# 🚀 Future Improvements
-
-- Refactor sang Clean Architecture
-- Áp dụng Riverpod hoặc BLoC
-- Tối ưu performance khi đọc chapter dài
-- Thêm unit test & integration test
-- Tối ưu performance cho Reading History:
-  - Áp dụng caching (local storage / Hive)
-  - Giảm số lần gọi API & Firestore
-  - Sử dụng batch fetch hoặc pagination
-
----
-
-# 📄 Assets & Credits
-
-- Dữ liệu truyện được cung cấp bởi MangaDex API
-- Một số hình ảnh (logo, banner, thumbnail) được sử dụng cho mục đích học tập và demo
-- Bản quyền hình ảnh thuộc về các tác giả và nhà phát hành tương ứng
