@@ -276,41 +276,6 @@ lib/
 
 ---
 
-# ⚙️ Setup & Run
-
-## 1. Clone project
-
-```bash
-git clone https://github.com/hoshino959/ComicApp.git
-cd ComicApp
-```
-
-## 2. Cài dependencies
-
-```bash
-flutter pub get
-```
-
-## 3. Cấu hình Firebase
-
-- Thêm file `google-services.json` vào:
-
-```text
-android/app/
-```
-
-- Enable:
-  - Firebase Authentication
-  - Cloud Firestore
-
-## 4. Run app
-
-```bash
-flutter run
-```
-
----
-
 # 📱 Screenshots
 
 ## 👤 Authentication
